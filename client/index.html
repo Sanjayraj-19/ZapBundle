@@ -1,0 +1,1177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="stylesheet" href="styles.css">
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ZapBundle - Save on SaaS Bundles</title>
+  <style>
+    /* Your original CSS (UNMODIFIED) */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    body {
+      background-color: #f8f9fa;
+      padding-top: 80px;
+    }
+    a {
+      text-decoration: none;
+    }
+    ul {
+      list-style: none;
+    }
+    h2 {
+      font-size: 36px;
+      margin-bottom: 30px;
+      color: #000;
+      text-align: center;
+    }
+
+    .logo-bar {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .logo-img {
+      height: 44px;
+      width: 44px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 4px 16px rgba(26,209,255,0.10);
+      border: 3px solid #1ad1ff;
+      object-fit: cover;
+      margin-right: 0;
+      transition: none;
+      display: block;
+    }
+    .logo-img:hover {
+      transform: none;
+      box-shadow: 0 4px 16px rgba(26,209,255,0.10);
+      border-color: #1ad1ff;
+    }
+    @media (max-width: 768px) {
+      .logo-img {
+        height: 44px;
+        width: 44px;
+      }
+    }
+
+    .navbar {
+      background-color: #ffffff;
+      position: fixed;
+      top: 0;
+      width: 100%;
+      height: 80px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 50px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+      opacity: 0;
+      transform: translateY(-40px) scale(0.98);
+      transition: opacity 0.7s cubic-bezier(.4,0,.2,1), transform 0.7s cubic-bezier(.4,0,.2,1);
+    }
+    .navbar.visible {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+    .logo {
+      font-size: 30px;
+      font-weight: bold;
+      color: #007BFF;
+    }
+    .top-button {
+      background-color: #007BFF;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 6px;
+      font-size: 16px;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+    .top-button:hover {
+      background-color: #0056b3;
+    }
+
+    .main-content {
+      text-align: center;
+      padding: 50px 20px;
+    }
+    .main-content h1 {
+      font-size: 42px;
+      margin-bottom: 20px;
+    }
+    .main-content p {
+      font-size: 20px;
+      margin-bottom: 30px;
+      color: #6c757d;
+    }
+    .cta-button {
+      background-color: #007BFF;
+      color: white;
+      padding: 14px 32px;
+      border-radius: 6px;
+      font-size: 20px;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+    .cta-button:hover {
+      background-color: #0056b3;
+    }
+
+    .why-choose {
+      padding: 60px 20px;
+      text-align: center;
+    }
+    .features {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 40px;
+      margin-top: 30px;
+    }
+    .feature-box {
+      background-color: #fff;
+      padding: 40px;
+      border-radius: 15px;
+      width: 300px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    .feature-box h3 {
+      font-size: 24px;
+      margin-bottom: 15px;
+      color: #007BFF;
+    }
+    .feature-box p {
+      color: #555;
+    }
+
+    .popular-bundles {
+      background-color: #ffffff;
+      padding: 60px 20px;
+    }
+    .bundle-list {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 40px;
+    }
+    .bundle-item {
+      background-color: #ffffff;
+      padding: 40px;
+      border-radius: 15px;
+      width: 300px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .bundle-heading {
+      text-align: center;
+      padding: 10px;
+      font-size: 24px;
+      font-weight: bold;
+      color: #fff;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+    .bundle-content ul li {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+      font-size: 18px;
+      color: #555;
+    }
+    .bundle-content ul li img {
+      width: 20px;
+      height: 20px;
+      margin-right: 10px;
+    }
+    .bundle-button {
+      margin-top: 20px;
+      padding: 12px 24px;
+      font-size: 16px;
+      font-weight: bold;
+      color: #fff;
+      border-radius: 6px;
+      transition: 0.3s;
+      text-align: center;
+    }
+
+    .bundle-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 30px;
+    }
+
+    .survey-section {
+      text-align: center;
+      padding: 50px 0;
+    }
+    .survey-button {
+      padding: 15px 30px;
+      font-size: 18px;
+      background-color: #007BFF;
+      color: white;
+      text-decoration: none;
+      border-radius: 10px;
+      transition: background-color 0.3s ease;
+    }
+    .survey-button:hover {
+      background-color: #0056b3;
+    }
+
+    .testimonials {
+      padding: 60px 20px;
+      background-color: #ffffff;
+      text-align: center;
+    }
+    .testimonial-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 30px;
+      justify-content: center;
+      margin-top: 30px;
+    }
+    .testimonial-box {
+      background-color: #f1f1f1;
+      padding: 30px;
+      border-radius: 12px;
+      width: 300px;
+      font-size: 18px;
+      color: #333;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .join-us {
+      text-align: center;
+      background-color: #ffffff;
+      padding: 60px 20px;
+    }
+    .join-us p {
+      font-size: 18px;
+      margin-bottom: 20px;
+      color: #555;
+    }
+    .join-button {
+      background-color: #28a745;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 6px;
+      font-size: 18px;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+    .join-button:hover {
+      background-color: #218838;
+    }
+
+    .contact-us-container {
+      width: 90%;
+      max-width: 600px;
+      margin: 50px auto;
+      padding: 30px;
+      background-color: #ffffff;
+      border-radius: 20px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+    .contact-heading {
+      color: #007BFF;
+      margin-bottom: 20px;
+      font-size: 28px;
+    }
+    .contact-form {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .contact-box {
+      width: 100%;
+      padding: 12px 15px;
+      margin: 10px 0;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+    }
+    .message-box {
+      height: 150px;
+      resize: vertical;
+    }
+    .send-button {
+      margin-top: 15px;
+      padding: 12px 30px;
+      font-size: 18px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    .send-button:hover {
+      background-color: #45a049;
+    }
+
+    .footer {
+      background-color: #000000;
+      color: white;
+      text-align: center;
+      padding: 30px 20px;
+      border-top-left-radius: 30px;
+      border-top-right-radius: 30px;
+      font-size: 16px;
+    }
+
+    @media (max-width: 768px) {
+      .features, .bundle-list, .testimonial-list {
+        flex-direction: column;
+        align-items: center;
+      }
+    }
+    .overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      backdrop-filter: blur(6px);
+      background: rgba(0, 0, 0, 0.4);
+      z-index: 1000;
+      justify-content: center;
+      align-items: flex-start;
+      padding-top: 80px;
+      animation: fadeIn 0.3s ease-in-out forwards;
+    }
+    .bundle-popup {
+      background: white;
+      width: 95%;
+      max-width: 480px;
+      border-radius: 18px;
+      padding: 32px 24px 28px 24px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+      animation: popupIn 0.45s cubic-bezier(.4,0,.2,1);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+    }
+    @keyframes popupIn {
+      from { opacity: 0; transform: translateY(40px) scale(0.96);}
+      to { opacity: 1; transform: translateY(0) scale(1);}
+    }
+    @keyframes popupOut {
+      from { opacity: 1; transform: translateY(0) scale(1);}
+      to { opacity: 0; transform: translateY(40px) scale(0.96);}
+    }
+    .close-btn {
+      position: absolute;
+      top: 18px;
+      right: 22px;
+      font-size: 26px;
+      cursor: pointer;
+      color: #007BFF;
+      font-weight: bold;
+      background: none;
+      border: none;
+      z-index: 2;
+      transition: color 0.2s;
+    }
+    .close-btn:hover {
+      color: #ff416c;
+    }
+    .bundle-search {
+      width: 100%;
+      padding: 12px 14px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: 1px solid #d0e6ff;
+      margin-bottom: 18px;
+      transition: border 0.2s;
+    }
+    .bundle-search:focus {
+      border: 1.5px solid #007BFF;
+      outline: none;
+    }
+    .saas-list {
+      max-height: 180px;
+      overflow-y: auto;
+      margin-bottom: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .saas-list label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 16px;
+      background: #f7faff;
+      border-radius: 8px;
+      padding: 8px 12px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .saas-list label:hover {
+      background: #e9f2ff;
+    }
+    .saas-list img {
+      width: 22px;
+      height: 22px;
+      border-radius: 4px;
+      background: #fff;
+      border: 1px solid #e0e0e0;
+    }
+    .confirm-btn {
+      margin-top: 24px;
+      padding: 14px 0;
+      background: linear-gradient(90deg, #007BFF 60%, #00BFFF 100%);
+      color: white;
+      font-size: 18px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      width: 100%;
+      font-weight: bold;
+      transition: background 0.3s;
+      box-shadow: 0 2px 8px rgba(0,123,255,0.08);
+    }
+    .confirm-btn:hover {
+      background: linear-gradient(90deg, #0056b3 60%, #009acc 100%);
+    }
+    @media (max-width: 600px) {
+      .bundle-popup {
+        padding: 18px 6vw;
+        max-width: 98vw;
+      }
+    }
+    .dropdown {
+      position: relative;
+      display: flex;
+      align-items: center;
+      margin-left: 10px;
+    }
+    .dropdown-avatar {
+      height: 44px;
+      width: 44px;
+      border-radius: 50%;
+      border: 2px solid #007BFF;
+      object-fit: cover;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+      transition: box-shadow 0.25s, transform 0.25s, border-color 0.25s;
+      background: #fff;
+    }
+    .dropdown-avatar:hover {
+      box-shadow: 0 8px 24px rgba(0,123,255,0.18);
+      transform: scale(1.12) rotate(-7deg);
+      border-color: #0056b3;
+    }
+    .dropdown-menu {
+      position: absolute;
+      top: 54px;
+      right: 0;
+      background: #fff;
+      box-shadow: 0 12px 32px rgba(0,0,0,0.13);
+      border-radius: 14px;
+      min-width: 170px;
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+      z-index: 1001;
+      animation: dropdownIn 0.35s cubic-bezier(.4,0,.2,1);
+      transform-origin: top right;
+    }
+    @keyframes dropdownIn {
+      from { opacity: 0; transform: scaleY(0.7) translateY(-10px);}
+      to { opacity: 1; transform: scaleY(1) translateY(0);}
+    }
+    @keyframes dropdownOut {
+      from { opacity: 1; transform: scaleY(1) translateY(0);}
+      to { opacity: 0; transform: scaleY(0.7) translateY(-10px);}
+    }
+    .dropdown-menu.show {
+      display: flex;
+      animation: dropdownIn 0.35s cubic-bezier(.4,0,.2,1);
+    }
+    .dropdown-menu.hide {
+      animation: dropdownOut 0.25s cubic-bezier(.4,0,.2,1);
+    }
+    .dropdown-menu a {
+      padding: 14px 22px;
+      color: #007BFF;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 16px;
+      transition: background 0.2s, color 0.2s;
+      border-bottom: 1px solid #f1f1f1;
+    }
+    .dropdown-menu a:last-child {
+      border-bottom: none;
+    }
+    .dropdown-menu a:hover {
+      background: #f5faff;
+      color: #0056b3;
+    }
+    .scroll-fade {
+      opacity: 0;
+      transform: translateY(40px) scale(0.98);
+      transition: opacity 0.7s cubic-bezier(.4,0,.2,1), transform 0.7s cubic-bezier(.4,0,.2,1);
+      will-change: opacity, transform;
+    }
+    .scroll-fade.visible {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+    .scroll-fade-left {
+      opacity: 0;
+      transform: translateX(-60px) scale(0.98);
+      transition: opacity 0.7s cubic-bezier(.4,0,.2,1), transform 0.7s cubic-bezier(.4,0,.2,1);
+      will-change: opacity, transform;
+    }
+    .scroll-fade-left.visible {
+      opacity: 1;
+      transform: translateX(0) scale(1);
+    }
+    .scroll-fade-right {
+      opacity: 0;
+      transform: translateX(60px) scale(0.98);
+      transition: opacity 0.7s cubic-bezier(.4,0,.2,1), transform 0.7s cubic-bezier(.4,0,.2,1);
+      will-change: opacity, transform;
+    }
+    .scroll-fade-right.visible {
+      opacity: 1;
+      transform: translateX(0) scale(1);
+    }
+    .decor-left, .decor-right {
+      display: none !important;
+    }
+    .decor-spot, .decor-spot-left, .decor-spot-right {
+      display: none !important;
+    }
+    .decor-spot {
+      position: absolute;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0.18;
+      filter: blur(60px);
+      border-radius: 50%;
+      transition: opacity 0.5s, transform 0.7s cubic-bezier(.4,0,.2,1);
+      will-change: transform;
+    }
+    .decor-spot-left {
+      left: -160px;
+      top: 420px;
+      width: 480px;
+      height: 480px;
+      background: radial-gradient(circle at 60% 40%, #007BFF 0%, #00BFFF 80%);
+    }
+    .decor-spot-right {
+      right: -140px;
+      top: 1100px;
+      width: 420px;
+      height: 420px;
+      background: radial-gradient(circle at 40% 60%, #ff416c 0%, #ffd200 90%);
+    }
+    @media (max-width: 900px) {
+      .decor-spot { display: none !important; }
+    }
+
+    :root {
+      --zapblue: #1ad1ff;
+      --zapdark: #0056b3;
+    }
+
+    /* Navbar and logo text */
+    .logo {
+      color: var(--zapdark) !important;
+    }
+
+    /* Buttons */
+    .top-button,
+    .cta-button,
+    .survey-button,
+    .confirm-btn {
+      background-color: var(--zapblue) !important;
+      color: #fff !important;
+      border: none;
+    }
+    .top-button:hover,
+    .cta-button:hover,
+    .survey-button:hover,
+    .confirm-btn:hover {
+      background-color: var(--zapdark) !important;
+    }
+
+    /* Feature box headings */
+    .feature-box h3,
+    .contact-heading {
+      color: var(--zapblue) !important;
+    }
+
+    /* Borders for blue elements */
+    .logo-img,
+    .dropdown-avatar {
+      border-color: var(--zapblue) !important;
+    }
+    .feature-box {
+      border: 2px solid var(--zapblue);
+    }
+
+    /* Dropdown menu links */
+    .dropdown-menu a {
+      color: var(--zapblue) !important;
+    }
+    .dropdown-menu a:hover {
+      color: var(--zapdark) !important;
+    }
+
+    /* Minor: update close button color */
+    .close-btn {
+      color: var(--zapblue) !important;
+    }
+    .close-btn:hover {
+      color: #ff416c !important;
+    }
+  </style>
+</head>
+<body>
+<div class="decor-spot decor-spot-left"></div>
+<div class="decor-spot decor-spot-right"></div>
+<!-- Navbar -->
+<div class="navbar" id="mainNavbar">
+  <div class="logo-bar">
+    <img src="icons/your-logo.png" alt="Logo" class="logo-img" />
+    <span style="font-size:30px; font-weight:bold; line-height:1;">
+      <span style="color:#1ad1ff;">Zap</span><span style="color:#0056b3;">Bundle</span>
+    </span>
+  </div>
+  <div id="nav-button-area"></div>
+</div>
+<!-- Main Section -->
+<div class="main-content scroll-fade">
+  <h1>Save Money on SaaS — Get the Perfect Bundle for Your Business!</h1>
+  <p>We bundle SaaS into business agencies, and smooth the way and get exclusive access.</p>
+  <a href="signup.html" class="cta-button hide-on-login">Get Early Access</a>
+</div>
+
+<!-- Why Choose Section -->
+<div class="why-choose scroll-fade">
+  <h2>Why Choose Our Bundles?</h2>
+  <div class="features">
+    <div class="feature-box scroll-fade-left">
+      <h3>Save up to 40%</h3>
+      <p>Significant discounts on SaaS tools compared to buying individually.</p>
+    </div>
+    <div class="feature-box scroll-fade">
+      <h3>Simplified Management</h3>
+      <p>Manage all your subscriptions with ease in one bundle.</p>
+    </div>
+    <div class="feature-box scroll-fade-right">
+      <h3>Expertly Curated</h3>
+      <p>Bundles selected by experts for maximum compatibility and efficiency.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Popular Bundles -->
+
+<div class="popular-bundles scroll-fade">
+  <h2>Popular Bundles</h2>
+  <div class="bundle-container">
+    <div class="bundle-card scroll-fade-left" onclick="handleBundleClick('Marketing Master Bundle')">
+      <div class="card-inner">
+        <div class="card-front" style="background: linear-gradient(135deg, #ff416c, #ff4b2b);">
+          Marketing Master Bundle
+        </div>
+        <div class="card-back">
+          Includes tools for email campaigns, analytics & ad management — ideal for growth hackers & marketers.
+        </div>
+      </div>
+    </div>
+
+    <div class="bundle-card scroll-fade" onclick="handleBundleClick('Productivity Power Bundle')">
+      <div class="card-inner">
+        <div class="card-front" style="background: linear-gradient(135deg, #1e3c72, #2a5298);">
+          Productivity Power Bundle
+        </div>
+        <div class="card-back">
+          Task tracking, team collaboration, note-taking & automation tools to supercharge your productivity.
+        </div>
+      </div>
+    </div>
+
+    <div class="bundle-card scroll-fade" onclick="handleBundleClick('Design & Dev Bundle')">
+      <div class="card-inner">
+        <div class="card-front" style="background: linear-gradient(135deg, #11998e, #38ef7d);">
+          Design & Dev Bundle
+        </div>
+        <div class="card-back">
+          UI kits, prototyping, IDE tools, version control and more for developers & designers.
+        </div>
+      </div>
+    </div>
+
+    <div class="bundle-card scroll-fade-right" onclick="handleBundleClick('custom')">
+      <div class="card-inner">
+        <div class="card-front" style="background: linear-gradient(135deg, #f7971e, #ffd200);">
+          Create Your Own Bundle
+        </div>
+        <div class="card-back">
+          Tell us what tools you want. We’re collecting feedback to focus on the most requested bundles and build early support.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="bundleOverlay" onclick="closeOnOutside(event)">
+  <div class="menu bundle-popup" onclick="event.stopPropagation()">
+    <div class="close-btn" onclick="closeMenu()">✕</div>
+    <h2 style="margin-bottom:18px; color:#007BFF;">Select SaaS Tools for Your Custom Bundle</h2>
+    <input type="text" placeholder="Search SaaS..." onkeyup="filterSaaS(this.value)" class="bundle-search" />
+    <div class="saas-list" id="saasList">
+      <label><input type="checkbox" value="Slack"> <img src="https://logo.clearbit.com/slack.com"> Slack</label>
+      <label><input type="checkbox" value="Trello"> <img src="https://logo.clearbit.com/trello.com"> Trello</label>
+      <label><input type="checkbox" value="Notion"> <img src="https://logo.clearbit.com/notion.so"> Notion</label>
+      <label><input type="checkbox" value="Asana"> <img src="https://logo.clearbit.com/asana.com"> Asana</label>
+      <label><input type="checkbox" value="GitHub"> <img src="https://logo.clearbit.com/github.com"> GitHub</label>
+      <!-- Add more as needed -->
+    </div>
+    <div class="other-bundle-section" style="margin-top:18px;">
+      <label style="font-weight:500; color:#333;">
+        <input type="checkbox" id="otherBundleCheck" onchange="toggleOtherInput(this)">
+        <span style="margin-left:8px;">Other (not listed)</span>
+      </label>
+      <input type="text" id="otherBundleInput" class="bundle-search" placeholder="Enter your desired SaaS tool(s)" style="display:none; margin-top:10px;" />
+    </div>
+    <button class="confirm-btn" onclick="submitCustomBundle()">Confirm Selection</button>
+  </div>
+</div>
+
+<script>
+  // Navbar animation on page load
+  window.addEventListener('DOMContentLoaded', function() {
+    setTimeout(() => {
+      document.getElementById('mainNavbar').classList.add('visible');
+    }, 80);
+
+    renderProfileNav();
+    if (isLoggedIn) {
+      document.querySelectorAll('.hide-on-login').forEach(el => el.style.display = 'none');
+    }
+  });
+
+  // Modern scroll animation: always reveal on scroll, hide when out of view
+  function revealOnScroll() {
+    const reveals = document.querySelectorAll('.scroll-fade, .scroll-fade-left, .scroll-fade-right');
+    const windowHeight = window.innerHeight;
+    reveals.forEach(el => {
+      const top = el.getBoundingClientRect().top;
+      if (top < windowHeight - 60) {
+        el.classList.add('visible');
+      } else {
+        el.classList.remove('visible');
+      }
+    });
+  }
+  window.addEventListener('scroll', revealOnScroll);
+  window.addEventListener('DOMContentLoaded', revealOnScroll);
+
+  // Avatar dropdown logic (copied from profile.html, with animation and hover)
+  function renderProfileNav() {
+    const navArea = document.getElementById('nav-button-area');
+    const userData = JSON.parse(localStorage.getItem('userProfile')) || {};
+    const profilePic = userData.profilePic || 'icons/default-profile.png';
+    navArea.innerHTML = `
+      <div class="dropdown" id="dropdown" style="position: relative;">
+        <img id="navProfilePic" class="dropdown-avatar" src="${profilePic}" alt="Profile" />
+        <div class="dropdown-menu" id="dropdownMenu">
+          <a href="index.html">Home</a>
+          <a href="profile.html">Profile</a>
+          <a href="index.html#contact-us">Contact Us</a>
+          <a href="#" onclick="logout()">Logout</a>
+        </div>
+      </div>
+    `;
+
+    // Attach dropdown logic
+    const dropdown = document.getElementById('dropdown');
+    const dropdownMenu = document.getElementById('dropdownMenu');
+    const navProfilePic = document.getElementById('navProfilePic');
+    navProfilePic.addEventListener('click', function(e) {
+      e.stopPropagation();
+      if (dropdownMenu.classList.contains('show')) {
+        dropdownMenu.classList.remove('show');
+        dropdownMenu.classList.add('hide');
+        setTimeout(() => dropdownMenu.style.display = 'none', 250);
+      } else {
+        dropdownMenu.style.display = 'flex';
+        dropdownMenu.classList.remove('hide');
+        setTimeout(() => dropdownMenu.classList.add('show'), 10);
+      }
+    });
+    document.addEventListener('click', function(e) {
+      if (!dropdown.contains(e.target) && dropdownMenu.classList.contains('show')) {
+        dropdownMenu.classList.remove('show');
+        dropdownMenu.classList.add('hide');
+        setTimeout(() => dropdownMenu.style.display = 'none', 250);
+      }
+    });
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && dropdownMenu.classList.contains('show')) {
+        dropdownMenu.classList.remove('show');
+        dropdownMenu.classList.add('hide');
+        setTimeout(() => dropdownMenu.style.display = 'none', 250);
+      }
+    });
+  }
+
+  function logout() {
+    localStorage.removeItem('isLoggedIn');
+    localStorage.removeItem('hasTakenSurvey');
+    localStorage.removeItem('userProfile');
+    location.href = "index.html";
+  }
+
+  function goToSurvey() {
+    if (isLoggedIn) {
+      if (localStorage.getItem('hasTakenSurvey') === 'true') {
+        alert("Thank you for taking the survey!");
+      } else {
+        window.location.href = "survey.html";
+      }
+    } else {
+      window.location.href = "signup.html";
+    }
+  }
+
+  // Custom Bundle Popup Logic
+  function handleBundleClick(bundleName) {
+    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+    const userProfile = JSON.parse(localStorage.getItem('userProfile') || '{}');
+
+    if (!isLoggedIn) {
+      localStorage.setItem('redirectAfterLogin', bundleName);
+      return window.location.href = 'signup.html';
+    }
+
+    if (!userProfile.hasTakenSurvey) {
+      localStorage.setItem('redirectAfterSurvey', bundleName);
+      return window.location.href = 'survey.html';
+    }
+
+    if (bundleName === 'custom') {
+      openMenu(true);
+    } else {
+      alert(`Your interest in the “${bundleName}” bundle has been registered!`);
+      saveBundleChoice(bundleName);
+    }
+  }
+
+  function openMenu(enable) {
+    const overlay = document.getElementById('bundleOverlay');
+    const popup = overlay.querySelector('.bundle-popup');
+    if (enable) {
+      overlay.style.display = 'flex';
+      setTimeout(() => {
+        popup.style.animation = 'popupIn 0.45s cubic-bezier(.4,0,.2,1)';
+      }, 10);
+    } else {
+      closeMenu();
+    }
+  }
+  function closeMenu() {
+    const overlay = document.getElementById('bundleOverlay');
+    const popup = overlay.querySelector('.bundle-popup');
+    if (popup) {
+      popup.style.animation = 'popupOut 0.3s cubic-bezier(.4,0,.2,1)';
+      setTimeout(() => {
+        overlay.style.display = 'none';
+        popup.style.animation = '';
+      }, 280);
+    } else {
+      overlay.style.display = 'none';
+    }
+  }
+  function closeOnOutside(e) {
+    if (e.target.id === 'bundleOverlay') closeMenu();
+  }
+  function filterSaaS(query) {
+    const items = document.querySelectorAll('#saasList label');
+    items.forEach(label => {
+      const name = label.textContent.toLowerCase();
+      label.style.display = name.includes(query.toLowerCase()) ? 'flex' : 'none';
+    });
+  }
+  function submitCustomBundle() {
+    // Get checked SaaS
+    const checked = Array.from(document.querySelectorAll('#saasList input:checked'))
+      .map(cb => cb.value);
+    // Get "Other" value if checked
+    const otherChecked = document.getElementById('otherBundleCheck').checked;
+    const otherValue = document.getElementById('otherBundleInput').value.trim();
+
+    // Require at least 2 selections (including "Other" if filled)
+    let selected = checked;
+    if (otherChecked && otherValue) {
+      selected.push(otherValue);
+    }
+    if (selected.length < 2) {
+      alert("Please select at least two SaaS tools or enter your desired tool(s).");
+      return;
+    }
+
+    const userProfile = JSON.parse(localStorage.getItem('userProfile') || '{}');
+    userProfile.customBundle = selected;
+    localStorage.setItem('userProfile', JSON.stringify(userProfile));
+    closeMenu();
+    alert("Your custom bundle preferences have been saved!");
+  }
+  function saveBundleChoice(bundleName) {
+    const userProfile = JSON.parse(localStorage.getItem('userProfile') || '{}');
+    userProfile.selectedBundle = bundleName;
+    localStorage.setItem('userProfile', JSON.stringify(userProfile));
+  }
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeMenu();
+  });
+
+  window.addEventListener('load', () => {
+    const userProfile = JSON.parse(localStorage.getItem('userProfile') || '{}');
+    const bundleName = localStorage.getItem('redirectAfterSurvey') || localStorage.getItem('redirectAfterLogin');
+    if (userProfile.hasTakenSurvey && bundleName) {
+      if (bundleName === 'custom') {
+        openMenu(true);
+      } else {
+        alert(`Your interest in the “${bundleName}” bundle has been registered!`);
+        saveBundleChoice(bundleName);
+      }
+      localStorage.removeItem('redirectAfterSurvey');
+      localStorage.removeItem('redirectAfterLogin');
+    }
+  });
+
+  function toggleOtherInput(checkbox) {
+    document.getElementById('otherBundleInput').style.display = checkbox.checked ? 'block' : 'none';
+  }
+
+  // Helper: check login state
+  const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+
+  function renderNavButtonArea() {
+    const navArea = document.getElementById('nav-button-area');
+    navArea.innerHTML = ""; // Clear previous
+
+    if (!isLoggedIn) {
+      // Not logged in: show CTA button
+      navArea.innerHTML = `<a href="signup.html" class="top-button" id="main-cta-btn">Get Early Access</a>`;
+      return;
+    }
+
+    // Logged in: show avatar dropdown (EXACTLY as in profile.html)
+    const userData = JSON.parse(localStorage.getItem('userProfile')) || {};
+    const profilePic = userData.profilePic || 'icons/default-profile.png';
+    navArea.innerHTML = `
+      <div class="dropdown" id="dropdown">
+        <img id="navProfilePic" class="dropdown-avatar" src="${profilePic}" alt="Profile" />
+        <div class="dropdown-menu" id="dropdownMenu">
+          <a href="index.html">Home</a>
+          <a href="profile.html">Profile</a>
+          <a href="index.html#contact-us">Contact Us</a>
+          <a href="#" onclick="logout()">Logout</a>
+        </div>
+      </div>
+    `;
+
+    // Dropdown logic (animation, outside click, ESC)
+    const dropdown = document.getElementById('dropdown');
+    const dropdownMenu = document.getElementById('dropdownMenu');
+    const navProfilePic = document.getElementById('navProfilePic');
+    navProfilePic.addEventListener('click', function(e) {
+      e.stopPropagation();
+      if (dropdownMenu.classList.contains('show')) {
+        dropdownMenu.classList.remove('show');
+        dropdownMenu.classList.add('hide');
+        setTimeout(() => dropdownMenu.style.display = 'none', 250);
+      } else {
+        dropdownMenu.style.display = 'flex';
+        dropdownMenu.classList.remove('hide');
+        setTimeout(() => dropdownMenu.classList.add('show'), 10);
+      }
+    });
+    document.addEventListener('click', function(e) {
+      if (!dropdown.contains(e.target) && dropdownMenu.classList.contains('show')) {
+        dropdownMenu.classList.remove('show');
+        dropdownMenu.classList.add('hide');
+        setTimeout(() => dropdownMenu.style.display = 'none', 250);
+      }
+    });
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && dropdownMenu.classList.contains('show')) {
+        dropdownMenu.classList.remove('show');
+        dropdownMenu.classList.add('hide');
+        setTimeout(() => dropdownMenu.style.display = 'none', 250);
+      }
+    });
+  }
+
+  function logout() {
+    localStorage.removeItem('isLoggedIn');
+    localStorage.removeItem('hasTakenSurvey');
+    localStorage.removeItem('userProfile');
+    location.href = "index.html";
+  }
+
+  // On DOMContentLoaded, render the nav button area
+  window.addEventListener('DOMContentLoaded', function() {
+    setTimeout(() => {
+      document.getElementById('mainNavbar').classList.add('visible');
+    }, 80);
+    renderNavButtonArea();
+    if (isLoggedIn) {
+      document.querySelectorAll('.hide-on-login').forEach(el => el.style.display = 'none');
+    }
+  });
+
+  // Parallax effect for decor spots (background moves slower than content)
+  window.addEventListener('scroll', function() {
+    const scrollY = window.scrollY || window.pageYOffset;
+    const left = document.querySelector('.decor-spot-left');
+    const right = document.querySelector('.decor-spot-right');
+    // Move the spots at a slower rate for parallax
+    if (left) left.style.transform = `translateY(${scrollY * 0.10}px)`;
+    if (right) right.style.transform = `translateY(${scrollY * 0.06}px)`;
+  });
+
+  function updateSurveyButton() {
+    const userProfile = JSON.parse(localStorage.getItem('userProfile') || '{}');
+    const hasTakenSurvey = userProfile.hasTakenSurvey || localStorage.getItem('hasTakenSurvey') === 'true';
+    const surveyBtn = document.getElementById('surveyBtn');
+    if (!surveyBtn) return;
+
+    if (hasTakenSurvey) {
+      surveyBtn.textContent = "View Survey";
+      surveyBtn.onclick = function(e) {
+        e.preventDefault();
+        window.location.href = "survey.html?view=1";
+      };
+    } else {
+      surveyBtn.textContent = "Take the Survey";
+      surveyBtn.onclick = function(e) {
+        e.preventDefault();
+        goToSurvey();
+      };
+    }
+  }
+
+  window.addEventListener('DOMContentLoaded', function() {
+    // ...existing code...
+    updateSurveyButton();
+  });
+</script>
+
+
+
+<!-- Survey Section -->
+<div class="survey-section scroll-fade">
+  <h2>Help Us Build the Right Bundles</h2>
+  <a href="#" class="survey-button" id="surveyBtn">Take the Survey</a>
+</div>
+
+<!-- Testimonials -->
+<div class="testimonials scroll-fade">
+  <h2>What Businesses are saying</h2>
+  <div class="testimonial-list">
+    <div class="testimonial-box scroll-fade-left">"As a small startup, managing multiple SaaS subscriptions was becoming expensive and complicated. SaaSlink's idea would greatly help us."</div>
+    <div class="testimonial-box scroll-fade">"The marketing bundle gave us access to premium tools we couldn't afford individually. The idea of SaaSlink would help us."</div>
+    <div class="testimonial-box scroll-fade-right">"Finally a solution that understands the pain points of small businesses. The single invoice for all our tools will simplify our accounting significantly."</div>
+  </div>
+</div>
+
+<!-- Join Us -->
+<div class="join-us scroll-fade">
+  <h2>Join 100+ Businesses Exploring SaaS Bundles!</h2>
+  <p>Be the first to know when we launch and get exclusive early access discounts.</p>
+  <form action="signup.php" method="POST">
+    <button type="submit" class="join-button hide-on-login">Get Early Access</button>
+  </form>
+</div>
+
+<!-- Contact Us Section -->
+<div class="contact-us-container scroll-fade" id="contact-us">
+  <h2 class="contact-heading">Contact Us</h2>
+  <form action="https://formsubmit.co/your-email@example.com" method="POST" class="contact-form">
+    <input type="text" name="name" placeholder="Your Name" required class="contact-box" />
+    <input type="email" name="email" placeholder="Your Email" required class="contact-box" />
+    <textarea name="message" placeholder="Your Message" required class="contact-box message-box"></textarea>
+    <button type="submit" class="send-button">Send</button>
+  </form>
+</div>
+
+<!-- Footer -->
+<div class="footer scroll-fade">
+  @2025 ZapBundle. All rights reserved.<br />
+  Helping businesses Save on SaaS since day one.
+</div>
+
+<!-- JavaScript for login logic -->
+<script>
+  const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+  const navArea = document.getElementById('nav-button-area');
+
+  function renderProfileNav() {
+    const userData = JSON.parse(localStorage.getItem('userProfile')) || {};
+    const profilePic = userData.profilePic || 'icons/default-profile.png';
+
+    navArea.innerHTML = `
+      <div class="dropdown" style="position: relative;">
+        <img src="${profilePic}" alt="Profile" onclick="toggleDropdown()" style="height: 40px; width: 40px; border-radius: 50%; cursor: pointer;">
+        <div id="dropdown-menu">
+        <a href="index.html">Home</a>
+        <a href="profile.html">Profile</a>
+        <a href="index.html#contact-us">Contact Us</a>
+        <a href="#" onclick="logout()">Logout</a>
+      </div>
+
+      </div>`;
+  }
+
+  function toggleDropdown() {
+    const menu = document.getElementById('dropdown-menu');
+    if (menu) menu.style.display = (menu.style.display === 'none') ? 'block' : 'none';
+  }
+
+  function logout() {
+    localStorage.removeItem('isLoggedIn');
+    localStorage.removeItem('hasTakenSurvey');
+    location.href = "index.html";
+  }
+
+  function goToSurvey() {
+    if (isLoggedIn) {
+      if (localStorage.getItem('hasTakenSurvey') === 'true') {
+        alert("Thank you for taking the survey!");
+      } else {
+        window.location.href = "survey.html";
+      }
+    } else {
+      window.location.href = "signup.html";
+    }
+  }
+  
+
+  if (isLoggedIn) {
+    renderProfileNav();
+    document.querySelectorAll('.hide-on-login').forEach(el => el.style.display = 'none');
+  }
+</script>
+</body>
+</html>

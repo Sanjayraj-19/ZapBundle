@@ -1,0 +1,411 @@
+body {
+  font-family: Arial, sans-serif;
+  background: #f8f9fa;
+  margin: 0;
+  padding-top: 80px; /* Prevent navbar from overlapping content */
+}
+
+  .logo img {
+    height: 40px;
+    width: auto;
+  }
+  
+
+  .logo-area img {
+    height: 40px;
+    margin-right: 10px;
+  }
+  
+  .bundle-item {
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .bundle-item:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  }
+
+  .bundle-list {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+  
+  .bundle-item {
+    width: 250px;
+    height: 350px;
+    border-radius: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .bundle-item:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  }
+  
+  /* Individual Card Colors */
+  .bundle-item.marketing {
+    background-color: #007BFF; /* Blue */
+  }
+  
+  .bundle-item.productivity {
+    background-color: #dc3545; /* Red */
+  }
+  
+  .bundle-item.design {
+    background-color: #28a745; /* Green */
+  }
+  
+  .bundle-item.custom {
+    background-color: #6f42c1; /* Purple */
+  }
+  
+  /* Navbar and Header */
+  .navbar, header {
+    background-color: #ffffff;
+    height: 80px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 50px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+  }
+  .logo-area, .logo {
+    display: flex;
+    align-items: center;
+    font-size: 28px;
+    font-weight: bold;
+    color: #007BFF;
+  }
+  .logo img {
+    height: 40px;
+    margin-right: 10px;
+  }
+  .top-button, .btn-access {
+    background-color: #007BFF;
+    color: white;
+    padding: 10px 22px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    transition: 0.3s;
+    text-decoration: none;
+  }
+  .top-button:hover, .btn-access:hover {
+    background-color: #0056b3;
+  }
+  
+  /* Form Containers */
+  .form-container, .survey-box, .profile-container {
+    background-color: #ffffff;
+    padding: 35px 30px;
+    border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 600px;
+    margin: 50px auto;
+  }
+  .form-container input,
+  .survey-box input,
+  .survey-box select,
+  .survey-box textarea,
+  .profile-container input[type="text"] {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 20px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+  }
+  .form-container button,
+  .submit-btn,
+  .profile-container button {
+    width: 100%;
+    background-color: #007BFF;
+    color: white;
+    padding: 14px;
+    border: none;
+    border-radius: 10px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  .form-container button:hover,
+  .submit-btn:hover,
+  .profile-container button:hover {
+    background-color: #0056b3;
+  }
+  
+  /* Survey checkbox/radio */
+  .checkbox-group, .radio-group {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* ✅ Align to left */
+    gap: 6px;                /* ✅ Less spacing between items */
+    margin-top: 10px;
+  }
+  
+  
+  .checkbox-item, .radio-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 15px;
+    color: #333;
+    line-height: 1.4;
+    width: 100%;
+  }
+  
+  
+  .checkbox-item label,
+  .radio-item label {
+    flex: 1;
+    margin: 0;
+    padding: 0;
+    line-height: 1.4;
+    font-weight: normal;
+    word-break: break-word;
+  }
+  
+
+
+  .checkbox-item input,
+  .radio-item input {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    margin-top: 2px;
+  }
+  
+  
+
+  textarea {
+    resize: vertical;
+  }
+  
+  /* Footer */
+  .footer, footer {
+    background-color: #000;
+    color: white;
+    text-align: center;
+    padding: 30px 20px;
+    border-top-left-radius: 30px;
+    border-top-right-radius: 30px;
+    font-size: 16px;
+  }
+  
+  /* Profile Page Enhancements */
+  .profile-preview {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+  .profile-preview label {
+    cursor: pointer;
+    display: block;
+  }
+  .profile-preview img {
+    height: 100px;
+    width: 100px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 2px solid #007BFF;
+    transition: transform 0.3s ease;
+  }
+  .profile-preview img:hover {
+    transform: scale(1.05);
+  }
+  #profilePicInput {
+    display: none;
+  }
+  
+  /* Dropdown Menu Styles */
+  .dropdown {
+    position: relative;
+  }
+  .dropdown img {
+    height: 40px;
+    width: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+  }
+  .dropdown-indicator {
+    font-size: 14px;
+    margin-left: 6px;
+    color: #333;
+  }
+  #dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 50px;
+    right: 0;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    padding: 8px 0; /* reduced padding */
+    z-index: 999;
+    text-align: left;
+    min-width: 140px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+  
+  #dropdown-menu a {
+    display: block;
+    padding: 8px 16px;  /* tighter line spacing */
+    font-size: 15px;
+    color: #007BFF;
+    font-weight: 500;
+    text-decoration: none;
+    line-height: 1.4; /* reduce spacing */
+  }
+  
+  #dropdown-menu a:hover {
+    color: #0056b3;
+  }
+
+  body {
+    font-family: Arial, sans-serif;
+    background: #f8f9fa;
+  }
+  .popular-bundles {
+    padding: 60px 20px;
+    text-align: center;
+  }
+  .popular-bundles h2 {
+    font-size: 36px;
+    margin-bottom: 30px;
+  }
+  .bundle-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+  }
+  .bundle-card {
+    perspective: 1000px;
+    width: 280px;
+    height: 200px;
+    cursor: pointer;
+  }
+  .card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.8s ease;
+    transform-style: preserve-3d;
+  }
+  .bundle-card:hover .card-inner {
+    transform: rotateY(180deg);
+  }
+  .card-front, .card-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 15px;
+    backface-visibility: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    padding: 15px;
+    text-align: center;
+  }
+  .card-back {
+    background: #333;
+    transform: rotateY(180deg);
+    font-size: 14px;
+  }
+  .overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    backdrop-filter: blur(6px);
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 1000;
+    justify-content: center;
+    align-items: flex-start;
+    padding-top: 80px;
+    animation: fadeIn 0.3s ease-in-out forwards;
+  }
+  .menu {
+    background: white;
+    width: 90%;
+    max-width: 600px;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.2);
+    animation: slideDown 0.4s ease-in-out forwards;
+  }
+  .menu input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    font-size: 16px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+  }
+  .saas-list label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 6px 0;
+    font-size: 14px;
+  }
+  .saas-list img {
+    width: 20px;
+    height: 20px;
+  }
+  .close-btn {
+    text-align: right;
+    font-size: 18px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    color: #333;
+    font-weight: bold;
+  }
+  .confirm-btn {
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: #007BFF;
+    color: white;
+    font-size: 16px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    width: 100%;
+  }
+  @keyframes fadeIn {
+    from {opacity: 0;} to {opacity: 1;}
+  }
+  @keyframes slideDown {
+    from {transform: translateY(-20px); opacity: 0;} to {transform: translateY(0); opacity: 1;}
+  }
+  
+  /* Responsive */
+  @media (max-width: 768px) {
+    .navbar, header {
+      padding: 0 20px;
+    }
+    .form-container, .survey-box, .profile-container {
+      margin: 30px auto;
+      padding: 25px 20px;
+    }
+  }
+  

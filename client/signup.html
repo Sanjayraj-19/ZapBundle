@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Signup or Login - SaaSlink</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    html, body {
+      height: 100%;
+    }
+    body {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      background-color: #f8f9fa;
+    }
+    a {
+      text-decoration: none;
+    }
+    h2 {
+      font-size: 32px;
+      margin-bottom: 25px;
+      color: #000;
+      text-align: center;
+    }
+
+    .navbar {
+      background-color: #ffffff;
+      height: 80px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 50px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      font-size: 28px;
+      font-weight: bold;
+      color: #007BFF;
+    }
+    .logo img {
+      height: 40px;
+      margin-right: 10px;
+    }
+    .top-button {
+      background-color: #007BFF;
+      color: white;
+      padding: 10px 22px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+    .top-button:hover {
+      background-color: #0056b3;
+    }
+
+    main {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    .form-container {
+      background-color: #ffffff;
+      padding: 35px 30px;
+      border-radius: 15px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+    }
+    .form-container input[type="text"],
+    .form-container input[type="email"],
+    .form-container input[type="password"] {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 20px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+    .form-container button {
+      width: 100%;
+      background-color: #007BFF;
+      color: white;
+      padding: 14px;
+      border: none;
+      border-radius: 6px;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    .form-container button:hover {
+      background-color: #0056b3;
+    }
+    .toggle-link {
+      margin-top: 15px;
+      display: block;
+      color: #007BFF;
+      cursor: pointer;
+    }
+    .show-password {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      margin-bottom: 20px;
+      font-size: 14px;
+    }
+    .show-password input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      margin-right: 10px;
+      accent-color: #007BFF;
+      cursor: pointer;
+    }
+
+    .footer {
+      background-color: #000000;
+      color: white;
+      text-align: center;
+      padding: 30px 20px;
+      border-top-left-radius: 30px;
+      border-top-right-radius: 30px;
+      font-size: 16px;
+      margin-top: auto;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<div class="navbar">
+  <div class="logo">
+    <img src="icons/your-logo.png" alt="Logo" />
+    SaaSlink
+  </div>
+  <a href="signup.html" class="top-button">Get Early Access</a>
+</div>
+
+<!-- Main Content -->
+<main>
+  <div class="form-container">
+    <h2 id="form-title">Create Account</h2>
+
+    <input type="text" id="name" placeholder="Name" required />
+    <input type="email" id="email" placeholder="Email" required />
+    <input type="password" id="password" placeholder="Password" required />
+    <input type="password" id="confirmPassword" placeholder="Confirm Password" required />
+
+    <div class="show-password">
+      <input type="checkbox" id="togglePassword" />
+      <label for="togglePassword">Show Password</label>
+    </div>
+
+    <button onclick="handleSubmit()">Create Account</button>
+    <span class="toggle-link" onclick="toggleForm()">Already have an account? Login</span>
+  </div>
+</main>
+
+<!-- Footer -->
+<div class="footer">
+  @2025 SaaSlink. All rights reserved.<br />
+  Helping businesses Save on SaaS since day one.
+</div>
+
+<script>
+  let isSignup = true;
+
+  function toggleForm() {
+    const title = document.getElementById('form-title');
+    const nameField = document.getElementById('name');
+    const confirmPasswordField = document.getElementById('confirmPassword');
+    const button = document.querySelector('button');
+    const link = document.querySelector('.toggle-link');
+
+    isSignup = !isSignup;
+
+    if (isSignup) {
+      title.textContent = "Create Account";
+      nameField.style.display = "block";
+      confirmPasswordField.style.display = "block";
+      button.textContent = "Create Account";
+      link.textContent = "Already have an account? Login";
+    } else {
+      title.textContent = "Login";
+      nameField.style.display = "none";
+      confirmPasswordField.style.display = "none";
+      button.textContent = "Login";
+      link.textContent = "Don't have an account? Sign up";
+    }
+  }
+
+  document.getElementById('togglePassword').addEventListener('change', function () {
+    const passwordField = document.getElementById('password');
+    const confirmField = document.getElementById('confirmPassword');
+    const type = this.checked ? "text" : "password";
+    passwordField.type = type;
+    confirmField.type = type;
+  });
+
+  function handleSubmit() {
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+
+    if (isSignup) {
+      const name = document.getElementById('name').value.trim();
+      const confirmPassword = document.getElementById('confirmPassword').value;
+      if (!name || !email || !password || !confirmPassword) {
+        alert("Please fill all fields.");
+        return;
+      }
+      if (password !== confirmPassword) {
+        alert("Passwords do not match.");
+        return;
+      }
+      alert("Account Created Successfully!");
+    } else {
+      if (!email || !password) {
+        alert("Please fill all fields.");
+        return;
+      }
+      alert("Login Successful!");
+    }
+
+    // Set login state and redirect
+    localStorage.setItem('isLoggedIn', 'true');
+    window.location.href = "index.html";
+  }
+  function handleSubmit() {
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+  
+    if (isSignup) {
+      const name = document.getElementById('name').value.trim();
+      const confirmPassword = document.getElementById('confirmPassword').value;
+      if (!name || !email || !password || !confirmPassword) {
+        alert("Please fill all fields.");
+        return;
+      }
+      if (password !== confirmPassword) {
+        alert("Passwords do not match.");
+        return;
+      }
+      const profile = { name, email, profilePic: '', hasTakenSurvey: false };
+      localStorage.setItem('userProfile', JSON.stringify(profile));
+      alert("Account Created Successfully!");
+    } else {
+      const userData = JSON.parse(localStorage.getItem('userProfile') || '{}');
+      if (!userData.email || userData.email !== email) {
+        alert("User not found.");
+        return;
+      }
+      alert("Login Successful!");
+    }
+  
+    localStorage.setItem('isLoggedIn', 'true');
+  
+    const hasTakenSurvey = JSON.parse(localStorage.getItem('userProfile') || '{}').hasTakenSurvey;
+    if (hasTakenSurvey) {
+      window.location.href = "index.html";
+    } else {
+      window.location.href = "survey.html";
+    }
+  }
+  
+</script>
+</body>
+</html>

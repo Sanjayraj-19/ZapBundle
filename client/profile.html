@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Your Profile - ZapBundle</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" />
+  <style>
+    :root {
+  --zapblue: #1ad1ff;
+  --zapdark: #0056b3;
+}
+
+    html, body {
+      max-width: 100vw;
+      overflow-x: hidden;
+    }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(120deg, #f8f9fa 60%, #e9f2ff 100%);
+      margin: 0;
+      padding-top: 80px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      /* Remove horizontal scroll on mobile */
+      width: 100vw;
+      box-sizing: border-box;
+    }
+    .profile-bg {
+      flex: 1 0 auto;
+      min-height: 100vh;
+      width: 100vw;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      background: 
+        linear-gradient(120deg, #e9f2ff 0%, #f8f9fa 100%) no-repeat,
+        url('https://www.transparenttextures.com/patterns/cubes.png');
+      background-size: cover;
+      padding-bottom: 40px;
+    }
+    .container {
+      width: 100%;
+      max-width: 820px;
+      min-height: 70vh;
+      margin: 60px 32px 30px 32px;
+      background: rgba(255,255,255,0.98);
+      border-radius: 24px;
+      box-shadow: 0 8px 40px 0 rgba(0,123,255,0.10), 0 1.5px 8px 0 rgba(0,0,0,0.04);
+      padding: 56px 48px 44px 48px;
+      animation: slideUp 0.5s cubic-bezier(.4,0,.2,1);
+      display: flex;
+      flex-direction: column;
+      gap: 36px;
+      position: relative;
+      z-index: 2;
+    }
+    @media (max-width: 1100px) {
+      .container {
+        max-width: 98vw;
+        margin: 40px 2vw 30px 2vw;
+        padding: 32px 8vw;
+      }
+    }
+    @media (max-width: 700px) {
+      .container {
+        padding: 18px 2vw;
+        margin: 24px 0 20px 0;
+      }
+    }
+    .navbar {
+      background-color: #fff;
+      position: fixed;
+      top: 0;
+      width: 100%;
+      height: 80px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 50px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      z-index: 1000;
+      opacity: 0;
+      transform: translateY(-40px) scale(0.98);
+      transition: opacity 0.7s cubic-bezier(.4,0,.2,1), transform 0.7s cubic-bezier(.4,0,.2,1);
+      box-sizing: border-box;
+    }
+    .navbar.visible {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+    .logo-bar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.logo-img {
+  height: 40px;
+  width: 40px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 4px 16px rgba(26,209,255,0.10);
+  border: 3px solid var(--zapblue);
+  object-fit: cover;
+  margin-right: 0;
+  transition: none;
+  display: block;
+}
+.logo-img:hover {
+  transform: none;
+  box-shadow: 0 4px 16px rgba(26,209,255,0.10);
+  border-color: var(--zapblue);
+}
+
+    .logo-area {
+      display: flex;
+      align-items: center;
+      font-size: 30px;
+      font-weight: bold;
+      color: #007BFF;
+      letter-spacing: 1px;
+      gap: 10px;
+    }
+    .logo-area img {
+      height: 40px;
+      margin-right: 10px;
+      transition: transform 0.3s ease;
+    }
+    .logo-area img:hover {
+      transform: scale(1.1);
+    }
+    /* Avatar dropdown copied from index.html */
+    .dropdown {
+      position: relative;
+      display: flex;
+      align-items: center;
+      margin-left: 10px;
+    }
+    .dropdown-avatar {
+      height: 40px;
+      width: 40px;
+      border-radius: 50%;
+      border: 2px solid var(--zapblue);
+      object-fit: cover;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+      transition: box-shadow 0.25s, transform 0.25s, border-color 0.25s;
+      background: #fff;
+    }
+    .dropdown-avatar:hover {
+      box-shadow: 0 8px 24px rgba(26,209,255,0.18);
+      transform: scale(1.12) rotate(-7deg);
+      border-color: var(--zapdark);
+    }
+    .dropdown-menu {
+      position: absolute;
+      top: 54px;
+      right: 0;
+      background: #fff;
+      box-shadow: 0 12px 32px rgba(0,0,0,0.13);
+      border-radius: 14px;
+      min-width: 170px;
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+      z-index: 1001;
+      animation: dropdownIn 0.35s cubic-bezier(.4,0,.2,1);
+      transform-origin: top right;
+    }
+    @keyframes dropdownIn {
+      from { opacity: 0; transform: scaleY(0.7) translateY(-10px);}
+      to { opacity: 1; transform: scaleY(1) translateY(0);}
+    }
+    @keyframes dropdownOut {
+      from { opacity: 1; transform: scaleY(1) translateY(0);}
+      to { opacity: 0; transform: scaleY(0.7) translateY(-10px);}
+    }
+    .dropdown-menu.show {
+      display: flex;
+      animation: dropdownIn 0.35s cubic-bezier(.4,0,.2,1);
+    }
+    .dropdown-menu.hide {
+      animation: dropdownOut 0.25s cubic-bezier(.4,0,.2,1);
+    }
+    .dropdown-menu a {
+      padding: 14px 22px;
+      color: var(--zapblue);
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 16px;
+      transition: background 0.2s, color 0.2s;
+      border-bottom: 1px solid #f1f1f1;
+    }
+    .dropdown-menu a:last-child {
+      border-bottom: none;
+    }
+    .dropdown-menu a:hover {
+      background: #f5faff;
+      color: var(--zapdark);
+    }
+    .profile-header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 18px;
+      gap: 8px;
+    }
+    .profile-edit {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+      justify-content: center;
+    }
+    .profile-edit img {
+      height: 110px;
+      width: 110px;
+      border-radius: 50%;
+      border: 2px solid #007BFF;
+      object-fit: cover;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(0,123,255,0.08);
+      transition: box-shadow 0.3s, transform 0.3s;
+    }
+    .profile-edit img:hover {
+      box-shadow: 0 8px 32px rgba(0,123,255,0.18);
+      transform: scale(1.08);
+    }
+    .profile-gmail {
+      font-size: 1.05rem;
+      color: #555;
+      margin-top: 8px;
+      margin-bottom: 2px;
+      background: #f7faff;
+      padding: 5px 16px;
+      border-radius: 14px;
+      font-weight: 500;
+      letter-spacing: 0.2px;
+      box-shadow: 0 1px 4px rgba(0,123,255,0.06);
+      display: inline-block;
+      animation: fadeIn 0.8s cubic-bezier(.4,0,.2,1);
+    }
+    .profile-name-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+      margin-bottom: 0;
+    }
+    .profile-name {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #222;
+      cursor: pointer;
+      transition: color 0.2s;
+      border-radius: 8px;
+      padding: 2px 10px;
+      background: #f5faff;
+      box-shadow: 0 1px 4px rgba(0,123,255,0.04);
+      animation: fadeIn 0.8s cubic-bezier(.4,0,.2,1);
+    }
+    .profile-name:hover {
+      color: #007BFF;
+      background: #e9f2ff;
+    }
+    .profile-counts {
+      display: flex;
+      gap: 18px;
+      margin-top: 8px;
+      margin-bottom: 2px;
+      justify-content: center;
+      font-size: 1.02rem;
+      color: #555;
+      font-weight: 500;
+      animation: fadeIn 0.8s cubic-bezier(.4,0,.2,1);
+    }
+    .profile-counts span {
+      background: #e9f2ff;
+      color: #0056b3;
+      border-radius: 12px;
+      padding: 4px 14px;
+      box-shadow: 0 1px 4px rgba(0,123,255,0.06);
+      font-size: 0.98rem;
+      font-weight: 500;
+      letter-spacing: 0.1px;
+    }
+    .profile-dates {
+      margin-top: 2px;
+      font-size: 0.98rem;
+      color: #888;
+      text-align: center;
+      animation: fadeIn 0.8s cubic-bezier(.4,0,.2,1);
+    }
+    /* Modal for editing name */
+    .modal-blur-bg {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(40,60,90,0.18);
+      backdrop-filter: blur(6px);
+      z-index: 3000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: fadeIn 0.35s cubic-bezier(.4,0,.2,1);
+    }
+    .edit-name-modal {
+      background: #fff;
+      border-radius: 18px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.13);
+      padding: 36px 28px 28px 28px;
+      min-width: 320px;
+      max-width: 90vw;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      animation: slideUp 0.4s cubic-bezier(.4,0,.2,1);
+    }
+    .edit-name-modal h2 {
+      color: var(--zapblue);
+      margin-bottom: 18px;
+      font-size: 1.4rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+    .edit-name-modal input[type="text"] {
+      padding: 12px 18px;
+      font-size: 1.1rem;
+      border: 1.5px solid #d0e6ff;
+      border-radius: 10px;
+      width: 90%;
+      margin-bottom: 18px;
+      transition: border 0.2s;
+      background: #f7faff;
+      outline: none;
+    }
+    .edit-name-modal input[type="text"]:focus {
+      border: 1.5px solid #007BFF;
+    }
+    .edit-name-modal .modal-btn-row {
+      display: flex;
+      gap: 12px;
+      width: 100%;
+      justify-content: center;
+    }
+    .edit-name-modal button {
+      background: linear-gradient(90deg, #007BFF 60%, #00BFFF 100%);
+      color: white;
+      border: none;
+      padding: 10px 24px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 600;
+      transition: background 0.3s;
+      box-shadow: 0 2px 8px rgba(0,123,255,0.08);
+    }
+    .edit-name-modal button:hover {
+      background: linear-gradient(90deg, #0056b3 60%, #009acc 100%);
+    }
+    .edit-name-modal .cancel-btn {
+      background: #f7faff;
+      color: var(--zapblue);
+      border: 1.5px solid var(--zapblue);
+      box-shadow: none;
+    }
+    .edit-name-modal .cancel-btn:hover {
+      background: #e9f2ff;
+      color: var(--zapdark);
+      border-color: var(--zapdark);
+    }
+    /* Decorative blurred shapes for sides */
+    .decor-left, .decor-right {
+      position: fixed;
+      top: 120px;
+      width: 220px;
+      height: 420px;
+      z-index: 1;
+      pointer-events: none;
+      opacity: 0.18;
+      filter: blur(32px);
+      border-radius: 50%;
+      background: linear-gradient(135deg, #007BFF 60%, #00BFFF 100%);
+      transition: opacity 0.5s;
+    }
+    .decor-left {
+      left: -80px;
+      background: linear-gradient(135deg, #007BFF 60%, #00BFFF 100%);
+    }
+    .decor-right {
+      right: -80px;
+      background: linear-gradient(135deg, #ff416c 60%, #ffd200 100%);
+    }
+    @media (max-width: 900px) {
+      .decor-left, .decor-right { display: none; }
+    }
+    @keyframes slideUp {
+      from {transform: translateY(40px); opacity: 0;}
+      to {transform: translateY(0); opacity: 1;}
+    }
+    @keyframes fadeIn {
+      from {opacity: 0;} to {opacity: 1;}
+    }
+    .footer {
+      background-color: var(--zapdark);
+      color: white;
+      text-align: center;
+      padding: 30px 20px;
+      border-top-left-radius: 30px;
+      border-top-right-radius: 30px;
+      font-size: 16px;
+      margin-top: auto;
+      box-shadow: 0 -2px 8px rgba(0,123,255,0.04);
+      animation: fadeIn 0.7s cubic-bezier(.4,0,.2,1);
+    }
+    .crop-modal-blur-bg {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(40,60,90,0.18);
+      backdrop-filter: blur(6px);
+      z-index: 3000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: fadeIn 0.35s cubic-bezier(.4,0,.2,1);
+    }
+    .crop-container {
+      background: #fff;
+      padding: 28px 24px 22px 24px;
+      border-radius: 18px;
+      text-align: center;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.13);
+      animation: slideUp 0.4s cubic-bezier(.4,0,.2,1);
+      min-width: 320px;
+      max-width: 95vw;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .crop-container h3 {
+      color: var(--zapblue);
+      margin-bottom: 18px;
+      font-size: 1.3rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+    .crop-container img {
+      max-width: 320px;
+      max-height: 320px;
+      border-radius: 12px;
+      margin-bottom: 18px;
+      background: #f7faff;
+      box-shadow: 0 2px 8px rgba(0,123,255,0.08);
+    }
+    .crop-buttons {
+      margin-top: 8px;
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .crop-buttons button {
+      padding: 10px 18px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      color: white;
+      background: linear-gradient(135deg, #007BFF, #00BFFF);
+      transition: background 0.3s;
+      font-weight: 600;
+      box-shadow: 0 2px 8px rgba(0,123,255,0.08);
+    }
+    .crop-buttons button:hover {
+      background: linear-gradient(135deg, #0056b3, #009acc);
+    }
+    .crop-buttons .cancel-btn {
+      background: #f7faff;
+      color: var(--zapblue);
+      border: 1.5px solid var(--zapblue);
+      box-shadow: none;
+    }
+    .crop-buttons .cancel-btn:hover {
+      background: #e9f2ff;
+      color: var(--zapdark);
+      border-color: var(--zapdark);
+    }
+    @media (max-width: 500px) {
+      .crop-container img { max-width: 90vw; }
+      .crop-container { padding: 10px 2vw; }
+    }
+    .profile-main-heading {
+      text-align: center;
+      color: var(--zapdark);
+      font-size: 2.4rem;
+      margin-bottom: 18px;
+      letter-spacing: 1px;
+      font-weight: 800;
+      background: linear-gradient(90deg, var(--zapblue) 60%, var(--zapdark) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .profile-edit-icon {
+      margin-left: 4px;
+      display: inline-flex;
+      align-items: center;
+      opacity: 0.7;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+    .profile-edit-icon:hover {
+      opacity: 1;
+      transform: scale(1.15);
+    }
+    .section {
+      background: #f7faff;
+      border-radius: 12px;
+      padding: 22px 18px 18px 18px;
+      box-shadow: 0 2px 8px rgba(0,123,255,0.04);
+      animation: fadeIn 0.7s cubic-bezier(.4,0,.2,1);
+      margin-bottom: 18px;
+      border-left: 5px solid #007BFF1A;
+      position: relative;
+    }
+    .section-heading {
+      color: var(--zapblue);
+      margin-bottom: 10px;
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .section-content {
+      color: #333;
+      font-size: 1.07rem;
+      line-height: 1.6;
+      font-weight: 400;
+      letter-spacing: 0.1px;
+    }
+    .survey-section {
+      background: linear-gradient(90deg, #f7faff 80%, #e9f2ff 100%);
+      border-left: 5px solid #00BFFF33;
+    }
+    .survey-btn {
+      margin-top: 10px;
+      background: linear-gradient(90deg, #007BFF 60%, #00BFFF 100%);
+      color: #fff;
+      border: none;
+      padding: 12px 32px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 1.13rem;
+      font-weight: bold;
+      box-shadow: 0 2px 8px rgba(0,123,255,0.08);
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      transition: background 0.3s, transform 0.2s;
+      letter-spacing: 0.2px;
+    }
+    .survey-btn:hover {
+      background: #0056b3 !important;
+      color: #fff !important;
+    }
+    .bundle-tag {
+      display: inline-block;
+      background: #eafaff;
+      color: var(--zapdark);
+      padding: 8px 18px;
+      border-radius: 20px;
+      font-size: 16px;
+      margin: 4px 8px 4px 0;
+      transition: background 0.3s;
+      box-shadow: 0 1px 4px rgba(0,123,255,0.06);
+      font-weight: 500;
+      letter-spacing: 0.1px;
+    }
+    .bundle-tag:hover {
+      background: #d0e6ff;
+      cursor: pointer;
+    }
+    .remove-btn {
+      margin-left: 10px;
+      color: #ff416c;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 16px;
+      transition: color 0.2s;
+    }
+    .remove-btn:hover {
+      color: #b30000;
+    }
+  </style>
+</head>
+<body>
+  <div class="decor-left"></div>
+  <div class="decor-right"></div>
+  <div class="navbar" id="mainNavbar">
+    <div class="logo-bar">
+      <img src="icons/your-logo.png" alt="Logo" class="logo-img" />
+      <span style="font-size:30px; font-weight:bold; line-height:1;">
+        <span style="color:#1ad1ff;">Zap</span><span style="color:#0056b3;">Bundle</span>
+      </span>
+    </div>
+    <div class="dropdown" id="dropdown">
+      <img id="navProfilePic" class="dropdown-avatar" src="icons/default-profile.png" alt="Profile" />
+      <div class="dropdown-menu" id="dropdownMenu">
+        <a href="index.html">Home</a>
+        <a href="profile.html">Profile</a>
+        <a href="index.html#contact-us">Contact Us</a>
+        <a href="#" onclick="logout()">Logout</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="profile-bg">
+    <div class="container">
+      <h1 class="profile-main-heading" style="color:#0056b3; background:none; -webkit-text-fill-color:unset;">
+        My ZapBundle Profile
+      </h1>
+      <div class="profile-header">
+        <div class="profile-edit">
+          <label for="profileImageInput" style="cursor:pointer;">
+            <img id="previewImage" src="icons/default-profile.png" alt="Profile Picture" title="Click to change profile picture" />
+          </label>
+          <input type="file" id="profileImageInput" accept="image/*" style="display:none;" />
+        </div>
+        <div class="profile-gmail" id="profileGmail" style="background:#eafaff; color:#0056b3;">your@email.com</div>
+        <div class="profile-name-row">
+          <span class="profile-name" id="profileNameDisplay" title="Click to edit your name" style="background:#eafaff; color:#0056b3;">Your Name</span>
+          <span class="profile-edit-icon" title="Edit name" onclick="document.getElementById('profileNameDisplay').click()">
+            <svg width="18" height="18" fill="none" stroke="#1ad1ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;cursor:pointer;">
+              <path d="M12.65 4.35l1 1a1 1 0 0 1 0 1.41l-7.29 7.29a1 1 0 0 1-.7.29H4v-1.65a1 1 0 0 1 .29-.7l7.29-7.29a1 1 0 0 1 1.41 0z"/>
+            </svg>
+          </span>
+        </div>
+        <div class="profile-counts" id="profileCounts">
+          <span id="bundleCount" style="background:#eafaff; color:#0056b3;"><b>Bundles:</b> 0</span>
+          <span id="customCount" style="background:#eafaff; color:#0056b3;"><b>Custom Tools:</b> 0</span>
+        </div>
+        <div class="profile-dates" id="profileDates">
+          <span id="createdDate"><b>Created:</b> --</span> &nbsp;|&nbsp;
+          <span id="modifiedDate"><b>Last Modified:</b> --</span>
+        </div>
+      </div>
+
+      <div class="section" style="background:#eafaff;">
+        <h3 class="section-heading" style="color:#1ad1ff;">Your Selected Bundle</h3>
+        <div id="bundleInfo" class="section-content">No bundle selected.</div>
+      </div>
+
+      <div class="section" style="background:#eafaff;">
+        <h3 class="section-heading" style="color:#1ad1ff;">Your Custom Bundle</h3>
+        <div id="customBundle" class="section-content">No tools selected.</div>
+      </div>
+
+      <div class="section survey-section" style="background:#eafaff;">
+        <h3 class="section-heading" style="color:#1ad1ff;">Survey Preferences</h3>
+        <p class="section-content" style="color:#0056b3;">You can retake or modify your survey responses anytime to get more tailored SaaS recommendations.</p>
+        <button class="modify-btn survey-btn" onclick="retakeSurvey()" style="background:#1ad1ff; color:#fff;">
+          Modify Survey
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Name Modal -->
+  <div id="editNameModalBg" class="modal-blur-bg" style="display:none;">
+    <div class="edit-name-modal">
+      <h2>Edit your name</h2>
+      <input type="text" id="editNameInput" maxlength="32" />
+      <div class="modal-btn-row">
+        <button onclick="saveNameEdit()">Save</button>
+        <button class="cancel-btn" onclick="closeNameModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Crop Modal with Blur -->
+  <div id="cropModalBg" class="crop-modal-blur-bg" style="display:none;">
+    <div class="crop-container">
+      <h3>Crop Your Image</h3>
+      <img id="cropImage" />
+      <div class="crop-buttons">
+        <button onclick="undoCrop()">Undo</button>
+        <button onclick="redoCrop()">Redo</button>
+        <button onclick="saveCroppedImage()">Save</button>
+        <button class="cancel-btn" onclick="closeCropModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    @2025 ZapBundle. All rights reserved.<br />
+    Helping businesses Save on SaaS since day one.
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+  <script>
+    // Navbar animation on page load
+    window.addEventListener('DOMContentLoaded', () => {
+      setTimeout(() => {
+        document.getElementById('mainNavbar').classList.add('visible');
+      }, 80);
+
+      // Load profile data
+      const profile = JSON.parse(localStorage.getItem('userProfile') || '{}');
+      // Gmail
+      document.getElementById('profileGmail').textContent = profile.gmail || 'your@email.com';
+      // Name
+      document.getElementById('profileNameDisplay').textContent = profile.name || 'Your Name';
+      // Profile pic
+      if (profile.profilePic) {
+        document.getElementById('navProfilePic').src = profile.profilePic;
+        document.getElementById('previewImage').src = profile.profilePic;
+      }
+      // Counts
+      document.getElementById('bundleCount').textContent = 'Bundles: ' + (profile.selectedBundle ? 1 : 0);
+      document.getElementById('customCount').textContent = 'Custom Tools: ' + ((profile.customBundle && profile.customBundle.length) ? profile.customBundle.length : 0);
+      // Dates
+      document.getElementById('createdDate').textContent = 'Created: ' + (profile.createdAt ? new Date(profile.createdAt).toLocaleDateString() : '--');
+      document.getElementById('modifiedDate').textContent = 'Last Modified: ' + (profile.modifiedAt ? new Date(profile.modifiedAt).toLocaleDateString() : '--');
+      // Bundles
+      if (profile.selectedBundle) {
+        document.getElementById('bundleInfo').innerHTML = `
+          <span class="bundle-tag">${profile.selectedBundle} <span class="remove-btn" onclick="removeBundle()">✕</span></span>`;
+      }
+      if (profile.customBundle && profile.customBundle.length > 0) {
+        document.getElementById('customBundle').innerHTML = profile.customBundle.map(tool => `
+          <span class="bundle-tag">${tool} <span class="remove-btn" onclick="removeTool('${tool}')">✕</span></span>`).join('');
+      }
+    });
+
+    // Name edit modal logic
+    document.getElementById('profileNameDisplay').addEventListener('click', function() {
+      const profile = JSON.parse(localStorage.getItem('userProfile') || '{}');
+      document.getElementById('editNameInput').value = profile.name || '';
+      document.getElementById('editNameModalBg').style.display = 'flex';
+      setTimeout(() => {
+        document.getElementById('editNameInput').focus();
+      }, 100);
+    });
+    function closeNameModal() {
+      document.getElementById('editNameModalBg').style.display = 'none';
+    }
+    function saveNameEdit() {
+      const newName = document.getElementById('editNameInput').value.trim();
+      if (!newName) return;
+      const profile = JSON.parse(localStorage.getItem('userProfile') || '{}');
+      profile.name = newName;
+      profile.modifiedAt = new Date().toISOString();
+      localStorage.setItem('userProfile', JSON.stringify(profile));
+      document.getElementById('profileNameDisplay').textContent = newName;
+      document.getElementById('modifiedDate').textContent = 'Last Modified: ' + new Date(profile.modifiedAt).toLocaleDateString();
+      closeNameModal();
+    }
+    // Close modal on ESC or click outside
+    document.getElementById('editNameModalBg').addEventListener('click', function(e) {
+      if (e.target === this) closeNameModal();
+    });
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closeNameModal();
+        closeCropModal();
+      }
+    });
+
+    // Cropper logic with modal blur
+    let cropper;
+    let imageHistory = [];
+    let redoStack = [];
+    const profile = JSON.parse(localStorage.getItem('userProfile') || '{}');
+
+
+    document.getElementById('profileImageInput').addEventListener('change', function (e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        openCropModal(e.target.result);
+      };
+      reader.readAsDataURL(file);
+    });
+
+    function openCropModal(imageSrc) {
+      const img = document.getElementById('cropImage');
+      img.src = imageSrc;
+      imageHistory = [imageSrc];
+      redoStack = [];
+      img.onload = () => {
+        if (cropper) cropper.destroy();
+        cropper = new Cropper(img, {
+          aspectRatio: 1,
+          viewMode: 1,
+          background: false,
+          autoCropArea: 1,
+          responsive: true,
+          crop() {
+            // Save state for undo
+            try {
+              const dataUrl = cropper.getCroppedCanvas({ width: 300, height: 300 }).toDataURL('image/png');
+              if (imageHistory[imageHistory.length - 1] !== dataUrl) {
+                imageHistory.push(dataUrl);
+                redoStack = [];
+              }
+            } catch {}
+          }
+        });
+        document.getElementById('cropModalBg').style.display = 'flex';
+      };
+    }
+
+    function closeCropModal() {
+      document.getElementById('cropModalBg').style.display = 'none';
+      if (cropper) cropper.destroy();
+      cropper = null;
+      imageHistory = [];
+      redoStack = [];
+      document.getElementById('profileImageInput').value = '';
+    }
+
+    function saveCroppedImage() {
+      if (!cropper) return;
+      const canvas = cropper.getCroppedCanvas({ width: 300, height: 300 });
+      const croppedData = canvas.toDataURL('image/png');
+      profile.profilePic = croppedData;
+      profile.modifiedAt = new Date().toISOString();
+      localStorage.setItem('userProfile', JSON.stringify(profile));
+      document.getElementById('navProfilePic').src = croppedData;
+      document.getElementById('previewImage').src = croppedData;
+      closeCropModal();
+    }
+
+    function undoCrop() {
+      if (imageHistory.length > 1) {
+        redoStack.push(imageHistory.pop());
+        cropper.replace(imageHistory[imageHistory.length - 1]);
+      }
+    }
+
+    function redoCrop() {
+      if (redoStack.length > 0) {
+        const redoImg = redoStack.pop();
+        imageHistory.push(redoImg);
+        cropper.replace(redoImg);
+      }
+    }
+
+    // Bundles and other logic
+    function removeBundle() {
+      profile.selectedBundle = null;
+      profile.modifiedAt = new Date().toISOString();
+      localStorage.setItem('userProfile', JSON.stringify(profile));
+      location.reload();
+    }
+    function removeTool(tool) {
+      profile.customBundle = profile.customBundle.filter(t => t !== tool);
+      profile.modifiedAt = new Date().toISOString();
+      localStorage.setItem('userProfile', JSON.stringify(profile));
+      location.reload();
+    }
+    function retakeSurvey() {
+      window.location.href = "survey.html";
+    }
+    function logout() {
+      localStorage.removeItem('isLoggedIn');
+      localStorage.removeItem('userProfile');
+      window.location.href = "index.html";
+    }
+
+    // Avatar dropdown logic with smooth animation and outside click
+    const dropdown = document.getElementById('dropdown');
+    const dropdownMenu = document.getElementById('dropdownMenu');
+    const navProfilePic = document.getElementById('navProfilePic');
+    navProfilePic.addEventListener('click', function(e) {
+      e.stopPropagation();
+      if (dropdownMenu.classList.contains('show')) {
+        dropdownMenu.classList.remove('show');
+        dropdownMenu.classList.add('hide');
+        setTimeout(() => dropdownMenu.style.display = 'none', 250);
+      } else {
+        dropdownMenu.style.display = 'flex';
+        dropdownMenu.classList.remove('hide');
+        setTimeout(() => dropdownMenu.classList.add('show'), 10);
+      }
+    });
+    document.addEventListener('click', function(e) {
+      if (!dropdown.contains(e.target) && dropdownMenu.classList.contains('show')) {
+        dropdownMenu.classList.remove('show');
+        dropdownMenu.classList.add('hide');
+        setTimeout(() => dropdownMenu.style.display = 'none', 250);
+      }
+    });
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && dropdownMenu.classList.contains('show')) {
+        dropdownMenu.classList.remove('show');
+        dropdownMenu.classList.add('hide');
+        setTimeout(() => dropdownMenu.style.display = 'none', 250);
+      }
+    });
+  </script>
+</body>
+</html>
