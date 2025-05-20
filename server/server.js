@@ -214,7 +214,7 @@ app.get('/api/auth/google/callback', passport.authenticate('google', { failureRe
   async (req, res) => {
     // Issue JWT and redirect to frontend with token
     const token = jwt.sign({ userId: req.user._id, email: req.user.email }, JWT_SECRET, { expiresIn: '7d' });
-    res.redirect(`https://zapbundle.onrender.com/oauth-success.html?token=${token}`);
+    res.redirect(`https://sanjayraj-19.github.io/FrontEndZapBundle/oauth-success.html?token=${token}`);
   }
 );
 
