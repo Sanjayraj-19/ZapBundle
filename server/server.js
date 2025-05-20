@@ -31,7 +31,10 @@ connectDB().catch(err => {
 });
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: "https://sanjayraj-19.github.io",
+  credentials: true
+}));
 app.use(express.json());
 
 // JWT middleware
@@ -154,12 +157,17 @@ app.put('/api/profile', authenticateToken, async (req, res) => {
 });
 
 // Survey submission endpoint
-app.post('/api/survey', async (req, res) => {
+app.post('/api/survey', authenticateToken, async (req, res) => {
   try {
     const survey = req.body;
-    // Save to DB (optional, for analytics)
     const db = client.db('saaslink');
-    await db.collection('surveys').insertOne({ ...survey, submittedAt: new Date() });
+    await db.collection('surveys').insertOne({ ...survey, userId: req.user.userId, submittedAt: new Date() });
+
+    // Mark user as having completed the survey
+    await usersCollection.updateOne(
+      { _id: new ObjectId(req.user.userId) },
+      { $set: { surveyCompleted: true } }
+    );
 
     // Send email to zapbundle@gmail.com
     const transporter = nodemailer.createTransport({

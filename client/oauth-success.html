@@ -6,12 +6,25 @@
 </head>
 <body>
   <script>
-    // Get token from URL and save to localStorage, then redirect
     const params = new URLSearchParams(window.location.search);
     const token = params.get('token');
     if (token) {
       localStorage.setItem('token', token);
-      window.location.href = "index.html";
+      // Check survey status
+      fetch("https://zapbundle.onrender.com/api/profile", {
+        headers: { "Authorization": "Bearer " + token }
+      })
+      .then(res => res.json())
+      .then(profile => {
+        if (profile.surveyCompleted) {
+          window.location.href = "index.html";
+        } else {
+          window.location.href = "survey.html";
+        }
+      })
+      .catch(() => {
+        window.location.href = "index.html";
+      });
     } else {
       document.body.innerHTML = "<h2>OAuth login failed. Please try again.</h2>";
     }
