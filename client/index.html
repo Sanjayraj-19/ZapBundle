@@ -871,7 +871,7 @@
   // BACKEND-AWARE LOGIN/PROFILE LOGIC
   // =========================
 
-  const API_URL = "https://zapbundle.onrender.com"; // Change to your deployed backend URL
+  const API_URL = "https://zapbundle.onrender.com";
 
   // Helper: Get JWT token
   function getToken() {
@@ -883,7 +883,7 @@
     return { "Authorization": "Bearer " + getToken() };
   }
 
-  // Check login and fetch profile from backend
+  // Fetch profile from backend
   async function getProfile() {
     const token = getToken();
     if (!token) return null;
@@ -899,19 +899,22 @@
   // Render nav button area (avatar or CTA)
   async function renderNavButtonArea() {
     const navArea = document.getElementById('nav-button-area');
+    if (!navArea) return;
     navArea.innerHTML = ""; // Clear previous
 
     const profile = await getProfile();
 
+    // Hide or show all .hide-on-login elements
+    document.querySelectorAll('.hide-on-login').forEach(el => {
+      el.style.display = profile ? 'none' : '';
+    });
+
     if (!profile) {
-      // Not logged in: show CTA button
       navArea.innerHTML = `<a href="signup.html" class="top-button" id="main-cta-btn">Get Early Access</a>`;
-      document.querySelectorAll('.hide-on-login').forEach(el => el.style.display = '');
       return;
     }
 
     // Logged in: show avatar dropdown
-    document.querySelectorAll('.hide-on-login').forEach(el => el.style.display = 'none');
     const profilePic = profile.profilePic || 'icons/default-profile.png';
     navArea.innerHTML = `
       <div class="dropdown" id="dropdown">
@@ -957,41 +960,13 @@
     });
   }
 
-  // Logout function
   function logout() {
     localStorage.removeItem('token');
     location.href = "index.html";
   }
 
-  // Survey button logic
-  async function updateSurveyButton() {
-    const surveyBtn = document.getElementById('surveyBtn');
-    if (!surveyBtn) return;
-
-    const profile = await getProfile();
-    if (!profile) {
-      surveyBtn.textContent = "Take the Survey";
-      surveyBtn.onclick = function(e) {
-        e.preventDefault();
-        window.location.href = "signup.html";
-      };
-      return;
-    }
-
-    // If you store survey completion in the backend, check it here.
-    // For now, always allow retake:
-    surveyBtn.textContent = "Take the Survey";
-    surveyBtn.onclick = function(e) {
-      e.preventDefault();
-      window.location.href = "survey.html";
-    };
-  }
-
-  // On DOMContentLoaded, render the nav button area and survey button
-  window.addEventListener('DOMContentLoaded', async function() {
-    await renderNavButtonArea();
-    await updateSurveyButton();
-  });
+  // On DOMContentLoaded, render the nav button area
+  window.addEventListener('DOMContentLoaded', renderNavButtonArea);
 </script>
 
 

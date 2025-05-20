@@ -2,10 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Your Profile - ZapBundle</title>
-  <link rel="stylesheet" href="styles.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" />
+  <link rel="stylesheet" href="styles.css">
   <style>
     :root {
   --zapblue: #1ad1ff;
@@ -594,11 +593,62 @@
     .remove-btn:hover {
       color: #b30000;
     }
+
+    .profile-container {
+      max-width: 480px;
+      margin: 60px auto 40px auto;
+      background: #fff;
+      border-radius: 18px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+      padding: 36px 28px 28px 28px;
+      text-align: center;
+    }
+    .profile-avatar {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      border: 3px solid #007BFF;
+      object-fit: cover;
+      margin-bottom: 18px;
+      background: #f8f9fa;
+    }
+    .profile-info {
+      font-size: 18px;
+      color: #333;
+      margin-bottom: 10px;
+    }
+    .logout-btn {
+      margin-top: 22px;
+      padding: 12px 32px;
+      font-size: 17px;
+      background: #007BFF;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.2s;
+    }
+    .logout-btn:hover {
+      background: #0056b3;
+    }
+    .loading-spinner {
+      margin: 80px auto;
+      border: 6px solid #f3f3f3;
+      border-top: 6px solid #007BFF;
+      border-radius: 50%;
+      width: 48px;
+      height: 48px;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg);}
+      100% { transform: rotate(360deg);}
+    }
   </style>
 </head>
 <body>
-  <div class="decor-left"></div>
-  <div class="decor-right"></div>
+  <!-- Navbar -->
   <div class="navbar" id="mainNavbar">
     <div class="logo-bar">
       <img src="icons/your-logo.png" alt="Logo" class="logo-img" />
@@ -606,102 +656,20 @@
         <span style="color:#1ad1ff;">Zap</span><span style="color:#0056b3;">Bundle</span>
       </span>
     </div>
-    <div class="dropdown" id="dropdown">
-      <img id="navProfilePic" class="dropdown-avatar" src="icons/default-profile.png" alt="Profile" />
-      <div class="dropdown-menu" id="dropdownMenu">
-        <a href="index.html">Home</a>
-        <a href="profile.html">Profile</a>
-        <a href="index.html#contact-us">Contact Us</a>
-        <a href="#" onclick="logout()">Logout</a>
-      </div>
-    </div>
+    <div id="nav-button-area"></div>
   </div>
 
-  <div class="profile-bg">
-    <div class="container">
-      <h1 class="profile-main-heading" style="color:#0056b3; background:none; -webkit-text-fill-color:unset;">
-        My ZapBundle Profile
-      </h1>
-      <div class="profile-header">
-        <div class="profile-edit">
-          <label for="profileImageInput" style="cursor:pointer;">
-            <img id="previewImage" src="icons/default-profile.png" alt="Profile Picture" title="Click to change profile picture" />
-          </label>
-          <input type="file" id="profileImageInput" accept="image/*" style="display:none;" />
-        </div>
-        <div class="profile-gmail" id="profileGmail" style="background:#eafaff; color:#0056b3;">your@email.com</div>
-        <div class="profile-name-row">
-          <span class="profile-name" id="profileNameDisplay" title="Click to edit your name" style="background:#eafaff; color:#0056b3;">Your Name</span>
-          <span class="profile-edit-icon" title="Edit name" onclick="document.getElementById('profileNameDisplay').click()">
-            <svg width="18" height="18" fill="none" stroke="#1ad1ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;cursor:pointer;">
-              <path d="M12.65 4.35l1 1a1 1 0 0 1 0 1.41l-7.29 7.29a1 1 0 0 1-.7.29H4v-1.65a1 1 0 0 1 .29-.7l7.29-7.29a1 1 0 0 1 1.41 0z"/>
-            </svg>
-          </span>
-        </div>
-        <div class="profile-counts" id="profileCounts">
-          <span id="bundleCount" style="background:#eafaff; color:#0056b3;"><b>Bundles:</b> 0</span>
-          <span id="customCount" style="background:#eafaff; color:#0056b3;"><b>Custom Tools:</b> 0</span>
-        </div>
-        <div class="profile-dates" id="profileDates">
-          <span id="createdDate"><b>Created:</b> --</span> &nbsp;|&nbsp;
-          <span id="modifiedDate"><b>Last Modified:</b> --</span>
-        </div>
-      </div>
-
-      <div class="section" style="background:#eafaff;">
-        <h3 class="section-heading" style="color:#1ad1ff;">Your Selected Bundle</h3>
-        <div id="bundleInfo" class="section-content">No bundle selected.</div>
-      </div>
-
-      <div class="section" style="background:#eafaff;">
-        <h3 class="section-heading" style="color:#1ad1ff;">Your Custom Bundle</h3>
-        <div id="customBundle" class="section-content">No tools selected.</div>
-      </div>
-
-      <div class="section survey-section" style="background:#eafaff;">
-        <h3 class="section-heading" style="color:#1ad1ff;">Survey Preferences</h3>
-        <p class="section-content" style="color:#0056b3;">You can retake or modify your survey responses anytime to get more tailored SaaS recommendations.</p>
-        <button class="modify-btn survey-btn" onclick="retakeSurvey()" style="background:#1ad1ff; color:#fff;">
-          Modify Survey
-        </button>
-      </div>
-    </div>
+  <div id="profileContent">
+    <div class="loading-spinner"></div>
   </div>
 
-  <!-- Edit Name Modal -->
-  <div id="editNameModalBg" class="modal-blur-bg" style="display:none;">
-    <div class="edit-name-modal">
-      <h2>Edit your name</h2>
-      <input type="text" id="editNameInput" maxlength="32" />
-      <div class="modal-btn-row">
-        <button onclick="saveNameEdit()">Save</button>
-        <button class="cancel-btn" onclick="closeNameModal()">Cancel</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Crop Modal with Blur -->
-  <div id="cropModalBg" class="crop-modal-blur-bg" style="display:none;">
-    <div class="crop-container">
-      <h3>Crop Your Image</h3>
-      <img id="cropImage" />
-      <div class="crop-buttons">
-        <button onclick="undoCrop()">Undo</button>
-        <button onclick="redoCrop()">Redo</button>
-        <button onclick="saveCroppedImage()">Save</button>
-        <button class="cancel-btn" onclick="closeCropModal()">Cancel</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="footer">
+  <div class="footer scroll-fade">
     @2025 ZapBundle. All rights reserved.<br />
     Helping businesses Save on SaaS since day one.
   </div>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
-  <script>
-const API_URL = "https://zapbundle.onrender.com"; // Change to your deployed backend URL
+<script>
+const API_URL = "https://zapbundle.onrender.com";
 
 // Helper: Get JWT token
 function getToken() {
@@ -713,231 +681,115 @@ function authHeader() {
   return { "Authorization": "Bearer " + getToken() };
 }
 
-// Load profile data from backend
-async function loadProfile() {
+// Fetch profile from backend
+async function getProfile() {
   const token = getToken();
-  if (!token) {
+  if (!token) return null;
+  try {
+    const res = await fetch(`${API_URL}/profile`, { headers: authHeader() });
+    if (!res.ok) return null;
+    return await res.json();
+  } catch {
+    return null;
+  }
+}
+
+// Render nav button area (avatar or CTA)
+async function renderNavButtonArea() {
+  const navArea = document.getElementById('nav-button-area');
+  if (!navArea) return;
+  navArea.innerHTML = ""; // Clear previous
+
+  const profile = await getProfile();
+
+  // Hide or show all .hide-on-login elements
+  document.querySelectorAll('.hide-on-login').forEach(el => {
+    el.style.display = profile ? 'none' : '';
+  });
+
+  if (!profile) {
+    navArea.innerHTML = `<a href="signup.html" class="top-button" id="main-cta-btn">Get Early Access</a>`;
+    return;
+  }
+
+  // Logged in: show avatar dropdown
+  const profilePic = profile.profilePic || 'icons/default-profile.png';
+  navArea.innerHTML = `
+    <div class="dropdown" id="dropdown">
+      <img id="navProfilePic" class="dropdown-avatar" src="${profilePic}" alt="Profile" />
+      <div class="dropdown-menu" id="dropdownMenu">
+        <a href="index.html">Home</a>
+        <a href="profile.html">Profile</a>
+        <a href="index.html#contact-us">Contact Us</a>
+        <a href="#" onclick="logout()">Logout</a>
+      </div>
+    </div>
+  `;
+
+  // Dropdown logic (animation, outside click, ESC)
+  const dropdown = document.getElementById('dropdown');
+  const dropdownMenu = document.getElementById('dropdownMenu');
+  const navProfilePic = document.getElementById('navProfilePic');
+  navProfilePic.addEventListener('click', function(e) {
+    e.stopPropagation();
+    if (dropdownMenu.classList.contains('show')) {
+      dropdownMenu.classList.remove('show');
+      dropdownMenu.classList.add('hide');
+      setTimeout(() => dropdownMenu.style.display = 'none', 250);
+    } else {
+      dropdownMenu.style.display = 'flex';
+      dropdownMenu.classList.remove('hide');
+      setTimeout(() => dropdownMenu.classList.add('show'), 10);
+    }
+  });
+  document.addEventListener('click', function(e) {
+    if (!dropdown.contains(e.target) && dropdownMenu.classList.contains('show')) {
+      dropdownMenu.classList.remove('show');
+      dropdownMenu.classList.add('hide');
+      setTimeout(() => dropdownMenu.style.display = 'none', 250);
+    }
+  });
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && dropdownMenu.classList.contains('show')) {
+      dropdownMenu.classList.remove('show');
+      dropdownMenu.classList.add('hide');
+      setTimeout(() => dropdownMenu.style.display = 'none', 250);
+    }
+  });
+}
+
+function logout() {
+  localStorage.removeItem('token');
+  location.href = "index.html";
+}
+
+// Render profile info
+async function renderProfile() {
+  const profileContent = document.getElementById('profileContent');
+  const profile = await getProfile();
+
+  if (!profile) {
+    alert("Session expired or unauthorized. Please log in again.");
+    localStorage.removeItem('token');
     window.location.href = "signup.html";
     return;
   }
-  try {
-    const res = await fetch(`${API_URL}/profile`, {
-      headers: { ...authHeader() }
-    });
-    if (!res.ok) throw new Error("Unauthorized");
-    const profile = await res.json();
 
-    // Gmail
-    document.getElementById('profileGmail').textContent = profile.email || 'your@email.com';
-    // Name
-    document.getElementById('profileNameDisplay').textContent = profile.name || 'Your Name';
-    // Profile pic
-    if (profile.profilePic) {
-      document.getElementById('navProfilePic').src = profile.profilePic;
-      document.getElementById('previewImage').src = profile.profilePic;
-    }
-    // Counts
-    document.getElementById('bundleCount').textContent = 'Bundles: ' + (profile.selectedBundle ? 1 : 0);
-    document.getElementById('customCount').textContent = 'Custom Tools: ' + ((profile.customBundle && profile.customBundle.length) ? profile.customBundle.length : 0);
-    // Dates
-    document.getElementById('createdDate').textContent = 'Created: ' + (profile.createdAt ? new Date(profile.createdAt).toLocaleDateString() : '--');
-    document.getElementById('modifiedDate').textContent = 'Last Modified: ' + (profile.modifiedAt ? new Date(profile.modifiedAt).toLocaleDateString() : '--');
-    // Bundles
-    if (profile.selectedBundle) {
-      document.getElementById('bundleInfo').innerHTML = `
-        <span class="bundle-tag">${profile.selectedBundle} <span class="remove-btn" onclick="removeBundle()">✕</span></span>`;
-    } else {
-      document.getElementById('bundleInfo').innerHTML = "No bundle selected.";
-    }
-    if (profile.customBundle && profile.customBundle.length > 0) {
-      document.getElementById('customBundle').innerHTML = profile.customBundle.map(tool => `
-        <span class="bundle-tag">${tool} <span class="remove-btn" onclick="removeTool('${tool}')">✕</span></span>`).join('');
-    } else {
-      document.getElementById('customBundle').innerHTML = "No tools selected.";
-    }
-  } catch (err) {
-    alert("Session expired or unauthorized. Please login again.");
-    localStorage.removeItem('token');
-    window.location.href = "signup.html";
-  }
+  profileContent.innerHTML = `
+    <div class="profile-container">
+      <img src="${profile.profilePic || 'icons/default-profile.png'}" class="profile-avatar" alt="Profile" />
+      <div class="profile-info"><b>Name:</b> ${profile.name || "N/A"}</div>
+      <div class="profile-info"><b>Email:</b> ${profile.email}</div>
+      <div class="profile-info"><b>Joined:</b> ${profile.createdAt ? new Date(profile.createdAt).toLocaleDateString() : "N/A"}</div>
+      <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+  `;
 }
 
-// Save profile changes to backend
-async function saveProfile(changes) {
-  try {
-    const res = await fetch(`${API_URL}/profile`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        ...authHeader()
-      },
-      body: JSON.stringify(changes)
-    });
-    if (!res.ok) throw new Error("Failed to update profile");
-    await loadProfile();
-  } catch (err) {
-    alert("Could not update profile. Please try again.");
-  }
-}
-
-// Name edit modal logic
-document.getElementById('profileNameDisplay').addEventListener('click', function() {
-  document.getElementById('editNameInput').value = document.getElementById('profileNameDisplay').textContent;
-  document.getElementById('editNameModalBg').style.display = 'flex';
-  setTimeout(() => {
-    document.getElementById('editNameInput').focus();
-  }, 100);
-});
-function closeNameModal() {
-  document.getElementById('editNameModalBg').style.display = 'none';
-}
-async function saveNameEdit() {
-  const newName = document.getElementById('editNameInput').value.trim();
-  if (!newName) return;
-  await saveProfile({ name: newName });
-  closeNameModal();
-}
-document.getElementById('editNameModalBg').addEventListener('click', function(e) {
-  if (e.target === this) closeNameModal();
-});
-document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape') {
-    closeNameModal();
-    closeCropModal();
-  }
-});
-
-// Cropper logic with modal blur
-let cropper;
-let imageHistory = [];
-let redoStack = [];
-
-document.getElementById('profileImageInput').addEventListener('change', function (e) {
-  const file = e.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = function (e) {
-    openCropModal(e.target.result);
-  };
-  reader.readAsDataURL(file);
-});
-
-function openCropModal(imageSrc) {
-  const img = document.getElementById('cropImage');
-  img.src = imageSrc;
-  imageHistory = [imageSrc];
-  redoStack = [];
-  img.onload = () => {
-    if (cropper) cropper.destroy();
-    cropper = new Cropper(img, {
-      aspectRatio: 1,
-      viewMode: 1,
-      background: false,
-      autoCropArea: 1,
-      responsive: true,
-      crop() {
-        try {
-          const dataUrl = cropper.getCroppedCanvas({ width: 300, height: 300 }).toDataURL('image/png');
-          if (imageHistory[imageHistory.length - 1] !== dataUrl) {
-            imageHistory.push(dataUrl);
-            redoStack = [];
-          }
-        } catch {}
-      }
-    });
-    document.getElementById('cropModalBg').style.display = 'flex';
-  };
-}
-
-function closeCropModal() {
-  document.getElementById('cropModalBg').style.display = 'none';
-  if (cropper) cropper.destroy();
-  cropper = null;
-  imageHistory = [];
-  redoStack = [];
-  document.getElementById('profileImageInput').value = '';
-}
-
-async function saveCroppedImage() {
-  if (!cropper) return;
-  const canvas = cropper.getCroppedCanvas({ width: 300, height: 300 });
-  const croppedData = canvas.toDataURL('image/png');
-  await saveProfile({ profilePic: croppedData });
-  closeCropModal();
-}
-
-function undoCrop() {
-  if (imageHistory.length > 1) {
-    redoStack.push(imageHistory.pop());
-    cropper.replace(imageHistory[imageHistory.length - 1]);
-  }
-}
-
-function redoCrop() {
-  if (redoStack.length > 0) {
-    const redoImg = redoStack.pop();
-    imageHistory.push(redoImg);
-    cropper.replace(redoImg);
-  }
-}
-
-// Bundles and other logic
-async function removeBundle() {
-  await saveProfile({ selectedBundle: null });
-}
-async function removeTool(tool) {
-  // Fetch current profile, remove tool, then save
-  const res = await fetch(`${API_URL}/profile`, { headers: authHeader() });
-  const profile = await res.json();
-  const customBundle = (profile.customBundle || []).filter(t => t !== tool);
-  await saveProfile({ customBundle });
-}
-function retakeSurvey() {
-  window.location.href = "survey.html";
-}
-function logout() {
-  localStorage.removeItem('token');
-  window.location.href = "index.html";
-}
-
-// Navbar animation on page load
 window.addEventListener('DOMContentLoaded', () => {
-  setTimeout(() => {
-    document.getElementById('mainNavbar').classList.add('visible');
-  }, 80);
-  loadProfile();
+  renderNavButtonArea();
+  renderProfile();
 });
-
-// Avatar dropdown logic with smooth animation and outside click
-const dropdown = document.getElementById('dropdown');
-const dropdownMenu = document.getElementById('dropdownMenu');
-const navProfilePic = document.getElementById('navProfilePic');
-navProfilePic.addEventListener('click', function(e) {
-  e.stopPropagation();
-  if (dropdownMenu.classList.contains('show')) {
-    dropdownMenu.classList.remove('show');
-    dropdownMenu.classList.add('hide');
-    setTimeout(() => dropdownMenu.style.display = 'none', 250);
-  } else {
-    dropdownMenu.style.display = 'flex';
-    dropdownMenu.classList.remove('hide');
-    setTimeout(() => dropdownMenu.classList.add('show'), 10);
-  }
-});
-document.addEventListener('click', function(e) {
-  if (!dropdown.contains(e.target) && dropdownMenu.classList.contains('show')) {
-    dropdownMenu.classList.remove('show');
-    dropdownMenu.classList.add('hide');
-    setTimeout(() => dropdownMenu.style.display = 'none', 250);
-  }
-});
-document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape' && dropdownMenu.classList.contains('show')) {
-    dropdownMenu.classList.remove('show');
-    dropdownMenu.classList.add('hide');
-    setTimeout(() => dropdownMenu.style.display = 'none', 250);
-  }
-});
-  </script>
+</script>
 </body>
 </html>

@@ -5,155 +5,28 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Signup or Login - ZapBundle</title>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-    html, body {
-      height: 100%;
-    }
-    body {
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-      background-color: #f8f9fa;
-    }
-    a {
-      text-decoration: none;
-    }
-    h2 {
-      font-size: 32px;
-      margin-bottom: 25px;
-      color: #000;
-      text-align: center;
-    }
-
-    .navbar {
-      background-color: #ffffff;
-      height: 80px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 0 50px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    }
-    .logo-img-round {
-      height: 40px;
-      margin-right: 10px;
-      border-radius: 50%;
-      object-fit: cover;
-      background: #fff;
-      border: 2px solid #007BFF;
-    }
-    .logo {
-      display: flex;
-      align-items: center;
-      font-size: 28px;
-      font-weight: bold;
-      color: #007BFF;
-    }
-    .top-button {
-      background-color: #007BFF;
-      color: white;
-      padding: 10px 22px;
-      border-radius: 8px;
-      font-size: 16px;
-      font-weight: bold;
-      transition: 0.3s;
-    }
-    .top-button:hover {
-      background-color: #0056b3;
-    }
-
-    main {
-      flex: 1;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
-    }
-    .form-container {
-      background-color: #ffffff;
-      padding: 35px 30px;
-      border-radius: 15px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      width: 100%;
-      max-width: 400px;
-      text-align: center;
-    }
-    .form-container input[type="text"],
-    .form-container input[type="email"],
-    .form-container input[type="password"] {
-      width: 100%;
-      padding: 12px;
-      margin-bottom: 20px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      font-size: 16px;
-    }
-    .form-container button {
-      width: 100%;
-      background-color: #007BFF;
-      color: white;
-      padding: 14px;
-      border: none;
-      border-radius: 6px;
-      font-size: 18px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: background-color 0.3s;
-    }
-    .form-container button:hover {
-      background-color: #0056b3;
-    }
-    .toggle-link {
-      margin-top: 15px;
-      display: block;
-      color: #007BFF;
-      cursor: pointer;
-    }
-    .show-password {
-      display: flex;
-      align-items: center;
-      justify-content: flex-start;
-      margin-bottom: 20px;
-      font-size: 14px;
-    }
-    .show-password input[type="checkbox"] {
-      width: 18px;
-      height: 18px;
-      margin-right: 10px;
-      accent-color: #007BFF;
-      cursor: pointer;
-    }
-
-    .footer {
-      background-color: #000000;
-      color: white;
-      text-align: center;
-      padding: 30px 20px;
-      border-top-left-radius: 30px;
-      border-top-right-radius: 30px;
-      font-size: 16px;
-      margin-top: auto;
-    }
-    .email-check {
-      font-size: 14px;
-      color: #d32f2f;
-      margin-bottom: 10px;
-      display: none;
-      text-align: left;
-    }
-    .email-check.available {
-      color: #388e3c;
-      display: block;
-    }
-    .email-check.taken {
-      color: #d32f2f;
-      display: block;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    html, body { height: 100%; }
+    body { display: flex; flex-direction: column; min-height: 100vh; background-color: #f8f9fa; }
+    a { text-decoration: none; }
+    h2 { font-size: 32px; margin-bottom: 25px; color: #000; text-align: center; }
+    .navbar { background-color: #ffffff; height: 80px; display: flex; justify-content: space-between; align-items: center; padding: 0 50px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); }
+    .logo-img-round { height: 40px; margin-right: 10px; border-radius: 50%; object-fit: cover; background: #fff; border: 2px solid #007BFF; }
+    .logo { display: flex; align-items: center; font-size: 28px; font-weight: bold; color: #007BFF; }
+    .top-button { background-color: #007BFF; color: white; padding: 10px 22px; border-radius: 8px; font-size: 16px; font-weight: bold; transition: 0.3s; }
+    .top-button:hover { background-color: #0056b3; }
+    main { flex: 1; display: flex; justify-content: center; align-items: center; padding: 20px; }
+    .form-container { background-color: #ffffff; padding: 35px 30px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); width: 100%; max-width: 400px; text-align: center; }
+    .form-container input[type="text"], .form-container input[type="email"], .form-container input[type="password"] { width: 100%; padding: 12px; margin-bottom: 20px; border-radius: 6px; border: 1px solid #ccc; font-size: 16px; }
+    .form-container button { width: 100%; background-color: #007BFF; color: white; padding: 14px; border: none; border-radius: 6px; font-size: 18px; font-weight: bold; cursor: pointer; transition: background-color 0.3s; }
+    .form-container button:hover { background-color: #0056b3; }
+    .toggle-link { margin-top: 15px; display: block; color: #007BFF; cursor: pointer; }
+    .show-password { display: flex; align-items: center; justify-content: flex-start; margin-bottom: 20px; font-size: 14px; }
+    .show-password input[type="checkbox"] { width: 18px; height: 18px; margin-right: 10px; accent-color: #007BFF; cursor: pointer; }
+    .footer { background-color: #000000; color: white; text-align: center; padding: 30px 20px; border-top-left-radius: 30px; border-top-right-radius: 30px; font-size: 16px; margin-top: auto; }
+    .email-check { font-size: 14px; color: #d32f2f; margin-bottom: 10px; display: none; text-align: left; }
+    .email-check.available { color: #388e3c; display: block; }
+    .email-check.taken { color: #d32f2f; display: block; }
   </style>
 </head>
 <body>
@@ -188,7 +61,7 @@
       <label for="togglePassword">Show Password</label>
     </div>
 
-    <button onclick="handleSubmit()">Create Account</button>
+    <button type="button" onclick="handleSubmit()">Create Account</button>
     <span class="toggle-link" onclick="toggleForm()">Already have an account? Login</span>
   </div>
 </main>
@@ -201,13 +74,13 @@
 
 <script>
   let isSignup = true;
-  const API_URL = "https://zapbundle.onrender.com"; // Change to your deployed backend URL if needed
+  const API_URL = "https://zapbundle.onrender.com";
 
   function toggleForm() {
     const title = document.getElementById('form-title');
     const nameField = document.getElementById('name');
     const confirmPasswordField = document.getElementById('confirmPassword');
-    const button = document.querySelector('button');
+    const button = document.querySelector('.form-container button[type="button"]');
     const link = document.querySelector('.toggle-link');
     document.getElementById('emailCheck').style.display = 'none';
 
@@ -244,7 +117,6 @@
       emailCheck.style.display = 'none';
       return;
     }
-    // Call backend to check email
     try {
       const res = await fetch(`${API_URL}/check-email?email=${encodeURIComponent(email)}`);
       const data = await res.json();
@@ -324,7 +196,7 @@
         }
         // Save JWT token for authenticated requests
         localStorage.setItem('token', data.token);
-        // Check survey status
+        // Check survey status and redirect accordingly
         fetch(`${API_URL}/profile`, {
           headers: { "Authorization": "Bearer " + data.token }
         })
