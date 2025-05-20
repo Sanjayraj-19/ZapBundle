@@ -81,11 +81,10 @@ passport.use(new GoogleStrategy({
   return done(null, user);
 }));
 
-
 // Register
 app.post('/api/register', async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, name } = req.body;
     if (!email || !password)
       return res.status(400).json({ error: 'Email and password required.' });
 
@@ -94,7 +93,7 @@ app.post('/api/register', async (req, res) => {
       return res.status(409).json({ error: 'Email already registered.' });
 
     const hashed = await bcrypt.hash(password, 12);
-    const user = { email, password: hashed, createdAt: new Date() };
+    const user = { email, password: hashed, name: name || "", createdAt: new Date() };
     await usersCollection.insertOne(user);
 
     res.status(201).json({ message: 'User registered successfully.' });
@@ -166,8 +165,8 @@ app.post('/api/survey', async (req, res) => {
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
-        user: process.env.EMAIL_USER, // your gmail
-        pass: process.env.EMAIL_PASS  // app password (not your gmail password)
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
       }
     });
 
@@ -217,7 +216,6 @@ app.get('/api/auth/google/callback', passport.authenticate('google', { failureRe
     res.redirect(`https://sanjayraj-19.github.io/FrontEndZapBundle/oauth-success.html?token=${token}`);
   }
 );
-
 
 // Optional: login failed route
 app.get('/login-failed', (req, res) => {
