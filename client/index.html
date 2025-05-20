@@ -761,11 +761,6 @@
     setTimeout(() => {
       document.getElementById('mainNavbar').classList.add('visible');
     }, 80);
-
-    renderProfileNav();
-    if (isLoggedIn) {
-      document.querySelectorAll('.hide-on-login').forEach(el => el.style.display = 'none');
-    }
   });
 
   // Modern scroll animation: always reveal on scroll, hide when out of view
@@ -784,97 +779,16 @@
   window.addEventListener('scroll', revealOnScroll);
   window.addEventListener('DOMContentLoaded', revealOnScroll);
 
-  // Avatar dropdown logic (copied from profile.html, with animation and hover)
-  function renderProfileNav() {
-    const navArea = document.getElementById('nav-button-area');
-    const userData = JSON.parse(localStorage.getItem('userProfile')) || {};
-    const profilePic = userData.profilePic || 'icons/default-profile.png';
-    navArea.innerHTML = `
-      <div class="dropdown" id="dropdown" style="position: relative;">
-        <img id="navProfilePic" class="dropdown-avatar" src="${profilePic}" alt="Profile" />
-        <div class="dropdown-menu" id="dropdownMenu">
-          <a href="index.html">Home</a>
-          <a href="profile.html">Profile</a>
-          <a href="index.html#contact-us">Contact Us</a>
-          <a href="#" onclick="logout()">Logout</a>
-        </div>
-      </div>
-    `;
-
-    // Attach dropdown logic
-    const dropdown = document.getElementById('dropdown');
-    const dropdownMenu = document.getElementById('dropdownMenu');
-    const navProfilePic = document.getElementById('navProfilePic');
-    navProfilePic.addEventListener('click', function(e) {
-      e.stopPropagation();
-      if (dropdownMenu.classList.contains('show')) {
-        dropdownMenu.classList.remove('show');
-        dropdownMenu.classList.add('hide');
-        setTimeout(() => dropdownMenu.style.display = 'none', 250);
-      } else {
-        dropdownMenu.style.display = 'flex';
-        dropdownMenu.classList.remove('hide');
-        setTimeout(() => dropdownMenu.classList.add('show'), 10);
-      }
-    });
-    document.addEventListener('click', function(e) {
-      if (!dropdown.contains(e.target) && dropdownMenu.classList.contains('show')) {
-        dropdownMenu.classList.remove('show');
-        dropdownMenu.classList.add('hide');
-        setTimeout(() => dropdownMenu.style.display = 'none', 250);
-      }
-    });
-    document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape' && dropdownMenu.classList.contains('show')) {
-        dropdownMenu.classList.remove('show');
-        dropdownMenu.classList.add('hide');
-        setTimeout(() => dropdownMenu.style.display = 'none', 250);
-      }
-    });
-  }
-
-  function logout() {
-    localStorage.removeItem('isLoggedIn');
-    localStorage.removeItem('hasTakenSurvey');
-    localStorage.removeItem('userProfile');
-    location.href = "index.html";
-  }
-
-  function goToSurvey() {
-    if (isLoggedIn) {
-      if (localStorage.getItem('hasTakenSurvey') === 'true') {
-        alert("Thank you for taking the survey!");
-      } else {
-        window.location.href = "survey.html";
-      }
-    } else {
-      window.location.href = "signup.html";
-    }
-  }
+  // Parallax effect for decor spots (background moves slower than content)
+  window.addEventListener('scroll', function() {
+    const scrollY = window.scrollY || window.pageYOffset;
+    const left = document.querySelector('.decor-spot-left');
+    const right = document.querySelector('.decor-spot-right');
+    if (left) left.style.transform = `translateY(${scrollY * 0.10}px)`;
+    if (right) right.style.transform = `translateY(${scrollY * 0.06}px)`;
+  });
 
   // Custom Bundle Popup Logic
-  function handleBundleClick(bundleName) {
-    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-    const userProfile = JSON.parse(localStorage.getItem('userProfile') || '{}');
-
-    if (!isLoggedIn) {
-      localStorage.setItem('redirectAfterLogin', bundleName);
-      return window.location.href = 'signup.html';
-    }
-
-    if (!userProfile.hasTakenSurvey) {
-      localStorage.setItem('redirectAfterSurvey', bundleName);
-      return window.location.href = 'survey.html';
-    }
-
-    if (bundleName === 'custom') {
-      openMenu(true);
-    } else {
-      alert(`Your interest in the “${bundleName}” bundle has been registered!`);
-      saveBundleChoice(bundleName);
-    }
-  }
-
   function openMenu(enable) {
     const overlay = document.getElementById('bundleOverlay');
     const popup = overlay.querySelector('.bundle-popup');
@@ -910,75 +824,60 @@
       label.style.display = name.includes(query.toLowerCase()) ? 'flex' : 'none';
     });
   }
-  function submitCustomBundle() {
-    // Get checked SaaS
-    const checked = Array.from(document.querySelectorAll('#saasList input:checked'))
-      .map(cb => cb.value);
-    // Get "Other" value if checked
-    const otherChecked = document.getElementById('otherBundleCheck').checked;
-    const otherValue = document.getElementById('otherBundleInput').value.trim();
-
-    // Require at least 2 selections (including "Other" if filled)
-    let selected = checked;
-    if (otherChecked && otherValue) {
-      selected.push(otherValue);
-    }
-    if (selected.length < 2) {
-      alert("Please select at least two SaaS tools or enter your desired tool(s).");
-      return;
-    }
-
-    const userProfile = JSON.parse(localStorage.getItem('userProfile') || '{}');
-    userProfile.customBundle = selected;
-    localStorage.setItem('userProfile', JSON.stringify(userProfile));
-    closeMenu();
-    alert("Your custom bundle preferences have been saved!");
-  }
-  function saveBundleChoice(bundleName) {
-    const userProfile = JSON.parse(localStorage.getItem('userProfile') || '{}');
-    userProfile.selectedBundle = bundleName;
-    localStorage.setItem('userProfile', JSON.stringify(userProfile));
-  }
-
   document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') closeMenu();
-  });
-
-  window.addEventListener('load', () => {
-    const userProfile = JSON.parse(localStorage.getItem('userProfile') || '{}');
-    const bundleName = localStorage.getItem('redirectAfterSurvey') || localStorage.getItem('redirectAfterLogin');
-    if (userProfile.hasTakenSurvey && bundleName) {
-      if (bundleName === 'custom') {
-        openMenu(true);
-      } else {
-        alert(`Your interest in the “${bundleName}” bundle has been registered!`);
-        saveBundleChoice(bundleName);
-      }
-      localStorage.removeItem('redirectAfterSurvey');
-      localStorage.removeItem('redirectAfterLogin');
-    }
   });
 
   function toggleOtherInput(checkbox) {
     document.getElementById('otherBundleInput').style.display = checkbox.checked ? 'block' : 'none';
   }
 
-  // Helper: check login state
-  const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+  // =========================
+  // BACKEND-AWARE LOGIN/PROFILE LOGIC
+  // =========================
 
-  function renderNavButtonArea() {
+  const API_URL = "http://localhost:3000/api"; // Change to your deployed backend URL
+
+  // Helper: Get JWT token
+  function getToken() {
+    return localStorage.getItem('token');
+  }
+
+  // Helper: Auth header
+  function authHeader() {
+    return { "Authorization": "Bearer " + getToken() };
+  }
+
+  // Check login and fetch profile from backend
+  async function getProfile() {
+    const token = getToken();
+    if (!token) return null;
+    try {
+      const res = await fetch(`${API_URL}/profile`, { headers: authHeader() });
+      if (!res.ok) return null;
+      return await res.json();
+    } catch {
+      return null;
+    }
+  }
+
+  // Render nav button area (avatar or CTA)
+  async function renderNavButtonArea() {
     const navArea = document.getElementById('nav-button-area');
     navArea.innerHTML = ""; // Clear previous
 
-    if (!isLoggedIn) {
+    const profile = await getProfile();
+
+    if (!profile) {
       // Not logged in: show CTA button
       navArea.innerHTML = `<a href="signup.html" class="top-button" id="main-cta-btn">Get Early Access</a>`;
+      document.querySelectorAll('.hide-on-login').forEach(el => el.style.display = '');
       return;
     }
 
-    // Logged in: show avatar dropdown (EXACTLY as in profile.html)
-    const userData = JSON.parse(localStorage.getItem('userProfile')) || {};
-    const profilePic = userData.profilePic || 'icons/default-profile.png';
+    // Logged in: show avatar dropdown
+    document.querySelectorAll('.hide-on-login').forEach(el => el.style.display = 'none');
+    const profilePic = profile.profilePic || 'icons/default-profile.png';
     navArea.innerHTML = `
       <div class="dropdown" id="dropdown">
         <img id="navProfilePic" class="dropdown-avatar" src="${profilePic}" alt="Profile" />
@@ -1023,58 +922,40 @@
     });
   }
 
+  // Logout function
   function logout() {
-    localStorage.removeItem('isLoggedIn');
-    localStorage.removeItem('hasTakenSurvey');
-    localStorage.removeItem('userProfile');
+    localStorage.removeItem('token');
     location.href = "index.html";
   }
 
-  // On DOMContentLoaded, render the nav button area
-  window.addEventListener('DOMContentLoaded', function() {
-    setTimeout(() => {
-      document.getElementById('mainNavbar').classList.add('visible');
-    }, 80);
-    renderNavButtonArea();
-    if (isLoggedIn) {
-      document.querySelectorAll('.hide-on-login').forEach(el => el.style.display = 'none');
-    }
-  });
-
-  // Parallax effect for decor spots (background moves slower than content)
-  window.addEventListener('scroll', function() {
-    const scrollY = window.scrollY || window.pageYOffset;
-    const left = document.querySelector('.decor-spot-left');
-    const right = document.querySelector('.decor-spot-right');
-    // Move the spots at a slower rate for parallax
-    if (left) left.style.transform = `translateY(${scrollY * 0.10}px)`;
-    if (right) right.style.transform = `translateY(${scrollY * 0.06}px)`;
-  });
-
-  function updateSurveyButton() {
-    const userProfile = JSON.parse(localStorage.getItem('userProfile') || '{}');
-    const hasTakenSurvey = userProfile.hasTakenSurvey || localStorage.getItem('hasTakenSurvey') === 'true';
+  // Survey button logic
+  async function updateSurveyButton() {
     const surveyBtn = document.getElementById('surveyBtn');
     if (!surveyBtn) return;
 
-    if (hasTakenSurvey) {
-      surveyBtn.textContent = "View Survey";
-      surveyBtn.onclick = function(e) {
-        e.preventDefault();
-        window.location.href = "survey.html?view=1";
-      };
-    } else {
+    const profile = await getProfile();
+    if (!profile) {
       surveyBtn.textContent = "Take the Survey";
       surveyBtn.onclick = function(e) {
         e.preventDefault();
-        goToSurvey();
+        window.location.href = "signup.html";
       };
+      return;
     }
+
+    // If you store survey completion in the backend, check it here.
+    // For now, always allow retake:
+    surveyBtn.textContent = "Take the Survey";
+    surveyBtn.onclick = function(e) {
+      e.preventDefault();
+      window.location.href = "survey.html";
+    };
   }
 
-  window.addEventListener('DOMContentLoaded', function() {
-    // ...existing code...
-    updateSurveyButton();
+  // On DOMContentLoaded, render the nav button area and survey button
+  window.addEventListener('DOMContentLoaded', async function() {
+    await renderNavButtonArea();
+    await updateSurveyButton();
   });
 </script>
 
@@ -1122,56 +1003,18 @@
   Helping businesses Save on SaaS since day one.
 </div>
 
-<!-- JavaScript for login logic -->
-<script>
-  const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-  const navArea = document.getElementById('nav-button-area');
 
-  function renderProfileNav() {
-    const userData = JSON.parse(localStorage.getItem('userProfile')) || {};
-    const profilePic = userData.profilePic || 'icons/default-profile.png';
 
-    navArea.innerHTML = `
-      <div class="dropdown" style="position: relative;">
-        <img src="${profilePic}" alt="Profile" onclick="toggleDropdown()" style="height: 40px; width: 40px; border-radius: 50%; cursor: pointer;">
-        <div id="dropdown-menu">
-        <a href="index.html">Home</a>
-        <a href="profile.html">Profile</a>
-        <a href="index.html#contact-us">Contact Us</a>
-        <a href="#" onclick="logout()">Logout</a>
-      </div>
-
-      </div>`;
-  }
-
-  function toggleDropdown() {
-    const menu = document.getElementById('dropdown-menu');
-    if (menu) menu.style.display = (menu.style.display === 'none') ? 'block' : 'none';
-  }
-
-  function logout() {
-    localStorage.removeItem('isLoggedIn');
-    localStorage.removeItem('hasTakenSurvey');
-    location.href = "index.html";
-  }
-
-  function goToSurvey() {
-    if (isLoggedIn) {
-      if (localStorage.getItem('hasTakenSurvey') === 'true') {
-        alert("Thank you for taking the survey!");
-      } else {
-        window.location.href = "survey.html";
-      }
-    } else {
-      window.location.href = "signup.html";
-    }
-  }
+  
+  
+  
+  
   
 
-  if (isLoggedIn) {
-    renderProfileNav();
-    document.querySelectorAll('.hide-on-login').forEach(el => el.style.display = 'none');
-  }
+  
+  
+
+  
 </script>
 </body>
 </html>

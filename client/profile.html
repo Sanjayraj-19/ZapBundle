@@ -701,207 +701,243 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
   <script>
-    // Navbar animation on page load
-    window.addEventListener('DOMContentLoaded', () => {
-      setTimeout(() => {
-        document.getElementById('mainNavbar').classList.add('visible');
-      }, 80);
+const API_URL = "http://localhost:3000/api"; // Change to your deployed backend URL
 
-      // Load profile data
-      const profile = JSON.parse(localStorage.getItem('userProfile') || '{}');
-      // Gmail
-      document.getElementById('profileGmail').textContent = profile.gmail || 'your@email.com';
-      // Name
-      document.getElementById('profileNameDisplay').textContent = profile.name || 'Your Name';
-      // Profile pic
-      if (profile.profilePic) {
-        document.getElementById('navProfilePic').src = profile.profilePic;
-        document.getElementById('previewImage').src = profile.profilePic;
-      }
-      // Counts
-      document.getElementById('bundleCount').textContent = 'Bundles: ' + (profile.selectedBundle ? 1 : 0);
-      document.getElementById('customCount').textContent = 'Custom Tools: ' + ((profile.customBundle && profile.customBundle.length) ? profile.customBundle.length : 0);
-      // Dates
-      document.getElementById('createdDate').textContent = 'Created: ' + (profile.createdAt ? new Date(profile.createdAt).toLocaleDateString() : '--');
-      document.getElementById('modifiedDate').textContent = 'Last Modified: ' + (profile.modifiedAt ? new Date(profile.modifiedAt).toLocaleDateString() : '--');
-      // Bundles
-      if (profile.selectedBundle) {
-        document.getElementById('bundleInfo').innerHTML = `
-          <span class="bundle-tag">${profile.selectedBundle} <span class="remove-btn" onclick="removeBundle()">✕</span></span>`;
-      }
-      if (profile.customBundle && profile.customBundle.length > 0) {
-        document.getElementById('customBundle').innerHTML = profile.customBundle.map(tool => `
-          <span class="bundle-tag">${tool} <span class="remove-btn" onclick="removeTool('${tool}')">✕</span></span>`).join('');
-      }
-    });
+// Helper: Get JWT token
+function getToken() {
+  return localStorage.getItem('token');
+}
 
-    // Name edit modal logic
-    document.getElementById('profileNameDisplay').addEventListener('click', function() {
-      const profile = JSON.parse(localStorage.getItem('userProfile') || '{}');
-      document.getElementById('editNameInput').value = profile.name || '';
-      document.getElementById('editNameModalBg').style.display = 'flex';
-      setTimeout(() => {
-        document.getElementById('editNameInput').focus();
-      }, 100);
+// Helper: Auth header
+function authHeader() {
+  return { "Authorization": "Bearer " + getToken() };
+}
+
+// Load profile data from backend
+async function loadProfile() {
+  const token = getToken();
+  if (!token) {
+    window.location.href = "signup.html";
+    return;
+  }
+  try {
+    const res = await fetch(`${API_URL}/profile`, {
+      headers: { ...authHeader() }
     });
-    function closeNameModal() {
-      document.getElementById('editNameModalBg').style.display = 'none';
+    if (!res.ok) throw new Error("Unauthorized");
+    const profile = await res.json();
+
+    // Gmail
+    document.getElementById('profileGmail').textContent = profile.email || 'your@email.com';
+    // Name
+    document.getElementById('profileNameDisplay').textContent = profile.name || 'Your Name';
+    // Profile pic
+    if (profile.profilePic) {
+      document.getElementById('navProfilePic').src = profile.profilePic;
+      document.getElementById('previewImage').src = profile.profilePic;
     }
-    function saveNameEdit() {
-      const newName = document.getElementById('editNameInput').value.trim();
-      if (!newName) return;
-      const profile = JSON.parse(localStorage.getItem('userProfile') || '{}');
-      profile.name = newName;
-      profile.modifiedAt = new Date().toISOString();
-      localStorage.setItem('userProfile', JSON.stringify(profile));
-      document.getElementById('profileNameDisplay').textContent = newName;
-      document.getElementById('modifiedDate').textContent = 'Last Modified: ' + new Date(profile.modifiedAt).toLocaleDateString();
-      closeNameModal();
+    // Counts
+    document.getElementById('bundleCount').textContent = 'Bundles: ' + (profile.selectedBundle ? 1 : 0);
+    document.getElementById('customCount').textContent = 'Custom Tools: ' + ((profile.customBundle && profile.customBundle.length) ? profile.customBundle.length : 0);
+    // Dates
+    document.getElementById('createdDate').textContent = 'Created: ' + (profile.createdAt ? new Date(profile.createdAt).toLocaleDateString() : '--');
+    document.getElementById('modifiedDate').textContent = 'Last Modified: ' + (profile.modifiedAt ? new Date(profile.modifiedAt).toLocaleDateString() : '--');
+    // Bundles
+    if (profile.selectedBundle) {
+      document.getElementById('bundleInfo').innerHTML = `
+        <span class="bundle-tag">${profile.selectedBundle} <span class="remove-btn" onclick="removeBundle()">✕</span></span>`;
+    } else {
+      document.getElementById('bundleInfo').innerHTML = "No bundle selected.";
     }
-    // Close modal on ESC or click outside
-    document.getElementById('editNameModalBg').addEventListener('click', function(e) {
-      if (e.target === this) closeNameModal();
+    if (profile.customBundle && profile.customBundle.length > 0) {
+      document.getElementById('customBundle').innerHTML = profile.customBundle.map(tool => `
+        <span class="bundle-tag">${tool} <span class="remove-btn" onclick="removeTool('${tool}')">✕</span></span>`).join('');
+    } else {
+      document.getElementById('customBundle').innerHTML = "No tools selected.";
+    }
+  } catch (err) {
+    alert("Session expired or unauthorized. Please login again.");
+    localStorage.removeItem('token');
+    window.location.href = "signup.html";
+  }
+}
+
+// Save profile changes to backend
+async function saveProfile(changes) {
+  try {
+    const res = await fetch(`${API_URL}/profile`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        ...authHeader()
+      },
+      body: JSON.stringify(changes)
     });
-    document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape') {
-        closeNameModal();
-        closeCropModal();
-      }
-    });
+    if (!res.ok) throw new Error("Failed to update profile");
+    await loadProfile();
+  } catch (err) {
+    alert("Could not update profile. Please try again.");
+  }
+}
 
-    // Cropper logic with modal blur
-    let cropper;
-    let imageHistory = [];
-    let redoStack = [];
-    const profile = JSON.parse(localStorage.getItem('userProfile') || '{}');
+// Name edit modal logic
+document.getElementById('profileNameDisplay').addEventListener('click', function() {
+  document.getElementById('editNameInput').value = document.getElementById('profileNameDisplay').textContent;
+  document.getElementById('editNameModalBg').style.display = 'flex';
+  setTimeout(() => {
+    document.getElementById('editNameInput').focus();
+  }, 100);
+});
+function closeNameModal() {
+  document.getElementById('editNameModalBg').style.display = 'none';
+}
+async function saveNameEdit() {
+  const newName = document.getElementById('editNameInput').value.trim();
+  if (!newName) return;
+  await saveProfile({ name: newName });
+  closeNameModal();
+}
+document.getElementById('editNameModalBg').addEventListener('click', function(e) {
+  if (e.target === this) closeNameModal();
+});
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    closeNameModal();
+    closeCropModal();
+  }
+});
 
+// Cropper logic with modal blur
+let cropper;
+let imageHistory = [];
+let redoStack = [];
 
-    document.getElementById('profileImageInput').addEventListener('change', function (e) {
-      const file = e.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = function (e) {
-        openCropModal(e.target.result);
-      };
-      reader.readAsDataURL(file);
-    });
+document.getElementById('profileImageInput').addEventListener('change', function (e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function (e) {
+    openCropModal(e.target.result);
+  };
+  reader.readAsDataURL(file);
+});
 
-    function openCropModal(imageSrc) {
-      const img = document.getElementById('cropImage');
-      img.src = imageSrc;
-      imageHistory = [imageSrc];
-      redoStack = [];
-      img.onload = () => {
-        if (cropper) cropper.destroy();
-        cropper = new Cropper(img, {
-          aspectRatio: 1,
-          viewMode: 1,
-          background: false,
-          autoCropArea: 1,
-          responsive: true,
-          crop() {
-            // Save state for undo
-            try {
-              const dataUrl = cropper.getCroppedCanvas({ width: 300, height: 300 }).toDataURL('image/png');
-              if (imageHistory[imageHistory.length - 1] !== dataUrl) {
-                imageHistory.push(dataUrl);
-                redoStack = [];
-              }
-            } catch {}
+function openCropModal(imageSrc) {
+  const img = document.getElementById('cropImage');
+  img.src = imageSrc;
+  imageHistory = [imageSrc];
+  redoStack = [];
+  img.onload = () => {
+    if (cropper) cropper.destroy();
+    cropper = new Cropper(img, {
+      aspectRatio: 1,
+      viewMode: 1,
+      background: false,
+      autoCropArea: 1,
+      responsive: true,
+      crop() {
+        try {
+          const dataUrl = cropper.getCroppedCanvas({ width: 300, height: 300 }).toDataURL('image/png');
+          if (imageHistory[imageHistory.length - 1] !== dataUrl) {
+            imageHistory.push(dataUrl);
+            redoStack = [];
           }
-        });
-        document.getElementById('cropModalBg').style.display = 'flex';
-      };
-    }
-
-    function closeCropModal() {
-      document.getElementById('cropModalBg').style.display = 'none';
-      if (cropper) cropper.destroy();
-      cropper = null;
-      imageHistory = [];
-      redoStack = [];
-      document.getElementById('profileImageInput').value = '';
-    }
-
-    function saveCroppedImage() {
-      if (!cropper) return;
-      const canvas = cropper.getCroppedCanvas({ width: 300, height: 300 });
-      const croppedData = canvas.toDataURL('image/png');
-      profile.profilePic = croppedData;
-      profile.modifiedAt = new Date().toISOString();
-      localStorage.setItem('userProfile', JSON.stringify(profile));
-      document.getElementById('navProfilePic').src = croppedData;
-      document.getElementById('previewImage').src = croppedData;
-      closeCropModal();
-    }
-
-    function undoCrop() {
-      if (imageHistory.length > 1) {
-        redoStack.push(imageHistory.pop());
-        cropper.replace(imageHistory[imageHistory.length - 1]);
-      }
-    }
-
-    function redoCrop() {
-      if (redoStack.length > 0) {
-        const redoImg = redoStack.pop();
-        imageHistory.push(redoImg);
-        cropper.replace(redoImg);
-      }
-    }
-
-    // Bundles and other logic
-    function removeBundle() {
-      profile.selectedBundle = null;
-      profile.modifiedAt = new Date().toISOString();
-      localStorage.setItem('userProfile', JSON.stringify(profile));
-      location.reload();
-    }
-    function removeTool(tool) {
-      profile.customBundle = profile.customBundle.filter(t => t !== tool);
-      profile.modifiedAt = new Date().toISOString();
-      localStorage.setItem('userProfile', JSON.stringify(profile));
-      location.reload();
-    }
-    function retakeSurvey() {
-      window.location.href = "survey.html";
-    }
-    function logout() {
-      localStorage.removeItem('isLoggedIn');
-      localStorage.removeItem('userProfile');
-      window.location.href = "index.html";
-    }
-
-    // Avatar dropdown logic with smooth animation and outside click
-    const dropdown = document.getElementById('dropdown');
-    const dropdownMenu = document.getElementById('dropdownMenu');
-    const navProfilePic = document.getElementById('navProfilePic');
-    navProfilePic.addEventListener('click', function(e) {
-      e.stopPropagation();
-      if (dropdownMenu.classList.contains('show')) {
-        dropdownMenu.classList.remove('show');
-        dropdownMenu.classList.add('hide');
-        setTimeout(() => dropdownMenu.style.display = 'none', 250);
-      } else {
-        dropdownMenu.style.display = 'flex';
-        dropdownMenu.classList.remove('hide');
-        setTimeout(() => dropdownMenu.classList.add('show'), 10);
+        } catch {}
       }
     });
-    document.addEventListener('click', function(e) {
-      if (!dropdown.contains(e.target) && dropdownMenu.classList.contains('show')) {
-        dropdownMenu.classList.remove('show');
-        dropdownMenu.classList.add('hide');
-        setTimeout(() => dropdownMenu.style.display = 'none', 250);
-      }
-    });
-    document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape' && dropdownMenu.classList.contains('show')) {
-        dropdownMenu.classList.remove('show');
-        dropdownMenu.classList.add('hide');
-        setTimeout(() => dropdownMenu.style.display = 'none', 250);
-      }
-    });
+    document.getElementById('cropModalBg').style.display = 'flex';
+  };
+}
+
+function closeCropModal() {
+  document.getElementById('cropModalBg').style.display = 'none';
+  if (cropper) cropper.destroy();
+  cropper = null;
+  imageHistory = [];
+  redoStack = [];
+  document.getElementById('profileImageInput').value = '';
+}
+
+async function saveCroppedImage() {
+  if (!cropper) return;
+  const canvas = cropper.getCroppedCanvas({ width: 300, height: 300 });
+  const croppedData = canvas.toDataURL('image/png');
+  await saveProfile({ profilePic: croppedData });
+  closeCropModal();
+}
+
+function undoCrop() {
+  if (imageHistory.length > 1) {
+    redoStack.push(imageHistory.pop());
+    cropper.replace(imageHistory[imageHistory.length - 1]);
+  }
+}
+
+function redoCrop() {
+  if (redoStack.length > 0) {
+    const redoImg = redoStack.pop();
+    imageHistory.push(redoImg);
+    cropper.replace(redoImg);
+  }
+}
+
+// Bundles and other logic
+async function removeBundle() {
+  await saveProfile({ selectedBundle: null });
+}
+async function removeTool(tool) {
+  // Fetch current profile, remove tool, then save
+  const res = await fetch(`${API_URL}/profile`, { headers: authHeader() });
+  const profile = await res.json();
+  const customBundle = (profile.customBundle || []).filter(t => t !== tool);
+  await saveProfile({ customBundle });
+}
+function retakeSurvey() {
+  window.location.href = "survey.html";
+}
+function logout() {
+  localStorage.removeItem('token');
+  window.location.href = "index.html";
+}
+
+// Navbar animation on page load
+window.addEventListener('DOMContentLoaded', () => {
+  setTimeout(() => {
+    document.getElementById('mainNavbar').classList.add('visible');
+  }, 80);
+  loadProfile();
+});
+
+// Avatar dropdown logic with smooth animation and outside click
+const dropdown = document.getElementById('dropdown');
+const dropdownMenu = document.getElementById('dropdownMenu');
+const navProfilePic = document.getElementById('navProfilePic');
+navProfilePic.addEventListener('click', function(e) {
+  e.stopPropagation();
+  if (dropdownMenu.classList.contains('show')) {
+    dropdownMenu.classList.remove('show');
+    dropdownMenu.classList.add('hide');
+    setTimeout(() => dropdownMenu.style.display = 'none', 250);
+  } else {
+    dropdownMenu.style.display = 'flex';
+    dropdownMenu.classList.remove('hide');
+    setTimeout(() => dropdownMenu.classList.add('show'), 10);
+  }
+});
+document.addEventListener('click', function(e) {
+  if (!dropdown.contains(e.target) && dropdownMenu.classList.contains('show')) {
+    dropdownMenu.classList.remove('show');
+    dropdownMenu.classList.add('hide');
+    setTimeout(() => dropdownMenu.style.display = 'none', 250);
+  }
+});
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape' && dropdownMenu.classList.contains('show')) {
+    dropdownMenu.classList.remove('show');
+    dropdownMenu.classList.add('hide');
+    setTimeout(() => dropdownMenu.style.display = 'none', 250);
+  }
+});
   </script>
 </body>
 </html>

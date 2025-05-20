@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Signup or Login - SaaSlink</title>
+  <title>Signup or Login - ZapBundle</title>
   <style>
     * {
       margin: 0;
@@ -39,16 +39,20 @@
       padding: 0 50px;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
+    .logo-img-round {
+      height: 40px;
+      margin-right: 10px;
+      border-radius: 50%;
+      object-fit: cover;
+      background: #fff;
+      border: 2px solid #007BFF;
+    }
     .logo {
       display: flex;
       align-items: center;
       font-size: 28px;
       font-weight: bold;
       color: #007BFF;
-    }
-    .logo img {
-      height: 40px;
-      margin-right: 10px;
     }
     .top-button {
       background-color: #007BFF;
@@ -135,6 +139,21 @@
       font-size: 16px;
       margin-top: auto;
     }
+    .email-check {
+      font-size: 14px;
+      color: #d32f2f;
+      margin-bottom: 10px;
+      display: none;
+      text-align: left;
+    }
+    .email-check.available {
+      color: #388e3c;
+      display: block;
+    }
+    .email-check.taken {
+      color: #d32f2f;
+      display: block;
+    }
   </style>
 </head>
 <body>
@@ -142,10 +161,9 @@
 <!-- Navbar -->
 <div class="navbar">
   <div class="logo">
-    <img src="icons/your-logo.png" alt="Logo" />
-    SaaSlink
+    <img src="icons/your-logo.png" alt="Logo" class="logo-img-round" />
+    ZapBundle
   </div>
-  <a href="signup.html" class="top-button">Get Early Access</a>
 </div>
 
 <!-- Main Content -->
@@ -153,8 +171,19 @@
   <div class="form-container">
     <h2 id="form-title">Create Account</h2>
 
+    <!-- Social Login Buttons -->
+    <button style="width:100%;margin-bottom:12px;background:#4285F4;color:#fff;font-weight:bold;border:none;border-radius:6px;padding:12px 0;cursor:pointer;"
+      onclick="window.location.href='https://your-backend.onrender.com/api/auth/google'">
+      <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" style="height:20px;vertical-align:middle;margin-right:8px;"> Sign up with Google
+    </button>
+    <button style="width:100%;margin-bottom:18px;background:#3b5998;color:#fff;font-weight:bold;border:none;border-radius:6px;padding:12px 0;cursor:pointer;"
+      onclick="window.location.href='https://your-backend.onrender.com/api/auth/facebook'">
+      <img src="https://www.svgrepo.com/show/475647/facebook-color.svg" alt="Facebook" style="height:20px;vertical-align:middle;margin-right:8px;"> Sign up with Facebook
+    </button>
+
     <input type="text" id="name" placeholder="Name" required />
-    <input type="email" id="email" placeholder="Email" required />
+    <input type="email" id="email" placeholder="Email" required autocomplete="off" />
+    <div id="emailCheck" class="email-check"></div>
     <input type="password" id="password" placeholder="Password" required />
     <input type="password" id="confirmPassword" placeholder="Confirm Password" required />
 
@@ -170,12 +199,13 @@
 
 <!-- Footer -->
 <div class="footer">
-  @2025 SaaSlink. All rights reserved.<br />
+  @2025 ZapBundle. All rights reserved.<br />
   Helping businesses Save on SaaS since day one.
 </div>
 
 <script>
   let isSignup = true;
+  const API_URL = "http://localhost:3000/api"; // Change to your deployed backend URL if needed
 
   function toggleForm() {
     const title = document.getElementById('form-title');
@@ -183,6 +213,7 @@
     const confirmPasswordField = document.getElementById('confirmPassword');
     const button = document.querySelector('button');
     const link = document.querySelector('.toggle-link');
+    document.getElementById('emailCheck').style.display = 'none';
 
     isSignup = !isSignup;
 
@@ -209,7 +240,32 @@
     confirmField.type = type;
   });
 
-  function handleSubmit() {
+  // Live email availability check
+  document.getElementById('email').addEventListener('input', async function () {
+    const email = this.value.trim();
+    const emailCheck = document.getElementById('emailCheck');
+    if (!isSignup || !email) {
+      emailCheck.style.display = 'none';
+      return;
+    }
+    // Call backend to check email
+    try {
+      const res = await fetch(`${API_URL}/check-email?email=${encodeURIComponent(email)}`);
+      const data = await res.json();
+      if (data.available) {
+        emailCheck.textContent = "Email is available!";
+        emailCheck.className = "email-check available";
+      } else {
+        emailCheck.textContent = "Email is already registered.";
+        emailCheck.className = "email-check taken";
+      }
+    } catch {
+      emailCheck.textContent = "";
+      emailCheck.style.display = 'none';
+    }
+  });
+
+  async function handleSubmit() {
     const email = document.getElementById('email').value.trim();
     const password = document.getElementById('password').value;
 
@@ -224,56 +280,61 @@
         alert("Passwords do not match.");
         return;
       }
-      alert("Account Created Successfully!");
+      // Check email availability before submitting
+      try {
+        const resCheck = await fetch(`${API_URL}/check-email?email=${encodeURIComponent(email)}`);
+        const dataCheck = await resCheck.json();
+        if (!dataCheck.available) {
+          alert("Email is already registered.");
+          return;
+        }
+      } catch {
+        alert("Could not verify email. Please try again.");
+        return;
+      }
+      // Call backend register API
+      try {
+        const res = await fetch(`${API_URL}/register`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          alert(data.error || "Registration failed.");
+          return;
+        }
+        alert("Account Created Successfully! Please login.");
+        toggleForm();
+      } catch (err) {
+        alert("Network error. Please try again.");
+      }
     } else {
       if (!email || !password) {
         alert("Please fill all fields.");
         return;
       }
-      alert("Login Successful!");
-    }
-
-    // Set login state and redirect
-    localStorage.setItem('isLoggedIn', 'true');
-    window.location.href = "index.html";
-  }
-  function handleSubmit() {
-    const email = document.getElementById('email').value.trim();
-    const password = document.getElementById('password').value;
-  
-    if (isSignup) {
-      const name = document.getElementById('name').value.trim();
-      const confirmPassword = document.getElementById('confirmPassword').value;
-      if (!name || !email || !password || !confirmPassword) {
-        alert("Please fill all fields.");
-        return;
+      // Call backend login API
+      try {
+        const res = await fetch(`${API_URL}/login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          alert(data.error || "Login failed.");
+          return;
+        }
+        // Save JWT token for authenticated requests
+        localStorage.setItem('token', data.token);
+        alert("Login Successful!");
+        window.location.href = "survey.html";
+      } catch (err) {
+        alert("Network error. Please try again.");
       }
-      if (password !== confirmPassword) {
-        alert("Passwords do not match.");
-        return;
-      }
-      const profile = { name, email, profilePic: '', hasTakenSurvey: false };
-      localStorage.setItem('userProfile', JSON.stringify(profile));
-      alert("Account Created Successfully!");
-    } else {
-      const userData = JSON.parse(localStorage.getItem('userProfile') || '{}');
-      if (!userData.email || userData.email !== email) {
-        alert("User not found.");
-        return;
-      }
-      alert("Login Successful!");
-    }
-  
-    localStorage.setItem('isLoggedIn', 'true');
-  
-    const hasTakenSurvey = JSON.parse(localStorage.getItem('userProfile') || '{}').hasTakenSurvey;
-    if (hasTakenSurvey) {
-      window.location.href = "index.html";
-    } else {
-      window.location.href = "survey.html";
     }
   }
-  
 </script>
 </body>
 </html>

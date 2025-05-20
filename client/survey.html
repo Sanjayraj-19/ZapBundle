@@ -406,7 +406,7 @@
   <!-- Survey Form -->
   <div class="survey-box scroll-fade">
     <h2>Take the Survey</h2>
-    <form action="https://formsubmit.co/your-email@example.com" method="POST" onsubmit="handleSurveySubmit(event)">
+    <form id="surveyForm" autocomplete="off">
       <input type="hidden" name="_format" value="xml" />
 
       <div class="survey-question">
@@ -523,172 +523,179 @@
 
   <!-- Access Check + Logout Logic -->
   <script>
-    if (localStorage.getItem('isLoggedIn') !== 'true') {
-      alert("Please log in to access the survey.");
-      window.location.href = "signup.html";
-    }
-  
-    function markSurveyComplete() {
-      const profile = JSON.parse(localStorage.getItem('userProfile') || '{}');
-      profile.hasTakenSurvey = true;
-      localStorage.setItem('userProfile', JSON.stringify(profile));
-      localStorage.setItem('hasTakenSurvey', 'true');
-    }
-  
-    function renderProfileNav() {
-      const userData = JSON.parse(localStorage.getItem('userProfile')) || {};
-      const profilePic = userData.profilePic || 'icons/default-profile.png';
-  
-      document.getElementById('nav-button-area').innerHTML = `
-        <div class="dropdown" id="dropdown" style="position: relative;">
-          <img id="navProfilePic" class="dropdown-avatar" src="${profilePic}" alt="Profile" />
-          <div class="dropdown-menu" id="dropdownMenu">
-            <a href="index.html">Home</a>
-            <a href="profile.html">Profile</a>
-            <a href="index.html#contact-us">Contact Us</a>
-            <a href="#" onclick="logout()">Logout</a>
-          </div>
-        </div>`;
-    }
-  
-    function toggleDropdown() {
-      const menu = document.getElementById('dropdown-menu');
-      if (menu) {
-        menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
-      }
-    }
-  
-    function logout() {
-      localStorage.removeItem('isLoggedIn');
-      localStorage.removeItem('hasTakenSurvey');
-      localStorage.removeItem('userProfile');
-      window.location.href = "index.html";
-    }
-  
-    function handleSurveySubmit(event) {
-      event.preventDefault(); // Prevent default form submission
-  
-      // Mark user as having completed the survey
-      const profile = JSON.parse(localStorage.getItem('userProfile') || '{}');
-      profile.hasTakenSurvey = true;
-      localStorage.setItem('userProfile', JSON.stringify(profile));
-      localStorage.setItem('hasTakenSurvey', 'true');
-  
-      alert("Survey submitted! Thank you.");
-      window.location.href = "index.html";
-    }
-  
-    // Animate on scroll
-    function revealOnScroll() {
-      const reveals = document.querySelectorAll('.scroll-fade, .scroll-fade-left, .scroll-fade-right');
-      const windowHeight = window.innerHeight;
-      reveals.forEach(el => {
-        const top = el.getBoundingClientRect().top;
-        if (top < windowHeight - 60) {
-          el.classList.add('visible');
-        } else {
-          el.classList.remove('visible');
-        }
-      });
-    }
-    window.addEventListener('scroll', revealOnScroll);
-    window.addEventListener('DOMContentLoaded', revealOnScroll);
+  // --- Access Check: Only allow if JWT token exists ---
+  if (!localStorage.getItem('token')) {
+    alert("Please log in to access the survey.");
+    window.location.href = "signup.html";
+  }
 
-    // Avatar dropdown logic (matches other pages)
-    function renderProfileNav() {
-      const navArea = document.getElementById('nav-button-area');
-      const userData = JSON.parse(localStorage.getItem('userProfile')) || {};
-      const profilePic = userData.profilePic || 'icons/default-profile.png';
-      navArea.innerHTML = `
-        <div class="dropdown" id="dropdown" style="position: relative;">
-          <img id="navProfilePic" class="dropdown-avatar" src="${profilePic}" alt="Profile" />
-          <div class="dropdown-menu" id="dropdownMenu">
-            <a href="index.html">Home</a>
-            <a href="profile.html">Profile</a>
-            <a href="index.html#contact-us">Contact Us</a>
-            <a href="#" onclick="logout()">Logout</a>
-          </div>
+  // --- Navbar/Profile Dropdown Logic (Backend-powered) ---
+  const API_URL = "http://localhost:3000/api"; // Change to your deployed backend URL
+
+  // Helper: Get JWT token
+  function getToken() {
+    return localStorage.getItem('token');
+  }
+
+  // Helper: Auth header
+  function authHeader() {
+    return { "Authorization": "Bearer " + getToken() };
+  }
+
+  // Fetch profile from backend
+  async function getProfile() {
+    const token = getToken();
+    if (!token) return null;
+    try {
+      const res = await fetch(`${API_URL}/profile`, { headers: authHeader() });
+      if (!res.ok) return null;
+      return await res.json();
+    } catch {
+      return null;
+    }
+  }
+
+  // Render nav/profile dropdown
+  async function renderProfileNav() {
+    const navArea = document.getElementById('nav-button-area');
+    const profile = await getProfile();
+    const profilePic = (profile && profile.profilePic) ? profile.profilePic : 'icons/default-profile.png';
+    navArea.innerHTML = `
+      <div class="dropdown" id="dropdown" style="position: relative;">
+        <img id="navProfilePic" class="dropdown-avatar" src="${profilePic}" alt="Profile" />
+        <div class="dropdown-menu" id="dropdownMenu">
+          <a href="index.html">Home</a>
+          <a href="profile.html">Profile</a>
+          <a href="index.html#contact-us">Contact Us</a>
+          <a href="#" onclick="logout()">Logout</a>
         </div>
-      `;
+      </div>
+    `;
 
-      // Attach dropdown logic
-      const dropdown = document.getElementById('dropdown');
-      const dropdownMenu = document.getElementById('dropdownMenu');
-      const navProfilePic = document.getElementById('navProfilePic');
-      navProfilePic.addEventListener('click', function(e) {
-        e.stopPropagation();
-        if (dropdownMenu.classList.contains('show')) {
-          dropdownMenu.classList.remove('show');
-          dropdownMenu.classList.add('hide');
-          setTimeout(() => dropdownMenu.style.display = 'none', 250);
-        } else {
-          dropdownMenu.style.display = 'flex';
-          dropdownMenu.classList.remove('hide');
-          setTimeout(() => dropdownMenu.classList.add('show'), 10);
-        }
+    // Attach dropdown logic
+    const dropdown = document.getElementById('dropdown');
+    const dropdownMenu = document.getElementById('dropdownMenu');
+    const navProfilePic = document.getElementById('navProfilePic');
+    navProfilePic.addEventListener('click', function(e) {
+      e.stopPropagation();
+      if (dropdownMenu.classList.contains('show')) {
+        dropdownMenu.classList.remove('show');
+        dropdownMenu.classList.add('hide');
+        setTimeout(() => dropdownMenu.style.display = 'none', 250);
+      } else {
+        dropdownMenu.style.display = 'flex';
+        dropdownMenu.classList.remove('hide');
+        setTimeout(() => dropdownMenu.classList.add('show'), 10);
+      }
+    });
+    document.addEventListener('click', function(e) {
+      if (!dropdown.contains(e.target) && dropdownMenu.classList.contains('show')) {
+        dropdownMenu.classList.remove('show');
+        dropdownMenu.classList.add('hide');
+        setTimeout(() => dropdownMenu.style.display = 'none', 250);
+      }
+    });
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && dropdownMenu.classList.contains('show')) {
+        dropdownMenu.classList.remove('show');
+        dropdownMenu.classList.add('hide');
+        setTimeout(() => dropdownMenu.style.display = 'none', 250);
+      }
+    });
+  }
+
+  function logout() {
+    localStorage.removeItem('token');
+    window.location.href = "index.html";
+  }
+
+  // --- Survey Submission ---
+  document.getElementById('surveyForm').addEventListener('submit', async function(event) {
+    event.preventDefault();
+
+    // Gather form data
+    const form = event.target;
+    const data = {
+      company_type: form.company_type.value || form.company_type_other.value,
+      saas_count: form.saas_count.value,
+      saas_types: Array.from(form.querySelectorAll('input[name="saas_types[]"]:checked')).map(cb => cb.value),
+      saas_types_other: form.saas_types_other.value,
+      monthly_spend: form.monthly_spend.value,
+      challenge: form.challenge.value || form.challenge_other.value,
+      challenge_other: form.challenge_other.value,
+      interest_bundles: form.interest_bundles.value,
+      early_access: form.early_access.value,
+      email: form.email.value,
+      company_name: form.company_name.value
+    };
+
+    // Send to backend
+    try {
+      const res = await fetch(`${API_URL}/survey`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
       });
-      document.addEventListener('click', function(e) {
-        if (!dropdown.contains(e.target) && dropdownMenu.classList.contains('show')) {
-          dropdownMenu.classList.remove('show');
-          dropdownMenu.classList.add('hide');
-          setTimeout(() => dropdownMenu.style.display = 'none', 250);
-        }
-      });
-      document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && dropdownMenu.classList.contains('show')) {
-          dropdownMenu.classList.remove('show');
-          dropdownMenu.classList.add('hide');
-          setTimeout(() => dropdownMenu.style.display = 'none', 250);
-        }
-      });
+      const result = await res.json();
+      if (res.ok) {
+        alert("Survey submitted! Thank you.");
+        window.location.href = "index.html";
+      } else {
+        alert(result.error || "Submission failed.");
+      }
+    } catch (err) {
+      alert("Network error. Please try again.");
     }
+  });
 
-    function logout() {
-      localStorage.removeItem('isLoggedIn');
-      localStorage.removeItem('hasTakenSurvey');
-      localStorage.removeItem('userProfile');
-      window.location.href = "index.html";
-    }
+  // --- Animate on scroll ---
+  function revealOnScroll() {
+    const reveals = document.querySelectorAll('.scroll-fade, .scroll-fade-left, .scroll-fade-right');
+    const windowHeight = window.innerHeight;
+    reveals.forEach(el => {
+      const top = el.getBoundingClientRect().top;
+      if (top < windowHeight - 60) {
+        el.classList.add('visible');
+      } else {
+        el.classList.remove('visible');
+      }
+    });
+  }
+  window.addEventListener('scroll', revealOnScroll);
+  window.addEventListener('DOMContentLoaded', revealOnScroll);
 
-    // Call on DOMContentLoaded
-    window.addEventListener('DOMContentLoaded', function() {
-      renderProfileNav();
-      revealOnScroll();
+  // --- Checkbox/radio toggle logic (unchanged) ---
+  document.addEventListener('DOMContentLoaded', function() {
+    renderProfileNav();
+    revealOnScroll();
+
+    // Toggle checkboxes on click
+    document.querySelectorAll('.checkbox-group input[type="checkbox"]').forEach(function(checkbox) {
+      checkbox.addEventListener('click', function(e) {
+        if (this.checked && this.dataset.wasChecked === "true") {
+          this.checked = false;
+        }
+        this.dataset.wasChecked = this.checked ? "true" : "false";
+      });
+      // Reset state on mouseup (for keyboard navigation)
+      checkbox.addEventListener('blur', function() {
+        this.dataset.wasChecked = this.checked ? "true" : "false";
+      });
     });
 
-    // Allow unchecking checkboxes on click (toggle)
-    document.addEventListener('DOMContentLoaded', function() {
-      // Existing calls
-      renderProfileNav();
-      revealOnScroll();
-
-      // Toggle checkboxes on click
-      document.querySelectorAll('.checkbox-group input[type="checkbox"]').forEach(function(checkbox) {
-        checkbox.addEventListener('click', function(e) {
-          if (this.checked && this.dataset.wasChecked === "true") {
-            this.checked = false;
-          }
-          this.dataset.wasChecked = this.checked ? "true" : "false";
-        });
-        // Reset state on mouseup (for keyboard navigation)
-        checkbox.addEventListener('blur', function() {
-          this.dataset.wasChecked = this.checked ? "true" : "false";
-        });
+    // Toggle radios on click (allow unchecking by clicking again)
+    document.querySelectorAll('.radio-group input[type="radio"]').forEach(function(radio) {
+      radio.addEventListener('click', function(e) {
+        if (this.checked && this.dataset.wasChecked === "true") {
+          this.checked = false;
+        }
+        this.dataset.wasChecked = this.checked ? "true" : "false";
       });
-
-      // Toggle radios on click (allow unchecking by clicking again)
-      document.querySelectorAll('.radio-group input[type="radio"]').forEach(function(radio) {
-        radio.addEventListener('click', function(e) {
-          if (this.checked && this.dataset.wasChecked === "true") {
-            this.checked = false;
-          }
-          this.dataset.wasChecked = this.checked ? "true" : "false";
-        });
-        radio.addEventListener('blur', function() {
-          this.dataset.wasChecked = this.checked ? "true" : "false";
-        });
+      radio.addEventListener('blur', function() {
+        this.dataset.wasChecked = this.checked ? "true" : "false";
       });
     });
+  });
   </script>
 </body>
 </html>
