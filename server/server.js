@@ -8,7 +8,6 @@ import nodemailer from 'nodemailer';
 import session from 'express-session';
 import passport from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
-import { Strategy as FacebookStrategy } from 'passport-facebook';
 
 dotenv.config();
 
@@ -82,27 +81,6 @@ passport.use(new GoogleStrategy({
   return done(null, user);
 }));
 
-// Facebook OAuth Strategy
-passport.use(new FacebookStrategy({
-  clientID: process.env.FACEBOOK_APP_ID,
-  clientSecret: process.env.FACEBOOK_APP_SECRET,
-  callbackURL: process.env.OAUTH_CALLBACK_URL + "/facebook/callback",
-  profileFields: ['id', 'displayName', 'photos', 'email']
-}, async (accessToken, refreshToken, profile, done) => {
-  // Find or create user in DB
-  let user = await usersCollection.findOne({ email: profile.emails[0].value });
-  if (!user) {
-    user = {
-      email: profile.emails[0].value,
-      name: profile.displayName,
-      profilePic: profile.photos[0]?.value,
-      createdAt: new Date(),
-      oauthProvider: 'facebook'
-    };
-    await usersCollection.insertOne(user);
-  }
-  return done(null, user);
-}));
 
 // Register
 app.post('/api/register', async (req, res) => {
@@ -236,18 +214,10 @@ app.get('/api/auth/google/callback', passport.authenticate('google', { failureRe
   async (req, res) => {
     // Issue JWT and redirect to frontend with token
     const token = jwt.sign({ userId: req.user._id, email: req.user.email }, JWT_SECRET, { expiresIn: '7d' });
-    res.redirect(`https://your-frontend-url.com/oauth-success.html?token=${token}`);
+    res.redirect(`https://zapbundle.onrender.com/oauth-success.html?token=${token}`);
   }
 );
 
-// Facebook OAuth routes
-app.get('/api/auth/facebook', passport.authenticate('facebook', { scope: ['email'] }));
-app.get('/api/auth/facebook/callback', passport.authenticate('facebook', { failureRedirect: '/login-failed' }),
-  async (req, res) => {
-    const token = jwt.sign({ userId: req.user._id, email: req.user.email }, JWT_SECRET, { expiresIn: '7d' });
-    res.redirect(`https://your-frontend-url.com/oauth-success.html?token=${token}`);
-  }
-);
 
 // Optional: login failed route
 app.get('/login-failed', (req, res) => {

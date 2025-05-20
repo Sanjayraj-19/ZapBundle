@@ -173,12 +173,8 @@
 
     <!-- Social Login Buttons -->
     <button style="width:100%;margin-bottom:12px;background:#4285F4;color:#fff;font-weight:bold;border:none;border-radius:6px;padding:12px 0;cursor:pointer;"
-      onclick="window.location.href='https://your-backend.onrender.com/api/auth/google'">
+      onclick="window.location.href='https://zapbundle.onrender.com/api/auth/google'">
       <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" style="height:20px;vertical-align:middle;margin-right:8px;"> Sign up with Google
-    </button>
-    <button style="width:100%;margin-bottom:18px;background:#3b5998;color:#fff;font-weight:bold;border:none;border-radius:6px;padding:12px 0;cursor:pointer;"
-      onclick="window.location.href='https://your-backend.onrender.com/api/auth/facebook'">
-      <img src="https://www.svgrepo.com/show/475647/facebook-color.svg" alt="Facebook" style="height:20px;vertical-align:middle;margin-right:8px;"> Sign up with Facebook
     </button>
 
     <input type="text" id="name" placeholder="Name" required />
@@ -205,7 +201,7 @@
 
 <script>
   let isSignup = true;
-  const API_URL = "http://localhost:3000/api"; // Change to your deployed backend URL if needed
+  const API_URL = "https://zapbundle.onrender.com"; // Change to your deployed backend URL if needed
 
   function toggleForm() {
     const title = document.getElementById('form-title');

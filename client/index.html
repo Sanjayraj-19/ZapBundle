@@ -737,11 +737,26 @@
     <h2 style="margin-bottom:18px; color:#007BFF;">Select SaaS Tools for Your Custom Bundle</h2>
     <input type="text" placeholder="Search SaaS..." onkeyup="filterSaaS(this.value)" class="bundle-search" />
     <div class="saas-list" id="saasList">
-      <label><input type="checkbox" value="Slack"> <img src="https://logo.clearbit.com/slack.com"> Slack</label>
-      <label><input type="checkbox" value="Trello"> <img src="https://logo.clearbit.com/trello.com"> Trello</label>
-      <label><input type="checkbox" value="Notion"> <img src="https://logo.clearbit.com/notion.so"> Notion</label>
-      <label><input type="checkbox" value="Asana"> <img src="https://logo.clearbit.com/asana.com"> Asana</label>
-      <label><input type="checkbox" value="GitHub"> <img src="https://logo.clearbit.com/github.com"> GitHub</label>
+      <label><input type="checkbox" value="Slack"> Slack</label>
+      <label><input type="checkbox" value="Trello"> Trello</label>
+      <label><input type="checkbox" value="Notion"> Notion</label>
+      <label><input type="checkbox" value="Asana"> Asana</label>
+      <label><input type="checkbox" value="GitHub"> GitHub</label>
+      <label><input type="checkbox" value="Zoom"> Zoom</label>
+      <label><input type="checkbox" value="Dropbox"> Dropbox</label>
+      <label><input type="checkbox" value="Google Workspace"> Google Workspace</label>
+      <label><input type="checkbox" value="Microsoft 365"> Microsoft 365</label>
+      <label><input type="checkbox" value="Salesforce"> Salesforce</label>
+      <label><input type="checkbox" value="HubSpot"> HubSpot</label>
+      <label><input type="checkbox" value="Mailchimp"> Mailchimp</label>
+      <label><input type="checkbox" value="Zendesk"> Zendesk</label>
+      <label><input type="checkbox" value="Airtable"> Airtable</label>
+      <label><input type="checkbox" value="Monday.com"> Monday.com</label>
+      <label><input type="checkbox" value="Figma"> Figma</label>
+      <label><input type="checkbox" value="Canva"> Canva</label>
+      <label><input type="checkbox" value="ClickUp"> ClickUp</label>
+      <label><input type="checkbox" value="Intercom"> Intercom</label>
+      <label><input type="checkbox" value="Freshdesk"> Freshdesk</label>
       <!-- Add more as needed -->
     </div>
     <div class="other-bundle-section" style="margin-top:18px;">
@@ -836,7 +851,7 @@
   // BACKEND-AWARE LOGIN/PROFILE LOGIC
   // =========================
 
-  const API_URL = "http://localhost:3000/api"; // Change to your deployed backend URL
+  const API_URL = "https://zapbundle.onrender.com"; // Change to your deployed backend URL
 
   // Helper: Get JWT token
   function getToken() {
@@ -989,7 +1004,7 @@
 <!-- Contact Us Section -->
 <div class="contact-us-container scroll-fade" id="contact-us">
   <h2 class="contact-heading">Contact Us</h2>
-  <form action="https://formsubmit.co/your-email@example.com" method="POST" class="contact-form">
+  <form action="https://formsubmit.co/zapbundle@gmail.com" method="POST" class="contact-form">
     <input type="text" name="name" placeholder="Your Name" required class="contact-box" />
     <input type="email" name="email" placeholder="Your Email" required class="contact-box" />
     <textarea name="message" placeholder="Your Message" required class="contact-box message-box"></textarea>
@@ -1003,18 +1018,5 @@
   Helping businesses Save on SaaS since day one.
 </div>
 
-
-
-  
-  
-  
-  
-  
-
-  
-  
-
-  
-</script>
 </body>
 </html>
