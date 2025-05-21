@@ -997,6 +997,48 @@
       alert("Network error. Please try again.");
     }
   }
+
+  async function submitCustomBundle() {
+    const token = getToken();
+    if (!token) {
+      window.location.href = "signup.html";
+      return;
+    }
+    // Gather selected SaaS tools
+    const checked = Array.from(document.querySelectorAll('#saasList input[type="checkbox"]:checked'))
+      .map(cb => cb.value);
+    const otherChecked = document.getElementById('otherBundleCheck').checked;
+    let otherValue = "";
+    if (otherChecked) {
+      otherValue = document.getElementById('otherBundleInput').value.trim();
+      if (otherValue) checked.push(otherValue);
+    }
+    if (checked.length === 0) {
+      alert("Please select at least one SaaS tool.");
+      return;
+    }
+    try {
+      const res = await fetch("https://zapbundle.onrender.com/api/register-bundle", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + token
+        },
+        body: JSON.stringify({ bundle: checked.join(", ") }) // Save as a single string, or send as array if backend supports
+      });
+      const data = await res.json();
+      if (res.ok) {
+        alert("Custom bundle registered to your account!");
+        closeMenu();
+        // Optionally, redirect to profile or refresh profile if on that page
+        // window.location.href = "profile.html";
+      } else {
+        alert(data.error || "Failed to register custom bundle.");
+      }
+    } catch (err) {
+      alert("Network error. Please try again.");
+    }
+  }
 </script>
 
 
