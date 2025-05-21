@@ -396,15 +396,176 @@
     .submit-btn:active {
       transform: translateY(1px);
     }
-    footer {
-      margin-top: 50px;
-      padding: 15px;
+    /* Background Elements */
+    .bg-shape {
+      position: fixed;
+      z-index: -1;
+      opacity: 0.5;
+    }
+    
+    .bg-shape-1 {
+      top: 10%;
+      left: -5%;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, var(--primary) 0%, rgba(99, 102, 241, 0) 70%);
+      border-radius: 50%;
+      filter: blur(50px);
+    }
+    
+    .bg-shape-2 {
+      bottom: 20%;
+      right: -10%;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, var(--accent) 0%, rgba(6, 182, 212, 0) 70%);
+      border-radius: 50%;
+      filter: blur(60px);
+    }
+    
+    .bg-shape-3 {
+      top: 60%;
+      left: 5%;
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle, var(--secondary) 0%, rgba(236, 72, 153, 0) 70%);
+      border-radius: 50%;
+      filter: blur(40px);
+    }
+    
+    /* Navbar */
+    .navbar {
+      background-color: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(10px);
+      position: fixed;
+      top: 0;
+      width: 100%;
+      height: 80px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 5%;
+      box-shadow: var(--shadow-md);
+      z-index: 1000;
+      opacity: 0;
+      transform: translateY(-20px);
+      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .navbar.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    
+    .logo-bar {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    
+    .logo-img {
+      height: 44px;
+      width: 44px;
+      border-radius: 12px;
+      background: #fff;
+      box-shadow: var(--shadow-md);
+      border: 2px solid var(--primary);
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+    
+    .logo-text {
+      font-size: 1.8rem;
+      font-weight: 700;
+      background: var(--gradient-1);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    /* Footer */
+    .footer {
+      background-color: var(--dark);
+      color: white;
       text-align: center;
-      font-size: 14px;
-      color: #fff;
-      background: var(--zapdark);
-      border-top-left-radius: 30px;
-      border-top-right-radius: 30px;
+      padding: 50px 20px 30px;
+      position: relative;
+    }
+    
+    .footer-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 40px;
+      margin-bottom: 40px;
+    }
+    
+    .footer-logo {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 15px;
+    }
+    
+    .footer-logo img {
+      height: 40px;
+    }
+    
+    .footer-description {
+      max-width: 300px;
+      text-align: left;
+      color: rgba(255, 255, 255, 0.7);
+    }
+    
+    .footer-links {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 15px;
+    }
+    
+    .footer-links h3 {
+      margin-bottom: 15px;
+      font-size: 1.2rem;
+    }
+    
+    .footer-links a {
+      color: rgba(255, 255, 255, 0.7);
+      transition: color 0.3s ease;
+    }
+    
+    .footer-links a:hover {
+      color: white;
+    }
+    
+    .footer-social {
+      display: flex;
+      gap: 15px;
+      margin-top: 20px;
+    }
+    
+    .social-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.1);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: all 0.3s ease;
+    }
+    
+    .social-icon:hover {
+      background: var(--primary);
+      transform: translateY(-3px);
+    }
+    
+    .footer-bottom {
+      padding-top: 30px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      color: rgba(255, 255, 255, 0.5);
+      font-size: 0.9rem;
     }
     /* Avatar dropdown styles to match other pages */
     .dropdown {
@@ -591,30 +752,40 @@
 </head>
 <body>
 
-  <!-- Header -->
-  <header class="navbar scroll-fade">
-    <div class="logo-area logo-bar">
-      <a href="index.html">
-        <img src="icons/your-logo.png" alt="Logo" class="logo-img" />
-      </a>
-      <a href="index.html">
-        <span style="font-size:24px; font-weight:bold; line-height:1;">
-          <span style="color:#1ad1ff;">Zap</span><span style="color:#0056b3;">Bundle</span>
-        </span>
-      </a>
+  <!-- Background Shapes -->
+  <div class="bg-shape bg-shape-1"></div>
+  <div class="bg-shape bg-shape-2"></div>
+  <div class="bg-shape bg-shape-3"></div>
+  
+  <!-- Navbar -->
+  <nav class="navbar" id="mainNavbar">
+    <div class="logo-bar">
+      <img src="icons/your-logo.png" alt="ZapBundle Logo" class="logo-img">
+      <span class="logo-text">ZapBundle</span>
     </div>
-    <div id="nav-button-area">
-      <div id="nav-links">
-        <a href="index.html" class="btn-access">Home</a>
-        <a href="profile.html" class="btn-access" id="profileLink" style="display:none;">My Profile</a>
-        <a href="signup.html" class="btn-access" id="loginLink">Login</a>
-      </div>
-    </div>
-  </header>
+    <div id="nav-button-area"></div>
+  </nav>
   
   <!-- Survey Form -->
   <div class="survey-box">
     <h2 id="surveyTitle">Take the Survey</h2>
+    
+    <!-- View Mode Controls -->
+    <div id="viewModeControls" style="display: none; text-align: center; margin-bottom: 30px;">
+      <div style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); padding: 25px; border-radius: 16px; text-align: center; margin-bottom: 20px; box-shadow: var(--shadow-md); border: 1px solid rgba(99, 102, 241, 0.2);">
+        <i class="fas fa-eye" style="font-size: 36px; color: var(--primary); margin-bottom: 15px;"></i>
+        <h3 style="color: var(--primary-dark); margin-bottom: 15px; font-size: 1.3rem;">Viewing Your Survey Responses</h3>
+        <p style="color: var(--dark); margin-bottom: 20px; line-height: 1.6;">These are your previous survey responses. You can review them or make changes if needed.</p>
+        <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+          <button id="editSurveyBtn" style="display: inline-block; background: var(--gradient-1); color: white; padding: 12px 24px; border-radius: 12px; text-decoration: none; font-weight: 600; box-shadow: var(--shadow-sm); transition: all 0.3s ease; border: none; cursor: pointer;">
+            <i class="fas fa-edit"></i> Edit Responses
+          </button>
+          <a href="index.html" style="display: inline-block; background: var(--gray); color: white; padding: 12px 24px; border-radius: 12px; text-decoration: none; font-weight: 600; box-shadow: var(--shadow-sm); transition: all 0.3s ease;">
+            <i class="fas fa-home"></i> Back to Home
+          </a>
+        </div>
+      </div>
+    </div>
     
     <!-- Success Message -->
     <div id="successMessage" style="display: none;">
@@ -787,14 +958,58 @@
         <input type="text" name="company_name" id="company_name" placeholder="Enter your company name...">
       </div>
 
-      <button type="submit" class="submit-btn">Submit Survey</button>
+      <button type="submit" class="submit-btn" id="submitSurveyBtn">
+        <span id="submitBtnText">Submit Survey</span>
+        <span id="submitBtnLoading" style="display: none;">
+          <i class="fas fa-spinner fa-spin" style="margin-right: 8px;"></i> Submitting...
+        </span>
+      </button>
     </form>
   </div>
 
   <!-- Footer -->
-  <footer class="scroll-fade">
-    © 2025 ZapBundle. All rights reserved.<br>
-    Helping businesses Save on SaaS since day one.
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-logo">
+        <img src="icons/your-logo.png" alt="ZapBundle Logo">
+        <p class="footer-description">ZapBundle helps businesses save money on SaaS subscriptions through expertly curated bundles.</p>
+        <div class="footer-social">
+          <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+          <a href="#" class="social-icon"><i class="fab fa-linkedin-in"></i></a>
+          <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+          <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+        </div>
+      </div>
+      
+      <div class="footer-links">
+        <h3>Company</h3>
+        <a href="#">About Us</a>
+        <a href="#">Our Team</a>
+        <a href="#">Careers</a>
+        <a href="#">Press</a>
+      </div>
+      
+      <div class="footer-links">
+        <h3>Resources</h3>
+        <a href="#">Blog</a>
+        <a href="#">Guides</a>
+        <a href="#">Support</a>
+        <a href="#">FAQ</a>
+      </div>
+      
+      <div class="footer-links">
+        <h3>Legal</h3>
+        <a href="#">Terms of Service</a>
+        <a href="#">Privacy Policy</a>
+        <a href="#">Cookie Policy</a>
+        <a href="#">GDPR</a>
+      </div>
+    </div>
+    
+    <div class="footer-bottom">
+      &copy; 2025 ZapBundle. All rights reserved.<br>
+      Helping businesses save on SaaS since day one.
+    </div>
   </footer>
 
   <!-- Access Check + Logout Logic -->
@@ -896,6 +1111,8 @@
       saas_count: form.saas_count.value,
       saas_types: Array.from(form.querySelectorAll('input[name="saas_types[]"]:checked')).map(cb => cb.value),
       saas_types_other: form.saas_types_other.value,
+      saas_tools: Array.from(form.querySelectorAll('input[name="saas_tools[]"]:checked')).map(cb => cb.value),
+      saas_tools_other: form.saas_tools_other ? form.saas_tools_other.value : '',
       monthly_spend: form.monthly_spend.value,
       challenge: form.challenge.value || form.challenge_other.value,
       challenge_other: form.challenge_other.value,
@@ -906,10 +1123,13 @@
     };
 
     // Change submit button to loading state
-    const submitBtn = form.querySelector('button[type="submit"]');
-    const originalText = submitBtn.innerHTML;
-    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+    const submitBtn = document.getElementById('submitSurveyBtn');
+    const submitBtnText = document.getElementById('submitBtnText');
+    const submitBtnLoading = document.getElementById('submitBtnLoading');
+    
     submitBtn.disabled = true;
+    submitBtnText.style.display = 'none';
+    submitBtnLoading.style.display = 'inline-block';
 
     try {
       const token = localStorage.getItem('token');
@@ -1001,13 +1221,35 @@
 
   // Check if user has already completed the survey
   function checkSurveyCompletion() {
-    if (localStorage.getItem('surveyCompleted') === 'true') {
+    // Check URL parameters for view mode
+    const urlParams = new URLSearchParams(window.location.search);
+    const mode = urlParams.get('mode');
+    
+    // If mode=view is in URL, show view mode
+    if (mode === 'view') {
+      showViewMode();
+      return;
+    }
+    
+    // Otherwise check if survey was already completed
+    if (localStorage.getItem('surveyCompleted') === 'true' || 
+        (localStorage.getItem('surveys') && JSON.parse(localStorage.getItem('surveys')).length > 0)) {
       document.getElementById('surveyForm').style.display = 'none';
       document.getElementById('successMessage').style.display = 'block';
       document.getElementById('successMessage').innerHTML = `
-        <h3 style="color: #10b981; margin-bottom: 10px;">You've Already Completed the Survey</h3>
-        <p style="color: #1a2330; margin-bottom: 15px;">Thank you for your previous feedback! Your input is helping us build better SaaS bundles.</p>
-        <a href="index.html" style="display: inline-block; background-color: var(--zapblue); color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: bold;">Back to Home</a>
+        <div style="background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%); padding: 25px; border-radius: 16px; text-align: center; margin-bottom: 30px; box-shadow: var(--shadow-md); border: 1px solid rgba(16, 185, 129, 0.2);">
+          <i class="fas fa-check-circle" style="font-size: 48px; color: var(--success); margin-bottom: 15px;"></i>
+          <h3 style="color: var(--success); margin-bottom: 15px; font-size: 1.5rem;">You've Already Completed the Survey</h3>
+          <p style="color: var(--dark); margin-bottom: 20px; line-height: 1.6;">Thank you for your previous feedback! Your input is helping us build better SaaS bundles.</p>
+          <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+            <a href="survey.html?mode=view" style="display: inline-block; background: var(--primary); color: white; padding: 12px 24px; border-radius: 12px; text-decoration: none; font-weight: 600; box-shadow: var(--shadow-sm); transition: all 0.3s ease;">
+              <i class="fas fa-eye"></i> View My Responses
+            </a>
+            <a href="index.html" style="display: inline-block; background: var(--gray); color: white; padding: 12px 24px; border-radius: 12px; text-decoration: none; font-weight: 600; box-shadow: var(--shadow-sm); transition: all 0.3s ease;">
+              <i class="fas fa-home"></i> Back to Home
+            </a>
+          </div>
+        </div>
       `;
     }
   }
@@ -1030,11 +1272,212 @@
     }
   }
   
+  // View/Edit Mode Functionality
+  let viewMode = false; // Track if we're in view mode
+  let surveyData = null; // Store survey data for view/edit mode
+  
+  // Function to show view mode
+  function showViewMode() {
+    viewMode = true;
+    document.getElementById('surveyTitle').textContent = 'Your Survey Responses';
+    document.getElementById('viewModeControls').style.display = 'block';
+    
+    // Get saved survey data
+    let savedData = null;
+    
+    // First check localStorage.surveyCompleted
+    if (localStorage.getItem('surveyCompleted') === 'true') {
+      // Try to get data from localStorage.surveys
+      const surveys = localStorage.getItem('surveys');
+      if (surveys) {
+        const parsedSurveys = JSON.parse(surveys);
+        if (parsedSurveys.length > 0) {
+          savedData = parsedSurveys[parsedSurveys.length - 1]; // Get the most recent survey
+        }
+      }
+    }
+    
+    // If no data found, check if there's any survey data in localStorage
+    if (!savedData && localStorage.getItem('surveys')) {
+      const surveys = JSON.parse(localStorage.getItem('surveys'));
+      if (surveys.length > 0) {
+        savedData = surveys[surveys.length - 1]; // Get the most recent survey
+      }
+    }
+    
+    if (savedData) {
+      surveyData = savedData;
+      populateFormWithData(surveyData);
+      
+      // Make form fields readonly
+      const form = document.getElementById('surveyForm');
+      const inputs = form.querySelectorAll('input, textarea, select');
+      inputs.forEach(input => {
+        input.disabled = true;
+      });
+      
+      // Hide submit button
+      document.querySelector('.submit-btn').style.display = 'none';
+      
+      // Add edit button event listener
+      document.getElementById('editSurveyBtn').addEventListener('click', function() {
+        enableEditMode();
+      });
+    } else {
+      // No survey data found
+      document.getElementById('surveyForm').style.display = 'none';
+      document.getElementById('viewModeControls').style.display = 'none';
+      
+      // Show message that no survey data was found
+      document.getElementById('successMessage').style.display = 'block';
+      document.getElementById('successMessage').innerHTML = `
+        <div style="background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%); padding: 25px; border-radius: 16px; text-align: center; margin-bottom: 30px; box-shadow: var(--shadow-md); border: 1px solid rgba(249, 115, 22, 0.2);">
+          <i class="fas fa-exclamation-circle" style="font-size: 48px; color: var(--warning); margin-bottom: 15px;"></i>
+          <h3 style="color: var(--warning); margin-bottom: 15px; font-size: 1.5rem;">No Survey Data Found</h3>
+          <p style="color: var(--dark); margin-bottom: 20px; line-height: 1.6;">It seems you haven't completed the survey yet or your data couldn't be retrieved.</p>
+          <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+            <a href="survey.html" style="display: inline-block; background: var(--primary); color: white; padding: 12px 24px; border-radius: 12px; text-decoration: none; font-weight: 600; box-shadow: var(--shadow-sm); transition: all 0.3s ease;">
+              <i class="fas fa-clipboard-list"></i> Take the Survey
+            </a>
+            <a href="index.html" style="display: inline-block; background: var(--gray); color: white; padding: 12px 24px; border-radius: 12px; text-decoration: none; font-weight: 600; box-shadow: var(--shadow-sm); transition: all 0.3s ease;">
+              <i class="fas fa-home"></i> Back to Home
+            </a>
+          </div>
+        </div>
+      `;
+    }
+  }
+  
+  // Function to enable edit mode
+  function enableEditMode() {
+    viewMode = false;
+    document.getElementById('surveyTitle').textContent = 'Edit Your Survey';
+    document.getElementById('viewModeControls').style.display = 'none';
+    
+    // Enable form fields
+    const form = document.getElementById('surveyForm');
+    const inputs = form.querySelectorAll('input, textarea, select');
+    inputs.forEach(input => {
+      input.disabled = false;
+    });
+    
+    // Show submit button
+    const submitBtn = document.querySelector('.submit-btn');
+    submitBtn.style.display = 'block';
+    
+    // Update button text
+    const submitBtnText = document.getElementById('submitBtnText');
+    if (submitBtnText) {
+      submitBtnText.textContent = 'Update Survey';
+    } else {
+      submitBtn.textContent = 'Update Survey';
+    }
+    
+    // Add a note that this is an update
+    const formNote = document.createElement('div');
+    formNote.id = 'formEditNote';
+    formNote.style.cssText = 'background: #eff6ff; padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 1px solid rgba(99, 102, 241, 0.2); color: var(--primary-dark);';
+    formNote.innerHTML = '<i class="fas fa-info-circle"></i> You are now editing your previous survey responses. Click "Update Survey" when you\'re done.';
+    
+    // Insert the note at the top of the form
+    if (!document.getElementById('formEditNote')) {
+      form.insertBefore(formNote, form.firstChild);
+    }
+  }
+  
+  // Function to populate form with data
+  function populateFormWithData(data) {
+    // Set radio buttons
+    if (data.company_type) {
+      const companyTypeRadio = document.querySelector(`input[name="company_type"][value="${data.company_type}"]`);
+      if (companyTypeRadio) companyTypeRadio.checked = true;
+      else document.getElementById('company_type_other').value = data.company_type;
+    }
+    
+    if (data.saas_count) {
+      const saasCountRadio = document.querySelector(`input[name="saas_count"][value="${data.saas_count}"]`);
+      if (saasCountRadio) saasCountRadio.checked = true;
+    }
+    
+    if (data.monthly_spend) {
+      const spendRadio = document.querySelector(`input[name="monthly_spend"][value="${data.monthly_spend}"]`);
+      if (spendRadio) spendRadio.checked = true;
+    }
+    
+    if (data.challenge) {
+      const challengeRadio = document.querySelector(`input[name="challenge"][value="${data.challenge}"]`);
+      if (challengeRadio) challengeRadio.checked = true;
+      else document.getElementById('challenge_other').value = data.challenge;
+    }
+    
+    if (data.interest_bundles) {
+      const bundleRadio = document.querySelector(`input[name="interest_bundles"][value="${data.interest_bundles}"]`);
+      if (bundleRadio) bundleRadio.checked = true;
+    }
+    
+    if (data.early_access) {
+      const earlyAccessRadio = document.querySelector(`input[name="early_access"][value="${data.early_access}"]`);
+      if (earlyAccessRadio) earlyAccessRadio.checked = true;
+    }
+    
+    // Set checkboxes
+    if (data.saas_types && Array.isArray(data.saas_types)) {
+      data.saas_types.forEach(type => {
+        const checkbox = document.querySelector(`input[name="saas_types[]"][value="${type}"]`);
+        if (checkbox) checkbox.checked = true;
+      });
+    }
+    
+    if (data.saas_tools && Array.isArray(data.saas_tools)) {
+      data.saas_tools.forEach(tool => {
+        const checkbox = document.querySelector(`input[name="saas_tools[]"][value="${tool}"]`);
+        if (checkbox) checkbox.checked = true;
+      });
+    }
+    
+    // Set text inputs
+    if (data.saas_types_other) document.getElementById('saas_types_other').value = data.saas_types_other;
+    if (data.saas_tools_other) document.getElementById('saas_tools_other').value = data.saas_tools_other;
+    if (data.email) document.getElementById('email').value = data.email;
+    if (data.company_name) document.getElementById('company_name').value = data.company_name;
+  }
+  
+  // Check URL parameters for view mode
+  function checkUrlParams() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const mode = urlParams.get('mode');
+    
+    // If mode=view is in URL, show view mode
+    if (mode === 'view') {
+      showViewMode();
+      return true;
+    }
+    return false;
+  }
+  
+  // Update the checkSurveyCompletion function to check for view mode
+  const originalCheckSurveyCompletion = checkSurveyCompletion;
+  checkSurveyCompletion = function() {
+    // First check if we're in view mode
+    if (checkUrlParams()) {
+      return;
+    }
+    
+    // Otherwise run the original function
+    originalCheckSurveyCompletion();
+  };
+
   document.addEventListener('DOMContentLoaded', function() {
     renderProfileNav();
     revealOnScroll();
     checkSurveyCompletion();
     updateNavigation();
+    
+    // Make navbar visible immediately
+    document.querySelector('.navbar').classList.add('visible');
+    
+    // Make navbar visible immediately
+    document.querySelector('.navbar').classList.add('visible');
 
     // Toggle checkboxes on click
     document.querySelectorAll('.checkbox-group input[type="checkbox"]').forEach(function(checkbox) {

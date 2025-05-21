@@ -1509,8 +1509,31 @@
       location.href = "index.html";
     }
     
+    // Check if user has completed the survey and update the survey button
+    function updateSurveyButton() {
+      const surveyBtn = document.getElementById('surveyBtn');
+      if (!surveyBtn) return;
+      
+      // Check if user has completed the survey
+      const surveyCompleted = localStorage.getItem('surveyCompleted') === 'true';
+      const surveys = localStorage.getItem('surveys');
+      
+      if (surveyCompleted || (surveys && JSON.parse(surveys).length > 0)) {
+        // User has completed the survey, change button to "View Survey"
+        surveyBtn.innerHTML = '<i class="fas fa-eye"></i> View Your Survey';
+        surveyBtn.href = 'survey.html?mode=view';
+      } else {
+        // User has not completed the survey
+        surveyBtn.innerHTML = '<i class="fas fa-clipboard-list"></i> Take the Survey';
+        surveyBtn.href = 'survey.html';
+      }
+    }
+    
     // Ensure this runs after DOM is fully loaded
-    window.addEventListener('DOMContentLoaded', renderNavButtonArea);
+    window.addEventListener('DOMContentLoaded', function() {
+      renderNavButtonArea();
+      updateSurveyButton();
+    });
     
     async function handleBundleClick(bundleName) {
       const token = localStorage.getItem('token');
