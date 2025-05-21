@@ -761,34 +761,19 @@
   <div class="bg-shape bg-shape-3"></div>
   
   <!-- Navbar -->
-  <header class="navbar visible" id="mainNavbar">
-    <div class="logo-area">
+  <nav class="navbar visible" id="mainNavbar">
+    <div class="logo-bar">
       <img src="icons/your-logo.png" alt="ZapBundle Logo" class="logo-img">
-      <span>ZapBundle</span>
+      <span class="logo-text">ZapBundle</span>
     </div>
     <div id="nav-button-area"></div>
-  </header>
+  </nav>
   
   <!-- Survey Form -->
   <div class="survey-box">
     <h2 id="surveyTitle">Take the Survey</h2>
     
-    <!-- View Mode Controls -->
-    <div id="viewModeControls" style="display: none; text-align: center; margin-bottom: 30px;">
-      <div style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); padding: 25px; border-radius: 16px; text-align: center; margin-bottom: 20px; box-shadow: var(--shadow-md); border: 1px solid rgba(99, 102, 241, 0.2);">
-        <i class="fas fa-eye" style="font-size: 36px; color: var(--primary); margin-bottom: 15px;"></i>
-        <h3 style="color: var(--primary-dark); margin-bottom: 15px; font-size: 1.3rem;">Viewing Your Survey Responses</h3>
-        <p style="color: var(--dark); margin-bottom: 20px; line-height: 1.6;">These are your previous survey responses. You can review them or make changes if needed.</p>
-        <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
-          <button id="editSurveyBtn" style="display: inline-block; background: var(--gradient-1); color: white; padding: 12px 24px; border-radius: 12px; text-decoration: none; font-weight: 600; box-shadow: var(--shadow-sm); transition: all 0.3s ease; border: none; cursor: pointer;">
-            <i class="fas fa-edit"></i> Edit Responses
-          </button>
-          <a href="index.html" style="display: inline-block; background: var(--gray); color: white; padding: 12px 24px; border-radius: 12px; text-decoration: none; font-weight: 600; box-shadow: var(--shadow-sm); transition: all 0.3s ease;">
-            <i class="fas fa-home"></i> Back to Home
-          </a>
-        </div>
-      </div>
-    </div>
+
     
     <!-- Success Message -->
     <div id="successMessage" style="display: none;">
@@ -1143,24 +1128,11 @@
       // If user is logged in, send with token
       if (token) {
         try {
-          // Check if we're in edit mode (updating an existing survey)
-          const isUpdate = viewMode;
-          let method = "POST";
-          let endpoint = `${API_URL}/api/survey`;
+          // Always create a new survey
+          const method = "POST";
+          const endpoint = `${API_URL}/api/survey`;
           
-          // If updating, use PUT method and include survey ID if available
-          if (isUpdate) {
-            method = "PUT";
-            
-            // If we have a survey ID, include it in the endpoint
-            if (surveyData && surveyData._id) {
-              endpoint = `${API_URL}/api/survey/${surveyData._id}`;
-            }
-            
-            console.log(`Updating survey with method: ${method} to endpoint: ${endpoint}`);
-          } else {
-            console.log(`Creating new survey with method: ${method} to endpoint: ${endpoint}`);
-          }
+          console.log(`Creating new survey with method: ${method} to endpoint: ${endpoint}`);
           
           const res = await fetch(endpoint, {
             method: method,
@@ -1173,23 +1145,9 @@
           
           if (res.ok) {
             success = true;
-            console.log(`Survey ${isUpdate ? 'updated' : 'created'} successfully`);
-            
-            // If we're updating, also update the local storage
-            if (isUpdate && localStorage.getItem('surveys')) {
-              try {
-                const surveys = JSON.parse(localStorage.getItem('surveys'));
-                // Replace the last survey with the updated one
-                if (surveys.length > 0) {
-                  surveys[surveys.length - 1] = data;
-                  localStorage.setItem('surveys', JSON.stringify(surveys));
-                }
-              } catch (e) {
-                console.error("Error updating local storage:", e);
-              }
-            }
+            console.log(`Survey created successfully`);
           } else {
-            console.error(`Failed to ${isUpdate ? 'update' : 'create'} survey:`, await res.text());
+            console.error(`Failed to create survey:`, await res.text());
           }
         } catch (err) {
           console.error("API error:", err);
@@ -1283,10 +1241,7 @@
           <h3 style="color: var(--success); margin-bottom: 15px; font-size: 1.5rem;">You've Already Completed the Survey</h3>
           <p style="color: var(--dark); margin-bottom: 20px; line-height: 1.6;">Thank you for your previous feedback! Your input is helping us build better SaaS bundles.</p>
           <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
-            <a href="survey.html?mode=view" style="display: inline-block; background: var(--primary); color: white; padding: 12px 24px; border-radius: 12px; text-decoration: none; font-weight: 600; box-shadow: var(--shadow-sm); transition: all 0.3s ease;">
-              <i class="fas fa-eye"></i> View My Responses
-            </a>
-            <a href="index.html" style="display: inline-block; background: var(--gray); color: white; padding: 12px 24px; border-radius: 12px; text-decoration: none; font-weight: 600; box-shadow: var(--shadow-sm); transition: all 0.3s ease;">
+            <a href="index.html" style="display: inline-block; background: var(--primary); color: white; padding: 12px 24px; border-radius: 12px; text-decoration: none; font-weight: 600; box-shadow: var(--shadow-sm); transition: all 0.3s ease;">
               <i class="fas fa-home"></i> Back to Home
             </a>
           </div>
@@ -1313,255 +1268,35 @@
     }
   }
   
-  // View/Edit Mode Functionality
-  let viewMode = false; // Track if we're in view mode
-  let surveyData = null; // Store survey data for view/edit mode
+  // Simple variable to track if we're in an update mode
+  let isUpdateMode = false;
   
-  // Function to show view mode
-  async function showViewMode() {
-    viewMode = true;
-    document.getElementById('surveyTitle').textContent = 'Your Survey Responses';
-    document.getElementById('viewModeControls').style.display = 'block';
-    
-    // Show loading state
-    const loadingMessage = document.createElement('div');
-    loadingMessage.id = 'loadingMessage';
-    loadingMessage.innerHTML = `
-      <div style="text-align: center; padding: 30px;">
-        <i class="fas fa-spinner fa-spin" style="font-size: 30px; color: var(--primary); margin-bottom: 15px;"></i>
-        <p>Loading your survey data...</p>
-      </div>
-    `;
-    document.getElementById('surveyForm').style.display = 'none';
-    document.getElementById('surveyForm').parentNode.insertBefore(loadingMessage, document.getElementById('surveyForm'));
-    
-    // Get saved survey data from API
-    let savedData = null;
-    const token = localStorage.getItem('token');
-    
-    if (token) {
-      try {
-        // Fetch survey data from the API
-        const response = await fetch(`${API_URL}/api/survey`, {
-          method: 'GET',
-          headers: {
-            'Authorization': 'Bearer ' + token,
-            'Content-Type': 'application/json'
-          }
-        });
-        
-        if (response.ok) {
-          const data = await response.json();
-          if (data && data.survey) {
-            savedData = data.survey;
-            console.log('Survey data retrieved from API:', savedData);
-          }
-        } else {
-          console.error('Failed to fetch survey data from API:', response.status);
-        }
-      } catch (error) {
-        console.error('Error fetching survey data:', error);
-      }
-    }
-    
-    // If no data from API, check localStorage as fallback
-    if (!savedData) {
-      // Check localStorage.surveyCompleted
-      if (localStorage.getItem('surveyCompleted') === 'true') {
-        // Try to get data from localStorage.surveys
-        const surveys = localStorage.getItem('surveys');
-        if (surveys) {
-          const parsedSurveys = JSON.parse(surveys);
-          if (parsedSurveys.length > 0) {
-            savedData = parsedSurveys[parsedSurveys.length - 1]; // Get the most recent survey
-            console.log('Survey data retrieved from localStorage:', savedData);
-          }
-        }
-      }
-    }
-    
-    // Remove loading message
-    if (document.getElementById('loadingMessage')) {
-      document.getElementById('loadingMessage').remove();
-    }
-    
-    // Show survey form again
-    document.getElementById('surveyForm').style.display = 'block';
-    
-    if (savedData) {
-      // Use the retrieved data
-      surveyData = savedData;
-      populateFormWithData(surveyData);
-      
-      // Make form fields readonly
-      const form = document.getElementById('surveyForm');
-      const inputs = form.querySelectorAll('input, textarea, select');
-      inputs.forEach(input => {
-        input.disabled = true;
-      });
-      
-      // Hide submit button
-      document.querySelector('.submit-btn').style.display = 'none';
-      
-      // Add edit button event listener
-      document.getElementById('editSurveyBtn').addEventListener('click', function() {
-        enableEditMode();
-      });
-    } else {
-      // No survey data found
+  // Check URL parameters - simplified since we removed view mode
+  function checkUrlParams() {
+    return false; // No special modes to check for
+  }
+  
+  // Simplified survey completion check
+  function checkSurveyCompletion() {
+    // Check if survey was already completed
+    if (localStorage.getItem('surveyCompleted') === 'true' || 
+        (localStorage.getItem('surveys') && JSON.parse(localStorage.getItem('surveys')).length > 0)) {
       document.getElementById('surveyForm').style.display = 'none';
-      document.getElementById('viewModeControls').style.display = 'none';
-      
-      // Show message that no survey data was found
       document.getElementById('successMessage').style.display = 'block';
-      document.getElementById('successMessage').innerHTML = `
-        <div style="background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%); padding: 25px; border-radius: 16px; text-align: center; margin-bottom: 30px; box-shadow: var(--shadow-md); border: 1px solid rgba(249, 115, 22, 0.2);">
-          <i class="fas fa-exclamation-circle" style="font-size: 48px; color: var(--warning); margin-bottom: 15px;"></i>
-          <h3 style="color: var(--warning); margin-bottom: 15px; font-size: 1.5rem;">No Survey Data Found</h3>
-          <p style="color: var(--dark); margin-bottom: 20px; line-height: 1.6;">It seems you haven't completed the survey yet or your data couldn't be retrieved.</p>
-          <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
-            <a href="survey.html" style="display: inline-block; background: var(--primary); color: white; padding: 12px 24px; border-radius: 12px; text-decoration: none; font-weight: 600; box-shadow: var(--shadow-sm); transition: all 0.3s ease;">
-              <i class="fas fa-clipboard-list"></i> Take the Survey
-            </a>
-            <a href="index.html" style="display: inline-block; background: var(--gray); color: white; padding: 12px 24px; border-radius: 12px; text-decoration: none; font-weight: 600; box-shadow: var(--shadow-sm); transition: all 0.3s ease;">
-              <i class="fas fa-home"></i> Back to Home
-            </a>
-          </div>
-        </div>
-      `;
     }
-  }
-  
-  // Function to enable edit mode
-  function enableEditMode() {
-    viewMode = true; // Keep viewMode true to indicate we're updating an existing survey
-    document.getElementById('surveyTitle').textContent = 'Edit Your Survey';
-    document.getElementById('viewModeControls').style.display = 'none';
-    
-    // Enable form fields
-    const form = document.getElementById('surveyForm');
-    const inputs = form.querySelectorAll('input, textarea, select');
-    inputs.forEach(input => {
-      input.disabled = false;
-    });
-    
-    // Show submit button
-    const submitBtn = document.querySelector('.submit-btn');
-    submitBtn.style.display = 'block';
-    
-    // Update button text
-    const submitBtnText = document.getElementById('submitBtnText');
-    if (submitBtnText) {
-      submitBtnText.textContent = 'Update Survey';
-    } else {
-      submitBtn.textContent = 'Update Survey';
-    }
-    
-    // Add a note that this is an update
-    const formNote = document.createElement('div');
-    formNote.id = 'formEditNote';
-    formNote.style.cssText = 'background: #eff6ff; padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 1px solid rgba(99, 102, 241, 0.2); color: var(--primary-dark);';
-    formNote.innerHTML = '<i class="fas fa-info-circle"></i> You are now editing your previous survey responses. Your old survey data will be replaced when you submit. Click "Update Survey" when you\'re done.';
-    
-    // Insert the note at the top of the form
-    if (!document.getElementById('formEditNote')) {
-      form.insertBefore(formNote, form.firstChild);
-    }
-  }
-  
-  // Function to populate form with data
-  function populateFormWithData(data) {
-    // Set radio buttons
-    if (data.company_type) {
-      const companyTypeRadio = document.querySelector(`input[name="company_type"][value="${data.company_type}"]`);
-      if (companyTypeRadio) companyTypeRadio.checked = true;
-      else document.getElementById('company_type_other').value = data.company_type;
-    }
-    
-    if (data.saas_count) {
-      const saasCountRadio = document.querySelector(`input[name="saas_count"][value="${data.saas_count}"]`);
-      if (saasCountRadio) saasCountRadio.checked = true;
-    }
-    
-    if (data.monthly_spend) {
-      const spendRadio = document.querySelector(`input[name="monthly_spend"][value="${data.monthly_spend}"]`);
-      if (spendRadio) spendRadio.checked = true;
-    }
-    
-    if (data.challenge) {
-      const challengeRadio = document.querySelector(`input[name="challenge"][value="${data.challenge}"]`);
-      if (challengeRadio) challengeRadio.checked = true;
-      else document.getElementById('challenge_other').value = data.challenge;
-    }
-    
-    if (data.interest_bundles) {
-      const bundleRadio = document.querySelector(`input[name="interest_bundles"][value="${data.interest_bundles}"]`);
-      if (bundleRadio) bundleRadio.checked = true;
-    }
-    
-    if (data.early_access) {
-      const earlyAccessRadio = document.querySelector(`input[name="early_access"][value="${data.early_access}"]`);
-      if (earlyAccessRadio) earlyAccessRadio.checked = true;
-    }
-    
-    // Set checkboxes
-    if (data.saas_types && Array.isArray(data.saas_types)) {
-      data.saas_types.forEach(type => {
-        const checkbox = document.querySelector(`input[name="saas_types[]"][value="${type}"]`);
-        if (checkbox) checkbox.checked = true;
-      });
-    }
-    
-    if (data.saas_tools && Array.isArray(data.saas_tools)) {
-      data.saas_tools.forEach(tool => {
-        const checkbox = document.querySelector(`input[name="saas_tools[]"][value="${tool}"]`);
-        if (checkbox) checkbox.checked = true;
-      });
-    }
-    
-    // Set text inputs
-    if (data.saas_types_other) document.getElementById('saas_types_other').value = data.saas_types_other;
-    if (data.saas_tools_other) document.getElementById('saas_tools_other').value = data.saas_tools_other;
-    if (data.email) document.getElementById('email').value = data.email;
-    if (data.company_name) document.getElementById('company_name').value = data.company_name;
-  }
-  
-  // Check URL parameters for view mode
-  async function checkUrlParams() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const mode = urlParams.get('mode');
-    
-    // If mode=view is in URL, show view mode
-    if (mode === 'view') {
-      await showViewMode();
-      return true;
-    }
-    return false;
-  }
-  
-  // Update the checkSurveyCompletion function to check for view mode
-  const originalCheckSurveyCompletion = checkSurveyCompletion;
-  checkSurveyCompletion = async function() {
-    // First check if we're in view mode
-    if (await checkUrlParams()) {
-      return;
-    }
-    
-    // Otherwise run the original function
-    originalCheckSurveyCompletion();
   };
 
-  document.addEventListener('DOMContentLoaded', async function() {
-    // Make navbar visible immediately (before any async operations)
+  document.addEventListener('DOMContentLoaded', function() {
+    // Make navbar visible immediately
     const navbar = document.querySelector('.navbar');
     if (navbar) {
       navbar.classList.add('visible');
     }
     
     // Initialize the rest of the page
-    await renderProfileNav();
+    renderProfileNav();
     revealOnScroll();
-    await checkSurveyCompletion();
+    checkSurveyCompletion();
     updateNavigation();
 
     // Toggle checkboxes on click
