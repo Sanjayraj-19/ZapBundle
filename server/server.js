@@ -254,6 +254,21 @@ app.post('/api/register-bundle', authenticateToken, async (req, res) => {
   }
 });
 
+// Remove bundle
+app.post('/api/remove-bundle', authenticateToken, async (req, res) => {
+  const { bundle } = req.body;
+  if (!bundle) return res.status(400).json({ error: "Bundle name required." });
+  try {
+    await usersCollection.updateOne(
+      { _id: new ObjectId(req.user.userId) },
+      { $pull: { selectedBundles: bundle } }
+    );
+    res.json({ message: "Bundle removed." });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to remove bundle." });
+  }
+});
+
 // Start server
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

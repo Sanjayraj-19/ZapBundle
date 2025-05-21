@@ -673,29 +673,55 @@ async function renderProfile() {
     return;
   }
 
+  // Debug the profile data
+  console.log("Profile data received:", profile);
+  
+  // Ensure selectedBundles is always an array
+  if (!profile.selectedBundles) {
+    profile.selectedBundles = [];
+    console.log("selectedBundles was undefined, initialized to empty array");
+  } else if (!Array.isArray(profile.selectedBundles)) {
+    profile.selectedBundles = [profile.selectedBundles];
+    console.log("selectedBundles was not an array, converted to array:", profile.selectedBundles);
+  }
+  
+  // Filter out any null or undefined values
+  profile.selectedBundles = profile.selectedBundles.filter(bundle => bundle);
+  
+  console.log("Final selectedBundles:", profile.selectedBundles);
+
   await renderNavButtonArea(profile);
 
   // Bundles
   let bundlesHtml = "";
-  if (profile.selectedBundles && profile.selectedBundles.length > 0) {
-    bundlesHtml = `<div class="bundle-list">` +
-      profile.selectedBundles.map(bundle =>
-        `<span class="bundle-tag">${bundle}
-          <button class="remove-btn" title="Remove" onclick="removeBundle('${bundle.replace(/'/g,"\\'")}')">&times;</button>
-        </span>`
-      ).join("") +
-      `</div>`;
-  } else {
-    bundlesHtml = `<div style="margin-top:18px;color:#888;">No bundles selected yet.</div>`;
+  
+  // Ensure selectedBundles is always an array before processing
+  if (!Array.isArray(profile.selectedBundles)) {
+    console.log("Converting selectedBundles to array");
+    profile.selectedBundles = profile.selectedBundles ? [profile.selectedBundles] : [];
   }
   
-  // Debug the bundles data
-  console.log("Profile data:", profile);
-  console.log("Selected bundles:", profile.selectedBundles);
+  console.log("Processing bundles:", profile.selectedBundles);
   
-  // Ensure selectedBundles is always an array
-  if (!Array.isArray(profile.selectedBundles)) {
-    profile.selectedBundles = [];
+  if (profile.selectedBundles && profile.selectedBundles.length > 0) {
+    console.log("Building bundle HTML for", profile.selectedBundles.length, "bundles");
+    
+    bundlesHtml = `<div class="bundle-list">`;
+    
+    profile.selectedBundles.forEach(bundle => {
+      if (bundle && typeof bundle === 'string') {
+        console.log("Adding bundle:", bundle);
+        bundlesHtml += `
+          <span class="bundle-tag">${bundle}
+            <button class="remove-btn" title="Remove" onclick="removeBundle('${bundle.replace(/'/g,"\\'")}')">&times;</button>
+          </span>`;
+      }
+    });
+    
+    bundlesHtml += `</div>`;
+  } else {
+    console.log("No bundles to display");
+    bundlesHtml = `<div style="margin-top:18px;color:#888;">No bundles selected yet.</div>`;
   }
 
   // Check if user has completed survey
@@ -741,7 +767,7 @@ async function renderProfile() {
       
       <div class="section-container">
         <h3 class="section-title">Your Bundles</h3>
-        ${Array.isArray(profile.selectedBundles) && profile.selectedBundles.length > 0 ? 
+        ${profile.selectedBundles && profile.selectedBundles.length > 0 ? 
           bundlesHtml : 
           `<p class="section-desc">You haven't selected any bundles yet.</p>
            <div class="action-buttons">
