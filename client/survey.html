@@ -2,23 +2,51 @@
 <html lang="en">
 <head>
   <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>ZapBundle - Survey</title>
   <style>
     :root {
-      --zapblue: #1ad1ff;
-      --zapdark: #0056b3;
-      --zapbg: #eafaff;
-      --zapbg-dark: #f8f9fa;
+      --primary: #6366f1;
+      --primary-dark: #4f46e5;
+      --primary-light: #a5b4fc;
+      --secondary: #ec4899;
+      --secondary-dark: #db2777;
+      --accent: #06b6d4;
+      --accent-dark: #0891b2;
+      --dark: #1e293b;
+      --light: #f8fafc;
+      --gray: #64748b;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --gradient-1: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+      --gradient-2: linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%);
+      --gradient-3: linear-gradient(135deg, var(--accent) 0%, var(--success) 100%);
+      --gradient-4: linear-gradient(135deg, var(--warning) 0%, var(--secondary) 100%);
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
     }
-    html, body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(120deg, var(--zapbg-dark) 60%, var(--zapbg) 100%);
+    
+    * {
       margin: 0;
       padding: 0;
-      min-height: 100vh;
-      color: #1a2330;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+    
+    body {
+      background-color: var(--light);
+      color: var(--dark);
+      padding-top: 80px;
+      overflow-x: hidden;
     }
     header.navbar {
       background: #fff;
@@ -84,118 +112,289 @@
     }
     /* Survey Box */
     .survey-box {
-      max-width: 700px;
+      max-width: 800px;
       background: #fff;
-      margin: 110px auto 50px auto;
-      padding: 30px;
-      border-radius: 20px;
-      box-shadow: 0px 4px 15px rgba(0,0,0,0.1);
+      margin: 40px auto 60px auto;
+      padding: 40px;
+      border-radius: 24px;
+      box-shadow: var(--shadow-lg);
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(99, 102, 241, 0.1);
+      animation: fadeIn 0.8s ease-out;
     }
+    
+    .survey-box::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 6px;
+      background: var(--gradient-1);
+    }
+    
     .survey-box h2 {
       text-align: center;
-      color: var(--zapdark);
-      margin-bottom: 20px;
-      font-size: 2rem;
-      font-family: 'Segoe UI Semibold', 'Segoe UI', Arial, sans-serif;
+      color: var(--primary-dark);
+      margin-bottom: 30px;
+      font-size: 2.2rem;
+      font-weight: 700;
       letter-spacing: 0.5px;
+      position: relative;
+      display: inline-block;
+      left: 50%;
+      transform: translateX(-50%);
     }
+    
+    .survey-box h2::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 0;
+      width: 60%;
+      height: 4px;
+      background: var(--gradient-1);
+      border-radius: 2px;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .survey-question {
+      margin-bottom: 32px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid rgba(99, 102, 241, 0.1);
+      animation: slideIn 0.6s ease-out;
+      animation-fill-mode: both;
+    }
+    
+    .survey-question:last-child {
+      border-bottom: none;
+      margin-bottom: 10px;
+    }
+    
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
     label {
       display: block;
-      margin: 18px 0 7px 0;
-      font-weight: 700;
-      color: var(--zapdark); /* Question: dark and bold */
-      font-size: 1.13rem;
-      font-family: 'Segoe UI Semibold', 'Segoe UI', Arial, sans-serif;
-      letter-spacing: 0.1px;
+      margin: 18px 0 12px 0;
+      font-weight: 600;
+      color: var(--primary-dark);
+      font-size: 1.15rem;
+      letter-spacing: 0.3px;
+      position: relative;
     }
+    
+    label .required {
+      color: var(--danger);
+      margin-left: 4px;
+    }
+    
     .radio-item label,
     .checkbox-item label {
       margin-top: 2px;
       font-weight: 400;
       font-size: 1rem;
-      color: #6c7a89; /* Answer: lighter color */
+      color: var(--gray);
       min-width: 0;
       flex-shrink: 0;
-      font-family: 'Segoe UI', Arial, sans-serif;
+      transition: color 0.2s ease;
     }
+    
+    .radio-item:hover label,
+    .checkbox-item:hover label {
+      color: var(--primary);
+    }
+    
     input[type="text"],
     input[type="email"],
     textarea,
     select {
-      color: #34495e; /* Lighter than question, but readable */
-      background: var(--zapbg);
-      padding: 10px;
-      margin-top: 5px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
+      width: 100%;
+      color: var(--dark);
+      background: #fff;
+      padding: 12px 16px;
+      margin-top: 8px;
+      border-radius: 12px;
+      border: 1px solid rgba(99, 102, 241, 0.3);
       box-sizing: border-box;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      box-shadow: var(--shadow-sm);
     }
+    
+    input[type="text"]:focus,
+    input[type="email"]:focus,
+    textarea:focus,
+    select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+      outline: none;
+    }
+    
     textarea {
       resize: vertical;
+      min-height: 100px;
     }
+    
     .radio-group, .checkbox-group {
-      margin-top: 0;
-      margin-bottom: 0;
-      padding-left: 2px;
+      margin: 12px 0;
+      padding: 5px 0;
     }
+    
     .radio-item, .checkbox-item {
       display: flex;
       align-items: flex-start;
-      gap: 10px;
-      margin-bottom: 2px; /* Reduced space between answers */
-      font-size: 1rem;
-      font-family: 'Segoe UI', Arial, sans-serif;
-      line-height: 1.1;
+      gap: 12px;
+      margin-bottom: 10px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      transition: background-color 0.2s ease;
     }
+    
+    .radio-item:hover, .checkbox-item:hover {
+      background-color: rgba(99, 102, 241, 0.05);
+    }
+    
     .radio-group .radio-item:last-child,
     .checkbox-group .checkbox-item:last-child {
       margin-bottom: 0;
     }
+    
+    /* Custom radio and checkbox styling */
+    input[type="radio"],
+    input[type="checkbox"] {
+      -webkit-appearance: none;
+      appearance: none;
+      background-color: #fff;
+      margin: 0;
+      width: 20px;
+      height: 20px;
+      border: 2px solid rgba(99, 102, 241, 0.5);
+      display: grid;
+      place-content: center;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+    
+    input[type="radio"] {
+      border-radius: 50%;
+    }
+    
+    input[type="checkbox"] {
+      border-radius: 4px;
+    }
+    
+    input[type="radio"]::before,
+    input[type="checkbox"]::before {
+      content: "";
+      width: 10px;
+      height: 10px;
+      transform: scale(0);
+      transition: transform 0.2s ease;
+      box-shadow: inset 1em 1em var(--primary);
+    }
+    
+    input[type="radio"]::before {
+      border-radius: 50%;
+    }
+    
+    input[type="checkbox"]::before {
+      border-radius: 2px;
+    }
+    
+    input[type="radio"]:checked,
+    input[type="checkbox"]:checked {
+      border-color: var(--primary);
+      background-color: #fff;
+    }
+    
+    input[type="radio"]:checked::before,
+    input[type="checkbox"]:checked::before {
+      transform: scale(1);
+    }
+    
+    input[type="radio"]:focus,
+    input[type="checkbox"]:focus {
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+    }
+    
     .other-textbox-wrap {
-      margin-top: 8px;
-      margin-bottom: 14px;
+      margin-top: 12px;
+      margin-bottom: 16px;
       display: flex;
       flex-direction: column;
       align-items: flex-start;
       width: 100%;
+      padding-left: 32px;
     }
+    
     .other-textbox {
       width: 100%;
-      max-width: 350px;
-      padding: 10px 12px;
-      border-radius: 8px;
-      border: 1.5px solid var(--zapblue);
-      background: var(--zapbg);
-      color: var(--zapdark);
+      max-width: 400px;
+      padding: 12px 16px;
+      border-radius: 12px;
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      background: #fff;
+      color: var(--dark);
       font-size: 1rem;
-      margin-top: 5px;
-      transition: border-color 0.2s, box-shadow 0.2s;
+      margin-top: 8px;
+      transition: all 0.3s ease;
       box-sizing: border-box;
       outline: none;
-      font-family: 'Segoe UI', Arial, sans-serif;
+      box-shadow: var(--shadow-sm);
     }
+    
     .other-textbox:focus {
-      border-color: var(--zapdark);
-      box-shadow: 0 0 0 2px #1ad1ff33;
-      background: #fff;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
     }
+    
     .submit-btn {
-      margin-top: 30px;
+      margin-top: 40px;
       width: 100%;
-      padding: 14px;
-      font-size: 1.13rem;
-      background: var(--zapblue);
+      padding: 16px;
+      font-size: 1.15rem;
+      background: var(--gradient-1);
       color: white;
       border: none;
-      border-radius: 10px;
+      border-radius: 14px;
       cursor: pointer;
-      transition: background-color 0.3s;
-      font-weight: bold;
-      font-family: 'Segoe UI Semibold', 'Segoe UI', Arial, sans-serif;
-      letter-spacing: 0.2px;
+      transition: all 0.3s ease;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      box-shadow: var(--shadow-md);
+      position: relative;
+      overflow: hidden;
     }
+    
+    .submit-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: all 0.6s ease;
+    }
+    
     .submit-btn:hover {
-      background-color: var(--zapdark);
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-lg);
+    }
+    
+    .submit-btn:hover::before {
+      left: 100%;
+    }
+    
+    .submit-btn:active {
+      transform: translateY(1px);
     }
     footer {
       margin-top: 50px;
@@ -414,19 +613,40 @@
   </header>
   
   <!-- Survey Form -->
-  <div class="survey-box scroll-fade">
-    <h2>Take the Survey</h2>
-    <div id="successMessage" style="display: none; background-color: #e6f7f0; padding: 20px; border-radius: 10px; text-align: center; margin-bottom: 20px;">
-      <h3 style="color: #10b981; margin-bottom: 10px;">Thank You for Your Feedback!</h3>
-      <p style="color: #1a2330; margin-bottom: 15px;">Your survey responses have been submitted successfully. We appreciate your input in helping us build better SaaS bundles.</p>
-      <a href="index.html" style="display: inline-block; background-color: var(--zapblue); color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: bold;">Back to Home</a>
+  <div class="survey-box">
+    <h2 id="surveyTitle">Take the Survey</h2>
+    
+    <!-- Success Message -->
+    <div id="successMessage" style="display: none;">
+      <div style="background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%); padding: 25px; border-radius: 16px; text-align: center; margin-bottom: 30px; box-shadow: var(--shadow-md); border: 1px solid rgba(16, 185, 129, 0.2);">
+        <i class="fas fa-check-circle" style="font-size: 48px; color: var(--success); margin-bottom: 15px;"></i>
+        <h3 style="color: var(--success); margin-bottom: 15px; font-size: 1.5rem;">Thank You for Your Feedback!</h3>
+        <p style="color: var(--dark); margin-bottom: 20px; line-height: 1.6;">Your survey responses have been submitted successfully. We appreciate your input in helping us build better SaaS bundles.</p>
+        <div style="display: flex; gap: 15px; justify-content: center;">
+          <a href="index.html" style="display: inline-block; background: var(--gradient-1); color: white; padding: 12px 24px; border-radius: 12px; text-decoration: none; font-weight: 600; box-shadow: var(--shadow-sm); transition: all 0.3s ease;">Back to Home</a>
+          <a href="profile.html" style="display: inline-block; background: white; color: var(--primary); padding: 12px 24px; border-radius: 12px; text-decoration: none; font-weight: 600; box-shadow: var(--shadow-sm); border: 1px solid rgba(99, 102, 241, 0.3); transition: all 0.3s ease;">View Profile</a>
+        </div>
+      </div>
     </div>
+    
+    <!-- View Mode Controls (only shown in view mode) -->
+    <div id="viewModeControls" style="display: none; margin-bottom: 30px; text-align: center;">
+      <div style="display: flex; gap: 15px; justify-content: center;">
+        <button id="editSurveyBtn" type="button" style="display: inline-block; background: var(--gradient-1); color: white; padding: 12px 24px; border-radius: 12px; text-decoration: none; font-weight: 600; box-shadow: var(--shadow-sm); border: none; cursor: pointer; transition: all 0.3s ease;">
+          <i class="fas fa-edit" style="margin-right: 8px;"></i> Edit Responses
+        </button>
+        <a href="profile.html" style="display: inline-block; background: white; color: var(--primary); padding: 12px 24px; border-radius: 12px; text-decoration: none; font-weight: 600; box-shadow: var(--shadow-sm); border: 1px solid rgba(99, 102, 241, 0.3); transition: all 0.3s ease;">
+          <i class="fas fa-user" style="margin-right: 8px;"></i> Back to Profile
+        </a>
+      </div>
+    </div>
+    
     <form id="surveyForm" autocomplete="off">
       <input type="hidden" name="_format" value="xml" />
 
       <div class="survey-question">
         <!-- 1. Company Type (Mandatory) -->
-        <label>1. What best describes your company type? <span style="color:#ff416c;">*</span></label>
+        <label>1. What best describes your company type? <span class="required">*</span></label>
         <div class="radio-group">
           <div class="radio-item"><input type="radio" name="company_type" value="Startup" id="startup" required><label for="startup">Startup</label></div>
           <div class="radio-item"><input type="radio" name="company_type" value="Small Business" id="smallbiz"><label for="smallbiz">Small Business</label></div>
@@ -435,25 +655,25 @@
           <div class="radio-item"><input type="radio" name="company_type" value="Freelance/Consultant" id="freelance"><label for="freelance">Freelance/Consultant</label></div>
         </div>
         <div class="other-textbox-wrap">
-          <label for="company_type_other" style="font-weight:normal; color:var(--zapdark); margin-top:10px;">Other company type:</label>
+          <label for="company_type_other" style="font-weight:normal; color:var(--gray); margin-top:10px;">Other company type:</label>
           <input type="text" name="company_type_other" id="company_type_other" class="other-textbox" placeholder="Type here if other..." />
         </div>
       </div>
 
       <div class="survey-question">
         <!-- 2. Number of SaaS Tools (Mandatory) -->
-        <label>2. How many SaaS tools are you currently subscribed to? <span style="color:#ff416c;">*</span></label>
+        <label>2. How many SaaS tools are you currently subscribed to? <span class="required">*</span></label>
         <div class="radio-group">
-          <div class="radio-item"><input type="radio" name="saas_count" value="1–3" required><label>1–3</label></div>
-          <div class="radio-item"><input type="radio" name="saas_count" value="4–7"><label>4–7</label></div>
-          <div class="radio-item"><input type="radio" name="saas_count" value="8–10"><label>8–10</label></div>
-          <div class="radio-item"><input type="radio" name="saas_count" value="More than 10"><label>More than 10</label></div>
+          <div class="radio-item"><input type="radio" name="saas_count" value="1–3" id="count1" required><label for="count1">1–3</label></div>
+          <div class="radio-item"><input type="radio" name="saas_count" value="4–7" id="count2"><label for="count2">4–7</label></div>
+          <div class="radio-item"><input type="radio" name="saas_count" value="8–10" id="count3"><label for="count3">8–10</label></div>
+          <div class="radio-item"><input type="radio" name="saas_count" value="More than 10" id="count4"><label for="count4">More than 10</label></div>
         </div>
       </div>
 
       <div class="survey-question">
         <!-- 3. Types of SaaS Tools (Mandatory) -->
-        <label>3. Which types of SaaS tools do you use most often? <span style="font-weight:normal;">(Select all that apply)</span> <span style="color:#ff416c;">*</span></label>
+        <label>3. Which types of SaaS tools do you use most often? <span style="font-weight:normal; color:var(--gray);">(Select all that apply)</span> <span class="required">*</span></label>
         <div class="checkbox-group">
           <div class="checkbox-item"><input type="checkbox" name="saas_types[]" value="Communication" required id="comm"><label for="comm">Communication (e.g., Slack, Zoom)</label></div>
           <div class="checkbox-item"><input type="checkbox" name="saas_types[]" value="Project Management" id="pm"><label for="pm">Project Management (e.g., Trello, Asana)</label></div>
@@ -463,25 +683,65 @@
           <div class="checkbox-item"><input type="checkbox" name="saas_types[]" value="Accounting/Finance Tools" id="acct"><label for="acct">Accounting/Finance Tools (e.g., QuickBooks, FreshBooks)</label></div>
         </div>
         <div class="other-textbox-wrap">
-          <label for="saas_types_other" style="font-weight:normal; color:var(--zapdark); margin-top:10px;">Other SaaS tool types you use:</label>
+          <label for="saas_types_other" style="font-weight:normal; color:var(--gray); margin-top:10px;">Other SaaS tool types you use:</label>
           <input type="text" name="saas_types_other" id="saas_types_other" class="other-textbox" placeholder="Type here if any other..." />
         </div>
       </div>
-
+      
       <div class="survey-question">
-        <!-- 4. Average Monthly Spend -->
-        <label>4. What is your average monthly spend on SaaS tools?</label>
-        <div class="radio-group">
-          <div class="radio-item"><input type="radio" name="monthly_spend" value="Less than ₹5,000" required><label>Less than ₹5,000</label></div>
-          <div class="radio-item"><input type="radio" name="monthly_spend" value="₹5,000–₹10,000"><label>₹5,000–₹10,000</label></div>
-          <div class="radio-item"><input type="radio" name="monthly_spend" value="₹10,000–₹25,000"><label>₹10,000–₹25,000</label></div>
-          <div class="radio-item"><input type="radio" name="monthly_spend" value="₹25,000+"><label>₹25,000+</label></div>
+        <!-- 4. Specific SaaS Tools (New Question) -->
+        <label>4. Select specific SaaS tools you currently use: <span style="font-weight:normal; color:var(--gray);">(Select all that apply)</span></label>
+        <div class="checkbox-group" id="saasToolsContainer">
+          <!-- Communication Tools -->
+          <h4 style="margin: 15px 0 10px 0; color: var(--primary-dark); font-size: 1.05rem; border-bottom: 1px solid rgba(99, 102, 241, 0.1); padding-bottom: 8px;">Communication Tools</h4>
+          <div class="checkbox-item"><input type="checkbox" name="saas_tools[]" value="Slack" id="slack"><label for="slack">Slack</label></div>
+          <div class="checkbox-item"><input type="checkbox" name="saas_tools[]" value="Zoom" id="zoom"><label for="zoom">Zoom</label></div>
+          <div class="checkbox-item"><input type="checkbox" name="saas_tools[]" value="Microsoft Teams" id="teams"><label for="teams">Microsoft Teams</label></div>
+          <div class="checkbox-item"><input type="checkbox" name="saas_tools[]" value="Google Meet" id="meet"><label for="meet">Google Meet</label></div>
+          
+          <!-- Project Management Tools -->
+          <h4 style="margin: 15px 0 10px 0; color: var(--primary-dark); font-size: 1.05rem; border-bottom: 1px solid rgba(99, 102, 241, 0.1); padding-bottom: 8px;">Project Management Tools</h4>
+          <div class="checkbox-item"><input type="checkbox" name="saas_tools[]" value="Trello" id="trello"><label for="trello">Trello</label></div>
+          <div class="checkbox-item"><input type="checkbox" name="saas_tools[]" value="Asana" id="asana"><label for="asana">Asana</label></div>
+          <div class="checkbox-item"><input type="checkbox" name="saas_tools[]" value="Monday.com" id="monday"><label for="monday">Monday.com</label></div>
+          <div class="checkbox-item"><input type="checkbox" name="saas_tools[]" value="Jira" id="jira"><label for="jira">Jira</label></div>
+          <div class="checkbox-item"><input type="checkbox" name="saas_tools[]" value="ClickUp" id="clickup"><label for="clickup">ClickUp</label></div>
+          
+          <!-- Marketing Tools -->
+          <h4 style="margin: 15px 0 10px 0; color: var(--primary-dark); font-size: 1.05rem; border-bottom: 1px solid rgba(99, 102, 241, 0.1); padding-bottom: 8px;">Marketing Tools</h4>
+          <div class="checkbox-item"><input type="checkbox" name="saas_tools[]" value="Mailchimp" id="mailchimp"><label for="mailchimp">Mailchimp</label></div>
+          <div class="checkbox-item"><input type="checkbox" name="saas_tools[]" value="HubSpot" id="hubspot"><label for="hubspot">HubSpot</label></div>
+          <div class="checkbox-item"><input type="checkbox" name="saas_tools[]" value="SEMrush" id="semrush"><label for="semrush">SEMrush</label></div>
+          <div class="checkbox-item"><input type="checkbox" name="saas_tools[]" value="Ahrefs" id="ahrefs"><label for="ahrefs">Ahrefs</label></div>
+          <div class="checkbox-item"><input type="checkbox" name="saas_tools[]" value="Buffer" id="buffer"><label for="buffer">Buffer</label></div>
+          
+          <!-- Design Tools -->
+          <h4 style="margin: 15px 0 10px 0; color: var(--primary-dark); font-size: 1.05rem; border-bottom: 1px solid rgba(99, 102, 241, 0.1); padding-bottom: 8px;">Design Tools</h4>
+          <div class="checkbox-item"><input type="checkbox" name="saas_tools[]" value="Figma" id="figma"><label for="figma">Figma</label></div>
+          <div class="checkbox-item"><input type="checkbox" name="saas_tools[]" value="Canva" id="canva"><label for="canva">Canva</label></div>
+          <div class="checkbox-item"><input type="checkbox" name="saas_tools[]" value="Adobe Creative Cloud" id="adobe"><label for="adobe">Adobe Creative Cloud</label></div>
+          <div class="checkbox-item"><input type="checkbox" name="saas_tools[]" value="Sketch" id="sketch"><label for="sketch">Sketch</label></div>
+        </div>
+        <div class="other-textbox-wrap">
+          <label for="saas_tools_other" style="font-weight:normal; color:var(--gray); margin-top:10px;">Other specific SaaS tools you use:</label>
+          <input type="text" name="saas_tools_other" id="saas_tools_other" class="other-textbox" placeholder="Type here if any other..." />
         </div>
       </div>
 
       <div class="survey-question">
-        <!-- 5. Biggest Challenge -->
-        <label>5. What is your biggest challenge with managing SaaS subscriptions?</label>
+        <!-- 5. Average Monthly Spend -->
+        <label>5. What is your average monthly spend on SaaS tools? <span class="required">*</span></label>
+        <div class="radio-group">
+          <div class="radio-item"><input type="radio" name="monthly_spend" value="Less than ₹5,000" id="spend1" required><label for="spend1">Less than ₹5,000</label></div>
+          <div class="radio-item"><input type="radio" name="monthly_spend" value="₹5,000–₹10,000" id="spend2"><label for="spend2">₹5,000–₹10,000</label></div>
+          <div class="radio-item"><input type="radio" name="monthly_spend" value="₹10,000–₹25,000" id="spend3"><label for="spend3">₹10,000–₹25,000</label></div>
+          <div class="radio-item"><input type="radio" name="monthly_spend" value="₹25,000+" id="spend4"><label for="spend4">₹25,000+</label></div>
+        </div>
+      </div>
+
+      <div class="survey-question">
+        <!-- 6. Biggest Challenge -->
+        <label>6. What is your biggest challenge with managing SaaS subscriptions? <span class="required">*</span></label>
         <div class="radio-group">
           <div class="radio-item"><input type="radio" name="challenge" value="Too expensive" required id="expensive"><label for="expensive">Too expensive</label></div>
           <div class="radio-item"><input type="radio" name="challenge" value="Managing multiple accounts and billing cycles" id="multiacc"><label for="multiacc">Managing multiple accounts and billing cycles</label></div>
@@ -489,28 +749,29 @@
           <div class="radio-item"><input type="radio" name="challenge" value="Lack of bundled discounts" id="nobundle"><label for="nobundle">Lack of bundled discounts</label></div>
         </div>
         <div class="other-textbox-wrap">
-          <label for="challenge_other" style="font-weight:normal; color:var(--zapdark); margin-top:10px;">Other challenge:</label>
-          <input type="text" name="challenge_other" id="challenge_other" class="other-textbox" placeholder="Type here if other..." required />
+          <label for="challenge_other" style="font-weight:normal; color:var(--gray); margin-top:10px;">Other challenge:</label>
+          <input type="text" name="challenge_other" id="challenge_other" class="other-textbox" placeholder="Type here if other..." />
         </div>
       </div>
 
       <div class="survey-question">
-        <!-- 6. Interest in Bundles -->
-        <label>6. Would you be interested in curated SaaS bundles at a discounted price?</label>
+        <!-- 7. Interest in Bundles -->
+        <label>7. Which bundle would you be most interested in? <span class="required">*</span></label>
         <div class="radio-group">
-          <div class="radio-item"><input type="radio" name="interest_bundles" value="Yes, definitely!" required><label>Yes, definitely!</label></div>
-          <div class="radio-item"><input type="radio" name="interest_bundles" value="Maybe, depends on the bundle."><label>Maybe, depends on the bundle.</label></div>
-          <div class="radio-item"><input type="radio" name="interest_bundles" value="No, I prefer individual subscriptions."><label>No, I prefer individual subscriptions.</label></div>
+          <div class="radio-item"><input type="radio" name="interest_bundles" value="Marketing Bundle (SEO, Email, Social Media)" required id="mktbundle"><label for="mktbundle">Marketing Bundle (SEO, Email, Social Media)</label></div>
+          <div class="radio-item"><input type="radio" name="interest_bundles" value="Productivity Bundle (Project Management, Communication, Notes)" id="prodbundle"><label for="prodbundle">Productivity Bundle (Project Management, Communication, Notes)</label></div>
+          <div class="radio-item"><input type="radio" name="interest_bundles" value="Design Bundle (Graphic Design, UI/UX, Stock Photos)" id="designbundle"><label for="designbundle">Design Bundle (Graphic Design, UI/UX, Stock Photos)</label></div>
+          <div class="radio-item"><input type="radio" name="interest_bundles" value="Development Bundle (Hosting, CI/CD, Code Management)" id="devbundle"><label for="devbundle">Development Bundle (Hosting, CI/CD, Code Management)</label></div>
+          <div class="radio-item"><input type="radio" name="interest_bundles" value="Custom Bundle" id="custombundle"><label for="custombundle">Custom Bundle (Mix and match tools)</label></div>
         </div>
       </div>
 
       <div class="survey-question">
-        <!-- 7. Early Access Program -->
-        <label>7. If we could save you up to 30% on your SaaS spend, would you join our early access program?</label>
+        <!-- 8. Early Access -->
+        <label>8. Would you like early access to our SaaS bundle platform? <span class="required">*</span></label>
         <div class="radio-group">
-          <div class="radio-item"><input type="radio" name="early_access" value="Yes" required><label>Yes</label></div>
-          <div class="radio-item"><input type="radio" name="early_access" value="Maybe"><label>Maybe</label></div>
-          <div class="radio-item"><input type="radio" name="early_access" value="No"><label>No</label></div>
+          <div class="radio-item"><input type="radio" name="early_access" value="Yes" required id="earlyyes"><label for="earlyyes">Yes, I'd like early access</label></div>
+          <div class="radio-item"><input type="radio" name="early_access" value="No" id="earlyno"><label for="earlyno">No, I'll wait for the public launch</label></div>
         </div>
       </div>
 
