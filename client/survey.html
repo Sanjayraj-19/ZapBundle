@@ -1096,12 +1096,18 @@
 
     // Gather form data
     const form = event.target;
+    // Get all selected SaaS tools
+    let saasTools = Array.from(form.querySelectorAll('input[name="saas_tools[]"]:checked')).map(cb => cb.value);
+    
+    // Remove duplicates
+    saasTools = [...new Set(saasTools)];
+    
     const data = {
       company_type: form.company_type.value || form.company_type_other.value,
       saas_count: form.saas_count.value,
       saas_types: Array.from(form.querySelectorAll('input[name="saas_types[]"]:checked')).map(cb => cb.value),
       saas_types_other: form.saas_types_other.value,
-      saas_tools: Array.from(form.querySelectorAll('input[name="saas_tools[]"]:checked')).map(cb => cb.value),
+      saas_tools: saasTools,
       saas_tools_other: form.saas_tools_other ? form.saas_tools_other.value : '',
       monthly_spend: form.monthly_spend.value,
       challenge: form.challenge.value || form.challenge_other.value,

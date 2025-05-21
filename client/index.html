@@ -1535,6 +1535,31 @@
       updateSurveyButton();
     });
     
+    // Check if user already has this bundle
+    async function checkIfBundleExists(bundleName) {
+      const token = localStorage.getItem('token');
+      if (!token) return false;
+      
+      try {
+        const res = await fetch("https://zapbundle.onrender.com/api/profile", {
+          headers: {
+            "Authorization": "Bearer " + token
+          }
+        });
+        
+        if (res.ok) {
+          const profile = await res.json();
+          if (profile.selectedBundles && Array.isArray(profile.selectedBundles)) {
+            return profile.selectedBundles.includes(bundleName);
+          }
+        }
+        return false;
+      } catch (err) {
+        console.error("Error checking bundle:", err);
+        return false;
+      }
+    }
+    
     async function handleBundleClick(bundleName) {
       const token = localStorage.getItem('token');
       if (!token) {
@@ -1545,6 +1570,13 @@
       // If "Create Your Own Bundle", show popup
       if (bundleName === 'custom') {
         openMenu(true);
+        return;
+      }
+      
+      // Check if user already has this bundle
+      const bundleExists = await checkIfBundleExists(bundleName);
+      if (bundleExists) {
+        alert(`You already have the "${bundleName}" bundle in your account.`);
         return;
       }
       
@@ -1594,6 +1626,19 @@
         return;
       }
       
+      // Remove duplicate SaaS tools
+      const uniqueChecked = [...new Set(checked)];
+      
+      // Create the bundle string
+      const bundleString = uniqueChecked.join(", ");
+      
+      // Check if user already has this bundle
+      const bundleExists = await checkIfBundleExists(bundleString);
+      if (bundleExists) {
+        alert(`You already have a bundle with these SaaS tools in your account.`);
+        return;
+      }
+      
       try {
         const res = await fetch("https://zapbundle.onrender.com/api/register-bundle", {
           method: "POST",
@@ -1601,7 +1646,7 @@
             "Content-Type": "application/json",
             "Authorization": "Bearer " + token
           },
-          body: JSON.stringify({ bundle: checked.join(", ") })
+          body: JSON.stringify({ bundle: bundleString })
         });
         
         const data = await res.json();
