@@ -395,17 +395,32 @@
   <!-- Header -->
   <header class="navbar scroll-fade">
     <div class="logo-area logo-bar">
-      <img src="icons/your-logo.png" alt="Logo" class="logo-img" />
-      <span style="font-size:24px; font-weight:bold; line-height:1;">
-        <span style="color:#1ad1ff;">Zap</span><span style="color:#0056b3;">Bundle</span>
-      </span>
+      <a href="index.html">
+        <img src="icons/your-logo.png" alt="Logo" class="logo-img" />
+      </a>
+      <a href="index.html">
+        <span style="font-size:24px; font-weight:bold; line-height:1;">
+          <span style="color:#1ad1ff;">Zap</span><span style="color:#0056b3;">Bundle</span>
+        </span>
+      </a>
     </div>
-    <div id="nav-button-area"></div>
+    <div id="nav-button-area">
+      <div id="nav-links">
+        <a href="index.html" class="btn-access">Home</a>
+        <a href="profile.html" class="btn-access" id="profileLink" style="display:none;">My Profile</a>
+        <a href="signup.html" class="btn-access" id="loginLink">Login</a>
+      </div>
+    </div>
   </header>
   
   <!-- Survey Form -->
   <div class="survey-box scroll-fade">
     <h2>Take the Survey</h2>
+    <div id="successMessage" style="display: none; background-color: #e6f7f0; padding: 20px; border-radius: 10px; text-align: center; margin-bottom: 20px;">
+      <h3 style="color: #10b981; margin-bottom: 10px;">Thank You for Your Feedback!</h3>
+      <p style="color: #1a2330; margin-bottom: 15px;">Your survey responses have been submitted successfully. We appreciate your input in helping us build better SaaS bundles.</p>
+      <a href="index.html" style="display: inline-block; background-color: var(--zapblue); color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: bold;">Back to Home</a>
+    </div>
     <form id="surveyForm" autocomplete="off">
       <input type="hidden" name="_format" value="xml" />
 
@@ -629,31 +644,81 @@
       company_name: form.company_name.value
     };
 
-    // Send to backend WITH JWT TOKEN
+    // Change submit button to loading state
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+    submitBtn.disabled = true;
+
     try {
       const token = localStorage.getItem('token');
-      if (!token) {
-        alert("Session expired. Please log in again.");
-        window.location.href = "signup.html";
-        return;
+      let success = false;
+      
+      // If user is logged in, send with token
+      if (token) {
+        try {
+          const res = await fetch(`${API_URL}/api/survey`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": "Bearer " + token
+            },
+            body: JSON.stringify(data)
+          });
+          
+          if (res.ok) {
+            success = true;
+          }
+        } catch (err) {
+          console.error("API error:", err);
+        }
+      } 
+      
+      // For non-logged in users or if API call failed, store locally
+      if (!success) {
+        // Store in localStorage as fallback
+        const surveys = JSON.parse(localStorage.getItem('surveys') || '[]');
+        surveys.push({
+          ...data,
+          timestamp: new Date().toISOString()
+        });
+        localStorage.setItem('surveys', JSON.stringify(surveys));
+        success = true;
+        
+        // Optional: Send to a form service like Formspree or your own endpoint
+        // that doesn't require authentication
+        try {
+          await fetch("https://formspree.io/f/zapbundle@gmail.com", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data)
+          });
+        } catch (e) {
+          console.log("Form service submission failed, but data is saved locally");
+        }
       }
-      const res = await fetch(`${API_URL}/api/survey`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer " + token
-        },
-        body: JSON.stringify(data)
-      });
-      const result = await res.json();
-      if (res.ok) {
-        alert("Survey submitted! Thank you.");
-        window.location.href = "index.html";
+      
+      // Show success message
+      if (success) {
+        // Hide the form and show success message
+        form.style.display = 'none';
+        document.getElementById('successMessage').style.display = 'block';
+        
+        // Store that user completed survey
+        localStorage.setItem('surveyCompleted', 'true');
+        
+        // Scroll to success message
+        document.getElementById('successMessage').scrollIntoView({ behavior: 'smooth' });
       } else {
-        alert(result.error || "Submission failed.");
+        alert("Submission failed. Please try again.");
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
       }
     } catch (err) {
+      console.error("Error:", err);
       alert("Network error. Please try again.");
+      submitBtn.innerHTML = originalText;
+      submitBtn.disabled = false;
     }
   });
 
@@ -673,10 +738,42 @@
   window.addEventListener('scroll', revealOnScroll);
   window.addEventListener('DOMContentLoaded', revealOnScroll);
 
+  // Check if user has already completed the survey
+  function checkSurveyCompletion() {
+    if (localStorage.getItem('surveyCompleted') === 'true') {
+      document.getElementById('surveyForm').style.display = 'none';
+      document.getElementById('successMessage').style.display = 'block';
+      document.getElementById('successMessage').innerHTML = `
+        <h3 style="color: #10b981; margin-bottom: 10px;">You've Already Completed the Survey</h3>
+        <p style="color: #1a2330; margin-bottom: 15px;">Thank you for your previous feedback! Your input is helping us build better SaaS bundles.</p>
+        <a href="index.html" style="display: inline-block; background-color: var(--zapblue); color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: bold;">Back to Home</a>
+      `;
+    }
+  }
+
   // --- Checkbox/radio toggle logic (unchanged) ---
+  // Check if user is logged in and update navigation
+  function updateNavigation() {
+    const token = localStorage.getItem('token');
+    const profileLink = document.getElementById('profileLink');
+    const loginLink = document.getElementById('loginLink');
+    
+    if (token) {
+      // User is logged in
+      profileLink.style.display = 'inline-block';
+      loginLink.style.display = 'none';
+    } else {
+      // User is not logged in
+      profileLink.style.display = 'none';
+      loginLink.style.display = 'inline-block';
+    }
+  }
+  
   document.addEventListener('DOMContentLoaded', function() {
     renderProfileNav();
     revealOnScroll();
+    checkSurveyCompletion();
+    updateNavigation();
 
     // Toggle checkboxes on click
     document.querySelectorAll('.checkbox-group input[type="checkbox"]').forEach(function(checkbox) {

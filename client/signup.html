@@ -1,223 +1,854 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Signup or Login - ZapBundle</title>
+  <title>Join ZapBundle - Save on SaaS Subscriptions</title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-    html, body { height: 100%; }
-    body { display: flex; flex-direction: column; min-height: 100vh; background-color: #f8f9fa; }
-    a { text-decoration: none; }
-    h2 { font-size: 32px; margin-bottom: 25px; color: #000; text-align: center; }
-    .navbar { background-color: #ffffff; height: 80px; display: flex; justify-content: space-between; align-items: center; padding: 0 50px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); }
-    .logo-img-round { height: 40px; margin-right: 10px; border-radius: 50%; object-fit: cover; background: #fff; border: 2px solid #007BFF; }
-    .logo { display: flex; align-items: center; font-size: 28px; font-weight: bold; color: #007BFF; }
-    .top-button { background-color: #007BFF; color: white; padding: 10px 22px; border-radius: 8px; font-size: 16px; font-weight: bold; transition: 0.3s; }
-    .top-button:hover { background-color: #0056b3; }
-    main { flex: 1; display: flex; justify-content: center; align-items: center; padding: 20px; }
-    .form-container { background-color: #ffffff; padding: 35px 30px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); width: 100%; max-width: 400px; text-align: center; }
-    .form-container input[type="text"], .form-container input[type="email"], .form-container input[type="password"] { width: 100%; padding: 12px; margin-bottom: 20px; border-radius: 6px; border: 1px solid #ccc; font-size: 16px; }
-    .form-container button { width: 100%; background-color: #007BFF; color: white; padding: 14px; border: none; border-radius: 6px; font-size: 18px; font-weight: bold; cursor: pointer; transition: background-color 0.3s; }
-    .form-container button:hover { background-color: #0056b3; }
-    .toggle-link { margin-top: 15px; display: block; color: #007BFF; cursor: pointer; }
-    .show-password { display: flex; align-items: center; justify-content: flex-start; margin-bottom: 20px; font-size: 14px; }
-    .show-password input[type="checkbox"] { width: 18px; height: 18px; margin-right: 10px; accent-color: #007BFF; cursor: pointer; }
-    .footer { background-color: #000000; color: white; text-align: center; padding: 30px 20px; border-top-left-radius: 30px; border-top-right-radius: 30px; font-size: 16px; margin-top: auto; }
-    .email-check { font-size: 14px; color: #d32f2f; margin-bottom: 10px; display: none; text-align: left; }
-    .email-check.available { color: #388e3c; display: block; }
-    .email-check.taken { color: #d32f2f; display: block; }
+    :root {
+      --primary: #6366f1;
+      --primary-dark: #4f46e5;
+      --primary-light: #a5b4fc;
+      --secondary: #ec4899;
+      --secondary-dark: #db2777;
+      --accent: #06b6d4;
+      --accent-dark: #0891b2;
+      --dark: #1e293b;
+      --light: #f8fafc;
+      --gray: #64748b;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --gradient-1: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+      --gradient-2: linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%);
+      --gradient-3: linear-gradient(135deg, var(--accent) 0%, var(--success) 100%);
+      --gradient-4: linear-gradient(135deg, var(--warning) 0%, var(--secondary) 100%);
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+    
+    body {
+      background-color: var(--light);
+      color: var(--dark);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+    
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+    
+    /* Background Elements */
+    .bg-shape {
+      position: absolute;
+      z-index: -1;
+      opacity: 0.5;
+    }
+    
+    .bg-shape-1 {
+      top: 10%;
+      left: -10%;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, var(--primary-light) 0%, rgba(99, 102, 241, 0) 70%);
+      border-radius: 50%;
+      filter: blur(50px);
+    }
+    
+    .bg-shape-2 {
+      bottom: 20%;
+      right: -10%;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, var(--accent) 0%, rgba(6, 182, 212, 0) 70%);
+      border-radius: 50%;
+      filter: blur(60px);
+    }
+    
+    /* Navbar */
+    .navbar {
+      background-color: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(10px);
+      position: fixed;
+      top: 0;
+      width: 100%;
+      height: 80px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 5%;
+      box-shadow: var(--shadow-md);
+      z-index: 1000;
+      opacity: 0;
+      transform: translateY(-20px);
+      animation: fadeInDown 0.8s forwards;
+    }
+    
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .logo-bar {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    
+    .logo-img {
+      height: 44px;
+      width: 44px;
+      border-radius: 12px;
+      background: #fff;
+      box-shadow: var(--shadow-md);
+      border: 2px solid var(--primary);
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+    
+    .logo-img:hover {
+      transform: rotate(-5deg) scale(1.1);
+    }
+    
+    .logo-text {
+      font-size: 1.8rem;
+      font-weight: 700;
+      background: var(--gradient-1);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .top-button {
+      background: var(--gradient-1);
+      color: white;
+      padding: 12px 24px;
+      border-radius: 50px;
+      font-size: 1rem;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      box-shadow: var(--shadow-md);
+      border: none;
+      cursor: pointer;
+    }
+    
+    .top-button:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-lg);
+    }
+    
+    /* Main Content */
+    .auth-container {
+      display: flex;
+      min-height: 100vh;
+      padding-top: 80px;
+    }
+    
+    .auth-image {
+      flex: 1;
+      background: var(--gradient-1);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 40px;
+      color: white;
+      position: relative;
+      overflow: hidden;
+      display: none;
+    }
+    
+    @media (min-width: 1024px) {
+      .auth-image {
+        display: flex;
+      }
+    }
+    
+    .auth-image-content {
+      position: relative;
+      z-index: 2;
+      max-width: 500px;
+      text-align: center;
+    }
+    
+    .auth-image h2 {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+    }
+    
+    .auth-image p {
+      font-size: 1.1rem;
+      margin-bottom: 30px;
+      opacity: 0.9;
+    }
+    
+    .auth-image-pattern {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      opacity: 0.2;
+    }
+    
+    .auth-form {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 40px 20px;
+    }
+    
+    .form-box {
+      width: 100%;
+      max-width: 450px;
+      background: white;
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: var(--shadow-lg);
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeInUp 0.8s forwards 0.3s;
+    }
+    
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .form-header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    
+    .form-header h2 {
+      font-size: 2rem;
+      margin-bottom: 10px;
+      background: var(--gradient-1);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .form-header p {
+      color: var(--gray);
+      font-size: 0.95rem;
+    }
+    
+    .social-login {
+      margin-bottom: 25px;
+    }
+    
+    .google-btn {
+      width: 100%;
+      padding: 12px;
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-size: 1rem;
+      font-weight: 500;
+      color: #444;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .google-btn:hover {
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+    }
+    
+    .google-btn img {
+      height: 20px;
+    }
+    
+    .divider {
+      display: flex;
+      align-items: center;
+      margin: 20px 0;
+      color: var(--gray);
+    }
+    
+    .divider::before,
+    .divider::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: #e2e8f0;
+    }
+    
+    .divider span {
+      padding: 0 15px;
+      font-size: 0.9rem;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: var(--dark);
+      font-size: 0.95rem;
+    }
+    
+    .form-input {
+      width: 100%;
+      padding: 12px 15px;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      background: #f8fafc;
+      transform-origin: left;
+    }
+    
+    .form-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+      background: white;
+      transform: scale(1.01);
+    }
+    
+    .form-input:hover {
+      border-color: var(--primary-light);
+    }
+    
+    .email-check {
+      font-size: 0.85rem;
+      margin-top: 5px;
+      display: none;
+    }
+    
+    .email-check.available {
+      color: var(--success);
+      display: block;
+    }
+    
+    .email-check.taken {
+      color: var(--danger);
+      display: block;
+    }
+    
+    .password-field {
+      position: relative;
+    }
+    
+    .toggle-password {
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--gray);
+      cursor: pointer;
+      font-size: 1.1rem;
+    }
+    
+    .form-button {
+      width: 100%;
+      padding: 14px;
+      background: var(--gradient-1);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: var(--shadow-md);
+      margin-top: 10px;
+      position: relative;
+      overflow: hidden;
+      z-index: 1;
+    }
+    
+    .form-button:before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 0%;
+      height: 100%;
+      background: var(--gradient-2);
+      transition: all 0.4s ease;
+      z-index: -1;
+      opacity: 0;
+    }
+    
+    .form-button:hover {
+      box-shadow: var(--shadow-lg);
+      transform: translateY(-2px);
+    }
+    
+    .form-button:hover:before {
+      width: 100%;
+      opacity: 1;
+    }
+    
+    .form-footer {
+      text-align: center;
+      margin-top: 25px;
+      color: var(--gray);
+      font-size: 0.95rem;
+    }
+    
+    .form-footer a {
+      color: var(--primary);
+      font-weight: 500;
+      transition: color 0.3s ease;
+    }
+    
+    .form-footer a:hover {
+      color: var(--primary-dark);
+      text-decoration: underline;
+    }
+    
+    /* Footer */
+    .footer {
+      background-color: var(--dark);
+      color: white;
+      text-align: center;
+      padding: 30px 20px;
+      margin-top: auto;
+      opacity: 0;
+      animation: fadeIn 0.8s forwards 0.6s;
+    }
+    
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+    
+    .footer-text {
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 0.9rem;
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .form-box {
+        padding: 30px 20px;
+      }
+      
+      .form-header h2 {
+        font-size: 1.8rem;
+      }
+      
+      .navbar {
+        padding: 0 20px;
+      }
+    }
   </style>
 </head>
 <body>
-
-<!-- Navbar -->
-<div class="navbar">
-  <div class="logo">
-    <img src="icons/your-logo.png" alt="Logo" class="logo-img-round" />
-    ZapBundle
-  </div>
-</div>
-
-<!-- Main Content -->
-<main>
-  <div class="form-container">
-    <h2 id="form-title">Create Account</h2>
-
-    <!-- Social Login Buttons -->
-    <button style="width:100%;margin-bottom:12px;background:#4285F4;color:#fff;font-weight:bold;border:none;border-radius:6px;padding:12px 0;cursor:pointer;"
-      onclick="window.location.href='https://zapbundle.onrender.com/api/auth/google'">
-      <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" style="height:20px;vertical-align:middle;margin-right:8px;"> Sign up with Google
-    </button>
-
-    <input type="text" id="name" placeholder="Name" required />
-    <input type="email" id="email" placeholder="Email" required autocomplete="off" />
-    <div id="emailCheck" class="email-check"></div>
-    <input type="password" id="password" placeholder="Password" required />
-    <input type="password" id="confirmPassword" placeholder="Confirm Password" required />
-
-    <div class="show-password">
-      <input type="checkbox" id="togglePassword" />
-      <label for="togglePassword">Show Password</label>
+  <!-- Background Shapes -->
+  <div class="bg-shape bg-shape-1"></div>
+  <div class="bg-shape bg-shape-2"></div>
+  
+  <!-- Navbar -->
+  <nav class="navbar">
+    <a href="index.html" class="logo-bar">
+      <img src="icons/your-logo.png" alt="ZapBundle Logo" class="logo-img" style="border-radius: 12px; object-fit: cover; display: block;">
+      <span class="logo-text">ZapBundle</span>
+    </a>
+    <a href="index.html" class="top-button">Back to Home</a>
+  </nav>
+  
+  <!-- Main Content -->
+  <div class="auth-container">
+    <!-- Left Side - Image and Text (Hidden on Mobile) -->
+    <div class="auth-image">
+      <div class="auth-image-pattern"></div>
+      <div class="auth-image-content">
+        <h2>Save up to 40% on Your SaaS Subscriptions</h2>
+        <p>Join ZapBundle to access exclusive bundles of the best SaaS tools at discounted prices. Simplify your tech stack and reduce costs with our curated packages.</p>
+        <img src="https://illustrations.popsy.co/white/digital-nomad.svg" alt="SaaS Bundles Illustration" style="max-width: 80%; margin-top: 20px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15); display: block; margin-left: auto; margin-right: auto;">
+      </div>
     </div>
-
-    <button type="button" onclick="handleSubmit()">Create Account</button>
-    <span class="toggle-link" onclick="toggleForm()">Already have an account? Login</span>
+    
+    <!-- Right Side - Auth Form -->
+    <div class="auth-form">
+      <div class="form-box">
+        <div class="form-header">
+          <h2 id="form-title">Create Account</h2>
+          <p id="form-description">Join ZapBundle to access exclusive SaaS bundles and save on your subscriptions.</p>
+        </div>
+        
+        <!-- Social Login -->
+        <div class="social-login">
+          <button class="google-btn" onclick="window.location.href='https://zapbundle.onrender.com/api/auth/google'">
+            <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" style="height: 20px; width: 20px; object-fit: contain; margin-right: 8px;">
+            <span id="google-btn-text">Sign up with Google</span>
+          </button>
+        </div>
+        
+        <!-- Divider -->
+        <div class="divider">
+          <span>or continue with email</span>
+        </div>
+        
+        <!-- Auth Form -->
+        <form id="authForm">
+          <!-- Name Field (Only for Signup) -->
+          <div class="form-group" id="nameGroup">
+            <label for="name">Full Name</label>
+            <input type="text" id="name" class="form-input" placeholder="Enter your name">
+          </div>
+          
+          <!-- Email Field -->
+          <div class="form-group">
+            <label for="email">Email Address</label>
+            <input type="email" id="email" class="form-input" placeholder="Enter your email" autocomplete="off">
+            <div id="emailCheck" class="email-check"></div>
+          </div>
+          
+          <!-- Password Field -->
+          <div class="form-group">
+            <label for="password">Password</label>
+            <div class="password-field">
+              <input type="password" id="password" class="form-input" placeholder="Enter your password">
+              <i class="toggle-password fas fa-eye" id="togglePassword"></i>
+            </div>
+          </div>
+          
+          <!-- Confirm Password Field (Only for Signup) -->
+          <div class="form-group" id="confirmPasswordGroup">
+            <label for="confirmPassword">Confirm Password</label>
+            <div class="password-field">
+              <input type="password" id="confirmPassword" class="form-input" placeholder="Confirm your password">
+              <i class="toggle-password fas fa-eye" id="toggleConfirmPassword"></i>
+            </div>
+          </div>
+          
+          <!-- Submit Button -->
+          <button type="button" class="form-button" id="submitButton" onclick="handleSubmit()">Create Account</button>
+        </form>
+        
+        <!-- Form Footer -->
+        <div class="form-footer">
+          <p id="toggleText">Already have an account? <a href="#" onclick="toggleForm()">Login</a></p>
+        </div>
+      </div>
+    </div>
   </div>
-</main>
-
-<!-- Footer -->
-<div class="footer">
-  @2025 ZapBundle. All rights reserved.<br />
-  Helping businesses Save on SaaS since day one.
-</div>
-
-<script>
-  let isSignup = true;
-  const API_URL = "https://zapbundle.onrender.com";
-
-  function toggleForm() {
-    const title = document.getElementById('form-title');
-    const nameField = document.getElementById('name');
-    const confirmPasswordField = document.getElementById('confirmPassword');
-    const button = document.querySelector('.form-container button[type="button"]');
-    const link = document.querySelector('.toggle-link');
-    document.getElementById('emailCheck').style.display = 'none';
-
-    isSignup = !isSignup;
-
-    if (isSignup) {
-      title.textContent = "Create Account";
-      nameField.style.display = "block";
-      confirmPasswordField.style.display = "block";
-      button.textContent = "Create Account";
-      link.textContent = "Already have an account? Login";
-    } else {
-      title.textContent = "Login";
-      nameField.style.display = "none";
-      confirmPasswordField.style.display = "none";
-      button.textContent = "Login";
-      link.textContent = "Don't have an account? Sign up";
-    }
-  }
-
-  document.getElementById('togglePassword').addEventListener('change', function () {
-    const passwordField = document.getElementById('password');
-    const confirmField = document.getElementById('confirmPassword');
-    const type = this.checked ? "text" : "password";
-    passwordField.type = type;
-    confirmField.type = type;
-  });
-
-  // Live email availability check
-  document.getElementById('email').addEventListener('input', async function () {
-    const email = this.value.trim();
-    const emailCheck = document.getElementById('emailCheck');
-    if (!isSignup || !email) {
-      emailCheck.style.display = 'none';
-      return;
-    }
-    try {
-      const res = await fetch(`${API_URL}/check-email?email=${encodeURIComponent(email)}`);
-      const data = await res.json();
-      if (data.available) {
-        emailCheck.textContent = "Email is available!";
-        emailCheck.className = "email-check available";
+  
+  <!-- Footer -->
+  <footer class="footer">
+    <p class="footer-text">&copy; 2025 ZapBundle. All rights reserved.<br>Helping businesses save on SaaS since day one.</p>
+  </footer>
+  
+  <script>
+    let isSignup = true;
+    const API_URL = "https://zapbundle.onrender.com";
+    
+    // Toggle between signup and login forms
+    function toggleForm() {
+      isSignup = !isSignup;
+      
+      // Update UI elements
+      const formTitle = document.getElementById('form-title');
+      const formDescription = document.getElementById('form-description');
+      const nameGroup = document.getElementById('nameGroup');
+      const confirmPasswordGroup = document.getElementById('confirmPasswordGroup');
+      const submitButton = document.getElementById('submitButton');
+      const toggleText = document.getElementById('toggleText');
+      const googleBtnText = document.getElementById('google-btn-text');
+      const emailCheck = document.getElementById('emailCheck');
+      
+      if (isSignup) {
+        formTitle.textContent = 'Create Account';
+        formDescription.textContent = 'Join ZapBundle to access exclusive SaaS bundles and save on your subscriptions.';
+        nameGroup.style.display = 'block';
+        confirmPasswordGroup.style.display = 'block';
+        submitButton.textContent = 'Create Account';
+        toggleText.innerHTML = 'Already have an account? <a href="#" onclick="toggleForm()">Login</a>';
+        googleBtnText.textContent = 'Sign up with Google';
       } else {
-        emailCheck.textContent = "Email is already registered.";
-        emailCheck.className = "email-check taken";
+        formTitle.textContent = 'Welcome Back';
+        formDescription.textContent = 'Log in to access your ZapBundle account and manage your SaaS subscriptions.';
+        nameGroup.style.display = 'none';
+        confirmPasswordGroup.style.display = 'none';
+        submitButton.textContent = 'Login';
+        toggleText.innerHTML = 'Don\'t have an account? <a href="#" onclick="toggleForm()">Sign up</a>';
+        googleBtnText.textContent = 'Login with Google';
       }
-    } catch {
-      emailCheck.textContent = "";
+      
+      // Clear form fields and validation messages
+      document.getElementById('authForm').reset();
       emailCheck.style.display = 'none';
     }
-  });
-
-  async function handleSubmit() {
-    const email = document.getElementById('email').value.trim();
-    const password = document.getElementById('password').value;
-
-    if (isSignup) {
-      const name = document.getElementById('name').value.trim();
-      const confirmPassword = document.getElementById('confirmPassword').value;
-      if (!name || !email || !password || !confirmPassword) {
-        alert("Please fill all fields.");
+    
+    // Toggle password visibility
+    document.getElementById('togglePassword').addEventListener('click', function() {
+      const passwordField = document.getElementById('password');
+      const type = passwordField.type === 'password' ? 'text' : 'password';
+      passwordField.type = type;
+      this.classList.toggle('fa-eye');
+      this.classList.toggle('fa-eye-slash');
+    });
+    
+    document.getElementById('toggleConfirmPassword').addEventListener('click', function() {
+      const confirmField = document.getElementById('confirmPassword');
+      const type = confirmField.type === 'password' ? 'text' : 'password';
+      confirmField.type = type;
+      this.classList.toggle('fa-eye');
+      this.classList.toggle('fa-eye-slash');
+    });
+    
+    // Live email availability check
+    document.getElementById('email').addEventListener('input', async function() {
+      const email = this.value.trim();
+      const emailCheck = document.getElementById('emailCheck');
+      
+      if (!isSignup || !email) {
+        emailCheck.style.display = 'none';
         return;
       }
-      if (password !== confirmPassword) {
-        alert("Passwords do not match.");
-        return;
-      }
-      // Check email availability before submitting
+      
       try {
-        const resCheck = await fetch(`${API_URL}/check-email?email=${encodeURIComponent(email)}`);
-        const dataCheck = await resCheck.json();
-        if (!dataCheck.available) {
-          alert("Email already registered. Please login.");
-          // Switch to login form automatically
-          toggleForm();
-          return;
+        const res = await fetch(`${API_URL}/check-email?email=${encodeURIComponent(email)}`);
+        const data = await res.json();
+        
+        if (data.available) {
+          emailCheck.textContent = "Email is available!";
+          emailCheck.className = "email-check available";
+        } else {
+          emailCheck.textContent = "Email is already registered.";
+          emailCheck.className = "email-check taken";
         }
       } catch {
-        alert("Could not verify email. Please try again.");
-        return;
+        emailCheck.style.display = 'none';
       }
-      // Call backend register API
-      try {
-        const res = await fetch(`${API_URL}/register`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, password, name })
-        });
-        const data = await res.json();
-        if (!res.ok) {
-          alert(data.error || "Registration failed.");
-          return;
-        }
-        alert("Account Created Successfully! Please login.");
-        toggleForm();
-      } catch (err) {
-        alert("Network error. Please try again.");
-      }
-    } else {
+    });
+    
+    // Form submission handler
+    async function handleSubmit() {
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const submitButton = document.getElementById('submitButton');
+      const originalText = submitButton.textContent;
+      
+      // Validate form
       if (!email || !password) {
-        alert("Please fill all fields.");
+        showAlert("Please fill in all required fields.");
         return;
       }
-      // Call backend login API
-      try {
-        const res = await fetch(`${API_URL}/login`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, password })
-        });
-        const data = await res.json();
-        if (!res.ok) {
-          alert(data.error || "Login failed.");
+      
+      // Show loading state
+      submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+      submitButton.disabled = true;
+      
+      if (isSignup) {
+        const name = document.getElementById('name').value.trim();
+        const confirmPassword = document.getElementById('confirmPassword').value;
+        
+        // Additional validation for signup
+        if (!name) {
+          showAlert("Please enter your name.");
+          resetButton();
           return;
         }
-        // Save JWT token for authenticated requests
-        localStorage.setItem('token', data.token);
-        // Check survey status and redirect accordingly
-        fetch(`${API_URL}/api/profile`, {
-          headers: { "Authorization": "Bearer " + data.token }
-        })
-        .then(res => res.json())
-        .then(profile => {
-          if (profile.surveyCompleted) {
-            window.location.href = "index.html";
-          } else {
-            window.location.href = "survey.html";
+        
+        if (password !== confirmPassword) {
+          showAlert("Passwords do not match.");
+          resetButton();
+          return;
+        }
+        
+        // Check email availability
+        try {
+          const resCheck = await fetch(`${API_URL}/check-email?email=${encodeURIComponent(email)}`);
+          const dataCheck = await resCheck.json();
+          
+          if (!dataCheck.available) {
+            showAlert("Email already registered. Please login instead.");
+            toggleForm();
+            resetButton();
+            return;
           }
-        })
-        .catch(() => {
-          window.location.href = "index.html";
-        });
-      } catch (err) {
-        alert("Network error. Please try again.");
+        } catch {
+          showAlert("Could not verify email. Please try again.");
+          resetButton();
+          return;
+        }
+        
+        // Register new account
+        try {
+          const res = await fetch(`${API_URL}/register`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password, name })
+          });
+          
+          const data = await res.json();
+          
+          if (!res.ok) {
+            showAlert(data.error || "Registration failed.");
+            resetButton();
+            return;
+          }
+          
+          showAlert("Account created successfully! Please login.", "success");
+          toggleForm();
+          resetButton();
+        } catch (err) {
+          showAlert("Network error. Please try again.");
+          resetButton();
+        }
+      } else {
+        // Login
+        try {
+          const res = await fetch(`${API_URL}/login`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password })
+          });
+          
+          const data = await res.json();
+          
+          if (!res.ok) {
+            showAlert(data.error || "Login failed.");
+            resetButton();
+            return;
+          }
+          
+          // Save JWT token
+          localStorage.setItem('token', data.token);
+          
+          // Check if user has completed survey locally
+          const surveyCompleted = localStorage.getItem('surveyCompleted') === 'true';
+          
+          // Check survey status from server and redirect
+          try {
+            const profileRes = await fetch(`${API_URL}/api/profile`, {
+              headers: { "Authorization": "Bearer " + data.token }
+            });
+            
+            if (profileRes.ok) {
+              const profile = await profileRes.json();
+              
+              // If survey is completed either locally or on server, go to profile
+              if (profile.surveyCompleted || surveyCompleted) {
+                // Sync local survey data if needed
+                if (surveyCompleted && !profile.surveyCompleted) {
+                  const surveys = JSON.parse(localStorage.getItem('surveys') || '[]');
+                  if (surveys.length > 0) {
+                    console.log("Local survey data could be synced to server");
+                  }
+                }
+                window.location.href = "profile.html";
+              } else {
+                // If no survey completed, direct to survey
+                window.location.href = "survey.html";
+              }
+            } else {
+              window.location.href = "profile.html";
+            }
+          } catch {
+            window.location.href = "profile.html";
+          }
+        } catch (err) {
+          showAlert("Network error. Please try again.");
+          resetButton();
+        }
+      }
+      
+      // Reset button state
+      function resetButton() {
+        submitButton.innerHTML = originalText;
+        submitButton.disabled = false;
       }
     }
-  }
-</script>
+    
+    // Show alert message
+    function showAlert(message, type = "error") {
+      const alertBox = document.createElement('div');
+      alertBox.style.position = 'fixed';
+      alertBox.style.top = '100px';
+      alertBox.style.left = '50%';
+      alertBox.style.transform = 'translateX(-50%)';
+      alertBox.style.padding = '15px 25px';
+      alertBox.style.borderRadius = '8px';
+      alertBox.style.boxShadow = 'var(--shadow-lg)';
+      alertBox.style.zIndex = '9999';
+      alertBox.style.fontSize = '0.95rem';
+      alertBox.style.fontWeight = '500';
+      alertBox.style.display = 'flex';
+      alertBox.style.alignItems = 'center';
+      alertBox.style.gap = '10px';
+      
+      if (type === "error") {
+        alertBox.style.backgroundColor = '#fee2e2';
+        alertBox.style.color = '#b91c1c';
+        alertBox.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${message}`;
+      } else {
+        alertBox.style.backgroundColor = '#d1fae5';
+        alertBox.style.color = '#047857';
+        alertBox.innerHTML = `<i class="fas fa-check-circle"></i> ${message}`;
+      }
+      
+      document.body.appendChild(alertBox);
+      
+      // Animate in
+      alertBox.style.opacity = '0';
+      alertBox.style.transform = 'translateX(-50%) translateY(-20px)';
+      alertBox.style.transition = 'all 0.3s ease';
+      
+      setTimeout(() => {
+        alertBox.style.opacity = '1';
+        alertBox.style.transform = 'translateX(-50%) translateY(0)';
+      }, 10);
+      
+      // Remove after 4 seconds
+      setTimeout(() => {
+        alertBox.style.opacity = '0';
+        alertBox.style.transform = 'translateX(-50%) translateY(-20px)';
+        
+        setTimeout(() => {
+          document.body.removeChild(alertBox);
+        }, 300);
+      }, 4000);
+    }
+  </script>
 </body>
 </html>

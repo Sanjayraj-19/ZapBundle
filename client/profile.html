@@ -306,6 +306,83 @@
       box-shadow: 0 -2px 8px rgba(0,123,255,0.04);
       animation: fadeIn 0.7s cubic-bezier(.4,0,.2,1);
     }
+    
+    /* New section styles */
+    .section-container {
+      margin-top: 30px;
+      padding: 20px;
+      background: #f8fafc;
+      border-radius: 12px;
+      text-align: left;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      animation: fadeIn 0.7s cubic-bezier(.4,0,.2,1);
+    }
+    
+    .section-title {
+      color: var(--zapdark);
+      font-size: 1.2rem;
+      margin-bottom: 15px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid var(--zapblue);
+      display: inline-block;
+    }
+    
+    .section-desc {
+      color: #64748b;
+      margin-bottom: 15px;
+      font-size: 0.95rem;
+    }
+    
+    .survey-summary {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 15px;
+    }
+    
+    .survey-item {
+      font-size: 0.95rem;
+      color: #334155;
+    }
+    
+    .action-buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+      flex-wrap: wrap;
+      justify-content: flex-start;
+    }
+    
+    .action-btn {
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: none;
+    }
+    
+    .primary-btn {
+      background: var(--zapblue);
+      color: white;
+    }
+    
+    .primary-btn:hover {
+      background: var(--zapdark);
+      transform: translateY(-2px);
+    }
+    
+    .edit-btn {
+      background: #f1f5f9;
+      color: var(--zapdark);
+      border: 1px solid var(--zapblue);
+    }
+    
+    .edit-btn:hover {
+      background: #e2e8f0;
+      transform: translateY(-2px);
+    }
   </style>
 </head>
 <body>
@@ -537,13 +614,60 @@ async function renderProfile() {
     bundlesHtml = `<div style="margin-top:18px;color:#888;">No bundles selected yet.</div>`;
   }
 
+  // Check if user has completed survey
+  const surveyCompleted = localStorage.getItem('surveyCompleted') === 'true';
+  const surveyData = JSON.parse(localStorage.getItem('surveys') || '[]');
+  const lastSurvey = surveyData.length > 0 ? surveyData[surveyData.length - 1] : null;
+  
+  // Survey section HTML
+  let surveyHtml = '';
+  if (surveyCompleted && lastSurvey) {
+    surveyHtml = `
+      <div class="section-container">
+        <h3 class="section-title">Your Survey Responses</h3>
+        <div class="survey-summary">
+          <div class="survey-item"><b>Company Type:</b> ${lastSurvey.company_type || 'Not specified'}</div>
+          <div class="survey-item"><b>SaaS Tools Used:</b> ${lastSurvey.saas_count || 'Not specified'}</div>
+          <div class="survey-item"><b>Monthly Spend:</b> ${lastSurvey.monthly_spend || 'Not specified'}</div>
+          <div class="survey-item"><b>Interested in:</b> ${lastSurvey.interest_bundles || 'Not specified'}</div>
+        </div>
+        <div class="action-buttons">
+          <button class="action-btn edit-btn" onclick="window.location.href='survey.html'">Edit Survey</button>
+        </div>
+      </div>
+    `;
+  } else {
+    surveyHtml = `
+      <div class="section-container">
+        <h3 class="section-title">Complete Your Survey</h3>
+        <p class="section-desc">Help us understand your needs by completing a short survey.</p>
+        <div class="action-buttons">
+          <button class="action-btn primary-btn" onclick="window.location.href='survey.html'">Take Survey</button>
+        </div>
+      </div>
+    `;
+  }
+
   profileContent.innerHTML = `
     <div class="profile-container">
       <img src="${profile.profilePic || 'icons/default-profile.png'}" class="profile-avatar" alt="Profile" title="Click to change" onclick="showCropModal('${profile.profilePic || 'icons/default-profile.png'}')"/>
       <div class="profile-info"><b>Name:</b> ${profile.name || "N/A"}</div>
       <div class="profile-info"><b>Email:</b> ${profile.email}</div>
       <div class="profile-info"><b>Joined:</b> ${profile.createdAt ? new Date(profile.createdAt).toLocaleDateString() : "N/A"}</div>
-      ${bundlesHtml}
+      
+      <div class="section-container">
+        <h3 class="section-title">Your Bundles</h3>
+        ${profile.selectedBundles && profile.selectedBundles.length > 0 ? 
+          bundlesHtml : 
+          `<p class="section-desc">You haven't selected any bundles yet.</p>
+           <div class="action-buttons">
+             <button class="action-btn primary-btn" onclick="window.location.href='index.html#bundles'">Browse Bundles</button>
+           </div>`
+        }
+      </div>
+      
+      ${surveyHtml}
+      
       <button class="logout-btn" onclick="logout()">Logout</button>
     </div>
   `;

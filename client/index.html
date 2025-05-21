@@ -2,66 +2,141 @@
 <html lang="en">
 <head>
   <link rel="stylesheet" href="styles.css">
-
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>ZapBundle - Save on SaaS Bundles</title>
   <style>
-    /* Your original CSS (UNMODIFIED) */
+    :root {
+      --primary: #6366f1;
+      --primary-dark: #4f46e5;
+      --primary-light: #a5b4fc;
+      --secondary: #ec4899;
+      --secondary-dark: #db2777;
+      --accent: #06b6d4;
+      --accent-dark: #0891b2;
+      --dark: #1e293b;
+      --light: #f8fafc;
+      --gray: #64748b;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --gradient-1: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+      --gradient-2: linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%);
+      --gradient-3: linear-gradient(135deg, var(--accent) 0%, var(--success) 100%);
+      --gradient-4: linear-gradient(135deg, var(--warning) 0%, var(--secondary) 100%);
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+    
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: 'Poppins', sans-serif;
     }
+    
     body {
-      background-color: #f8f9fa;
+      background-color: var(--light);
+      color: var(--dark);
       padding-top: 80px;
+      overflow-x: hidden;
     }
+    
     a {
       text-decoration: none;
+      color: inherit;
     }
+    
     ul {
       list-style: none;
     }
+    
+    h1, h2, h3, h4, h5, h6 {
+      font-weight: 700;
+      line-height: 1.2;
+    }
+    
+    h1 {
+      font-size: 3.5rem;
+      margin-bottom: 1.5rem;
+      background: var(--gradient-1);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
     h2 {
-      font-size: 36px;
-      margin-bottom: 30px;
-      color: #000;
-      text-align: center;
+      font-size: 2.5rem;
+      margin-bottom: 2rem;
+      position: relative;
+      display: inline-block;
     }
-
-    .logo-bar {
-      display: flex;
-      align-items: center;
-      gap: 14px;
+    
+    h2::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 4px;
+      background: var(--gradient-1);
+      border-radius: 2px;
     }
-    .logo-img {
-      height: 44px;
-      width: 44px;
+    
+    p {
+      line-height: 1.6;
+      margin-bottom: 1.5rem;
+      color: var(--gray);
+    }
+    
+    /* Background Elements */
+    .bg-shape {
+      position: absolute;
+      z-index: -1;
+      opacity: 0.5;
+    }
+    
+    .bg-shape-1 {
+      top: 10%;
+      left: -10%;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, var(--primary-light) 0%, rgba(99, 102, 241, 0) 70%);
       border-radius: 50%;
-      background: #fff;
-      box-shadow: 0 4px 16px rgba(26,209,255,0.10);
-      border: 3px solid #1ad1ff;
-      object-fit: cover;
-      margin-right: 0;
-      transition: none;
-      display: block;
+      filter: blur(50px);
     }
-    .logo-img:hover {
-      transform: none;
-      box-shadow: 0 4px 16px rgba(26,209,255,0.10);
-      border-color: #1ad1ff;
+    
+    .bg-shape-2 {
+      bottom: 20%;
+      right: -10%;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, var(--accent) 0%, rgba(6, 182, 212, 0) 70%);
+      border-radius: 50%;
+      filter: blur(60px);
     }
-    @media (max-width: 768px) {
-      .logo-img {
-        height: 44px;
-        width: 44px;
-      }
+    
+    .bg-shape-3 {
+      top: 60%;
+      left: 5%;
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle, var(--secondary) 0%, rgba(236, 72, 153, 0) 70%);
+      border-radius: 50%;
+      filter: blur(40px);
     }
-
+    
+    /* Navbar */
     .navbar {
-      background-color: #ffffff;
+      background-color: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(10px);
       position: fixed;
       top: 0;
       width: 100%;
@@ -69,1019 +144,1454 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 0 50px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      padding: 0 5%;
+      box-shadow: var(--shadow-md);
       z-index: 1000;
       opacity: 0;
-      transform: translateY(-40px) scale(0.98);
-      transition: opacity 0.7s cubic-bezier(.4,0,.2,1), transform 0.7s cubic-bezier(.4,0,.2,1);
+      transform: translateY(-20px);
+      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     }
+    
     .navbar.visible {
       opacity: 1;
-      transform: translateY(0) scale(1);
+      transform: translateY(0);
     }
-    .logo {
-      font-size: 30px;
-      font-weight: bold;
-      color: #007BFF;
+    
+    .logo-bar {
+      display: flex;
+      align-items: center;
+      gap: 14px;
     }
+    
+    .logo-img {
+      height: 44px;
+      width: 44px;
+      border-radius: 12px;
+      background: #fff;
+      box-shadow: var(--shadow-md);
+      border: 2px solid var(--primary);
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+    
+    .logo-img:hover {
+      transform: rotate(-5deg) scale(1.1);
+    }
+    
+    .logo-text {
+      font-size: 1.8rem;
+      font-weight: 700;
+      background: var(--gradient-1);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
     .top-button {
-      background-color: #007BFF;
+      background: var(--gradient-1);
       color: white;
       padding: 12px 24px;
-      border-radius: 6px;
-      font-size: 16px;
-      font-weight: bold;
-      transition: 0.3s;
+      border-radius: 50px;
+      font-size: 1rem;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      box-shadow: var(--shadow-md);
+      border: none;
+      cursor: pointer;
     }
+    
     .top-button:hover {
-      background-color: #0056b3;
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-lg);
     }
-
-    .main-content {
+    
+    /* Hero Section */
+    .hero-section {
+      position: relative;
+      padding: 100px 5% 120px;
       text-align: center;
-      padding: 50px 20px;
+      overflow: hidden;
     }
-    .main-content h1 {
-      font-size: 42px;
-      margin-bottom: 20px;
+    
+    .hero-content {
+      max-width: 800px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
     }
-    .main-content p {
-      font-size: 20px;
-      margin-bottom: 30px;
-      color: #6c757d;
+    
+    .hero-description {
+      font-size: 1.25rem;
+      margin-bottom: 2.5rem;
+      color: var(--gray);
     }
+    
     .cta-button {
-      background-color: #007BFF;
+      background: var(--gradient-1);
       color: white;
-      padding: 14px 32px;
-      border-radius: 6px;
-      font-size: 20px;
-      font-weight: bold;
-      transition: 0.3s;
+      padding: 16px 36px;
+      border-radius: 50px;
+      font-size: 1.2rem;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      box-shadow: var(--shadow-lg);
+      display: inline-block;
+      border: none;
+      cursor: pointer;
     }
+    
     .cta-button:hover {
-      background-color: #0056b3;
+      transform: translateY(-5px) scale(1.05);
+      box-shadow: var(--shadow-xl);
     }
-
-    .why-choose {
-      padding: 60px 20px;
+    
+    .hero-image {
+      max-width: 100%;
+      margin-top: 3rem;
+      border-radius: 20px;
+      box-shadow: var(--shadow-xl);
+    }
+    
+    /* Features Section */
+    .features-section {
+      padding: 100px 5%;
       text-align: center;
+      position: relative;
     }
-    .features {
+    
+    .features-container {
       display: flex;
-      justify-content: center;
       flex-wrap: wrap;
-      gap: 40px;
-      margin-top: 30px;
+      justify-content: center;
+      gap: 30px;
+      margin-top: 50px;
     }
-    .feature-box {
-      background-color: #fff;
-      padding: 40px;
-      border-radius: 15px;
+    
+    .feature-card {
+      background: white;
+      border-radius: 20px;
+      padding: 40px 30px;
       width: 300px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      box-shadow: var(--shadow-lg);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      z-index: 1;
     }
-    .feature-box h3 {
-      font-size: 24px;
+    
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 5px;
+      background: var(--gradient-1);
+      z-index: -1;
+    }
+    
+    .feature-card:hover {
+      transform: translateY(-10px);
+      box-shadow: var(--shadow-xl);
+    }
+    
+    .feature-icon {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+      background: var(--gradient-1);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .feature-title {
+      font-size: 1.5rem;
       margin-bottom: 15px;
-      color: #007BFF;
+      color: var(--dark);
     }
-    .feature-box p {
-      color: #555;
+    
+    .feature-description {
+      color: var(--gray);
+      font-size: 1rem;
     }
-
-    .popular-bundles {
-      background-color: #ffffff;
-      padding: 60px 20px;
+    
+    /* How It Works Section */
+    .how-it-works-section {
+      padding: 100px 5%;
+      text-align: center;
+      position: relative;
+      background-color: #f8fafc;
     }
-    .bundle-list {
+    
+    .steps-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 30px;
+      margin-top: 50px;
+    }
+    
+    .step-card {
+      background: white;
+      border-radius: 20px;
+      padding: 40px 30px;
+      width: 300px;
+      box-shadow: var(--shadow-lg);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .step-card:hover {
+      transform: translateY(-10px);
+      box-shadow: var(--shadow-xl);
+    }
+    
+    .step-number {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      width: 40px;
+      height: 40px;
+      background: var(--gradient-1);
+      color: white;
+      border-radius: 50%;
       display: flex;
       justify-content: center;
-      flex-wrap: wrap;
-      gap: 40px;
+      align-items: center;
+      font-size: 1.5rem;
+      font-weight: 700;
     }
-    .bundle-item {
-      background-color: #ffffff;
-      padding: 40px;
-      border-radius: 15px;
-      width: 300px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    
+    .step-icon {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+      color: var(--primary);
+    }
+    
+    .step-title {
+      font-size: 1.5rem;
+      margin-bottom: 15px;
+      color: var(--dark);
+    }
+    
+    .step-description {
+      color: var(--gray);
+      font-size: 1rem;
+    }
+    
+    /* Bundles Section */
+    .bundles-section {
+      padding: 100px 5%;
+      text-align: center;
+      background-color: #f1f5f9;
+      position: relative;
+    }
+    
+    .bundles-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 30px;
+      margin-top: 50px;
+    }
+    
+    .bundle-card {
+      width: 280px;
+      height: 350px;
+      perspective: 1000px;
+      cursor: pointer;
+    }
+    
+    .bundle-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transition: transform 0.8s;
+      transform-style: preserve-3d;
+    }
+    
+    .bundle-card:hover .bundle-inner {
+      transform: rotateY(180deg);
+    }
+    
+    .bundle-front, .bundle-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      border-radius: 20px;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
+      justify-content: center;
       align-items: center;
+      padding: 30px;
+      box-shadow: var(--shadow-lg);
     }
-    .bundle-heading {
-      text-align: center;
-      padding: 10px;
-      font-size: 24px;
-      font-weight: bold;
-      color: #fff;
-      border-radius: 8px;
+    
+    .bundle-front {
+      color: white;
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+    
+    .bundle-back {
+      background: white;
+      color: var(--dark);
+      transform: rotateY(180deg);
+      font-size: 1rem;
+      line-height: 1.6;
+    }
+    
+    .bundle-icon {
+      font-size: 3rem;
       margin-bottom: 20px;
     }
-    .bundle-content ul li {
-      display: flex;
-      align-items: center;
-      margin-bottom: 10px;
-      font-size: 18px;
-      color: #555;
-    }
-    .bundle-content ul li img {
-      width: 20px;
-      height: 20px;
-      margin-right: 10px;
-    }
-    .bundle-button {
-      margin-top: 20px;
-      padding: 12px 24px;
-      font-size: 16px;
-      font-weight: bold;
-      color: #fff;
-      border-radius: 6px;
-      transition: 0.3s;
-      text-align: center;
-    }
-
-    .bundle-buttons {
-      display: flex;
-      justify-content: center;
-      gap: 20px;
-      margin-top: 30px;
-    }
-
+    
+    /* Survey Section */
     .survey-section {
+      padding: 80px 5%;
       text-align: center;
-      padding: 50px 0;
+      position: relative;
     }
+    
     .survey-button {
-      padding: 15px 30px;
-      font-size: 18px;
-      background-color: #007BFF;
+      background: var(--gradient-2);
       color: white;
-      text-decoration: none;
-      border-radius: 10px;
-      transition: background-color 0.3s ease;
+      padding: 15px 30px;
+      border-radius: 50px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      box-shadow: var(--shadow-md);
+      display: inline-block;
     }
+    
     .survey-button:hover {
-      background-color: #0056b3;
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-lg);
     }
-
-    .testimonials {
-      padding: 60px 20px;
-      background-color: #ffffff;
+    
+    /* Testimonials Section */
+    .testimonials-section {
+      padding: 100px 5%;
       text-align: center;
+      background-color: #f1f5f9;
+      position: relative;
     }
-    .testimonial-list {
+    
+    .testimonials-container {
       display: flex;
       flex-wrap: wrap;
-      gap: 30px;
       justify-content: center;
-      margin-top: 30px;
+      gap: 30px;
+      margin-top: 50px;
     }
-    .testimonial-box {
-      background-color: #f1f1f1;
-      padding: 30px;
-      border-radius: 12px;
-      width: 300px;
-      font-size: 18px;
-      color: #333;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    }
-
-    .join-us {
-      text-align: center;
-      background-color: #ffffff;
-      padding: 60px 20px;
-    }
-    .join-us p {
-      font-size: 18px;
-      margin-bottom: 20px;
-      color: #555;
-    }
-    .join-button {
-      background-color: #28a745;
-      color: white;
-      padding: 12px 24px;
-      border-radius: 6px;
-      font-size: 18px;
-      font-weight: bold;
-      transition: 0.3s;
-    }
-    .join-button:hover {
-      background-color: #218838;
-    }
-
-    .contact-us-container {
-      width: 90%;
-      max-width: 600px;
-      margin: 50px auto;
-      padding: 30px;
-      background-color: #ffffff;
+    
+    .testimonial-card {
+      background: white;
       border-radius: 20px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      text-align: center;
+      padding: 30px;
+      width: 350px;
+      box-shadow: var(--shadow-md);
+      transition: all 0.3s ease;
+      text-align: left;
     }
-    .contact-heading {
-      color: #007BFF;
+    
+    .testimonial-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-lg);
+    }
+    
+    .testimonial-text {
+      font-size: 1rem;
+      line-height: 1.6;
       margin-bottom: 20px;
-      font-size: 28px;
+      color: var(--dark);
+      font-style: italic;
     }
+    
+    .testimonial-author {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    
+    .author-avatar {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+    
+    .author-info {
+      text-align: left;
+    }
+    
+    .author-name {
+      font-weight: 600;
+      color: var(--dark);
+    }
+    
+    .author-title {
+      font-size: 0.9rem;
+      color: var(--gray);
+    }
+    
+    /* Join Us Section */
+    .join-section {
+      padding: 100px 5%;
+      text-align: center;
+      position: relative;
+      background: var(--gradient-1);
+      color: white;
+    }
+    
+    .join-section h2 {
+      color: white;
+    }
+    
+    .join-section h2::after {
+      background: white;
+    }
+    
+    .join-section p {
+      color: rgba(255, 255, 255, 0.8);
+      max-width: 700px;
+      margin: 0 auto 30px;
+    }
+    
+    .join-button {
+      background: white;
+      color: var(--primary);
+      padding: 15px 30px;
+      border-radius: 50px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      box-shadow: var(--shadow-md);
+      display: inline-block;
+      border: none;
+      cursor: pointer;
+    }
+    
+    .join-button:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-lg);
+    }
+    
+    /* Contact Section */
+    .contact-section {
+      padding: 100px 5%;
+      position: relative;
+    }
+    
+    .contact-container {
+      max-width: 600px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: var(--shadow-lg);
+    }
+    
     .contact-form {
       display: flex;
       flex-direction: column;
-      align-items: center;
+      gap: 20px;
     }
-    .contact-box {
-      width: 100%;
+    
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    
+    .form-label {
+      font-weight: 500;
+      color: var(--dark);
+    }
+    
+    .form-input {
       padding: 12px 15px;
-      margin: 10px 0;
-      font-size: 16px;
-      border: 1px solid #ccc;
+      border: 1px solid #e2e8f0;
       border-radius: 10px;
+      font-size: 1rem;
+      transition: all 0.3s ease;
     }
-    .message-box {
+    
+    .form-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+    }
+    
+    .form-textarea {
       height: 150px;
       resize: vertical;
     }
-    .send-button {
-      margin-top: 15px;
-      padding: 12px 30px;
-      font-size: 18px;
-      background-color: #4CAF50;
+    
+    .submit-button {
+      background: var(--gradient-1);
       color: white;
-      border: none;
+      padding: 15px;
       border-radius: 10px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      box-shadow: var(--shadow-md);
+      border: none;
       cursor: pointer;
-      transition: background-color 0.3s ease;
+      margin-top: 10px;
     }
-    .send-button:hover {
-      background-color: #45a049;
+    
+    .submit-button:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-lg);
     }
-
+    
+    /* Footer */
     .footer {
-      background-color: #000000;
+      background-color: var(--dark);
       color: white;
       text-align: center;
-      padding: 30px 20px;
-      border-top-left-radius: 30px;
-      border-top-right-radius: 30px;
-      font-size: 16px;
+      padding: 50px 20px 30px;
+      position: relative;
     }
-
-    @media (max-width: 768px) {
-      .features, .bundle-list, .testimonial-list {
-        flex-direction: column;
-        align-items: center;
-      }
+    
+    .footer-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 40px;
+      margin-bottom: 40px;
     }
+    
+    .footer-logo {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 15px;
+    }
+    
+    .footer-logo img {
+      height: 40px;
+    }
+    
+    .footer-description {
+      max-width: 300px;
+      text-align: left;
+      color: rgba(255, 255, 255, 0.7);
+    }
+    
+    .footer-links {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 15px;
+    }
+    
+    .footer-links h3 {
+      margin-bottom: 15px;
+      font-size: 1.2rem;
+    }
+    
+    .footer-links a {
+      color: rgba(255, 255, 255, 0.7);
+      transition: color 0.3s ease;
+    }
+    
+    .footer-links a:hover {
+      color: white;
+    }
+    
+    .footer-social {
+      display: flex;
+      gap: 15px;
+      margin-top: 20px;
+    }
+    
+    .social-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.1);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: all 0.3s ease;
+    }
+    
+    .social-icon:hover {
+      background: var(--primary);
+      transform: translateY(-3px);
+    }
+    
+    .footer-bottom {
+      padding-top: 30px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      color: rgba(255, 255, 255, 0.5);
+      font-size: 0.9rem;
+    }
+    
+    /* Animations */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+    
+    .fade-in.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    
+    .fade-in-left {
+      opacity: 0;
+      transform: translateX(-50px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+    
+    .fade-in-left.visible {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    
+    .fade-in-right {
+      opacity: 0;
+      transform: translateX(50px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+    
+    .fade-in-right.visible {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    
+    /* Popup Overlay */
     .overlay {
       display: none;
       position: fixed;
-      top: 0; left: 0;
-      width: 100vw; height: 100vh;
-      backdrop-filter: blur(6px);
-      background: rgba(0, 0, 0, 0.4);
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      backdrop-filter: blur(8px);
+      background: rgba(15, 23, 42, 0.6);
       z-index: 1000;
       justify-content: center;
-      align-items: flex-start;
-      padding-top: 80px;
-      animation: fadeIn 0.3s ease-in-out forwards;
+      align-items: center;
+      padding: 20px;
     }
-    .bundle-popup {
+    
+    .popup {
       background: white;
       width: 95%;
-      max-width: 480px;
-      border-radius: 18px;
-      padding: 32px 24px 28px 24px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.18);
-      animation: popupIn 0.45s cubic-bezier(.4,0,.2,1);
+      max-width: 500px;
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: var(--shadow-xl);
       position: relative;
-      display: flex;
-      flex-direction: column;
-      align-items: stretch;
+      animation: popupIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     }
+    
     @keyframes popupIn {
-      from { opacity: 0; transform: translateY(40px) scale(0.96);}
-      to { opacity: 1; transform: translateY(0) scale(1);}
+      from { opacity: 0; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1); }
     }
+    
     @keyframes popupOut {
-      from { opacity: 1; transform: translateY(0) scale(1);}
-      to { opacity: 0; transform: translateY(40px) scale(0.96);}
+      from { opacity: 1; transform: scale(1); }
+      to { opacity: 0; transform: scale(0.9); }
     }
+    
     .close-btn {
       position: absolute;
-      top: 18px;
-      right: 22px;
-      font-size: 26px;
+      top: 20px;
+      right: 20px;
+      font-size: 1.5rem;
       cursor: pointer;
-      color: #007BFF;
-      font-weight: bold;
+      color: var(--gray);
+      transition: color 0.3s ease;
       background: none;
       border: none;
-      z-index: 2;
-      transition: color 0.2s;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 50%;
     }
+    
     .close-btn:hover {
-      color: #ff416c;
+      color: var(--danger);
+      background: rgba(239, 68, 68, 0.1);
     }
+    
+    .popup h2 {
+      margin-bottom: 20px;
+      font-size: 1.8rem;
+    }
+    
+    .popup h2::after {
+      display: none;
+    }
+    
     .bundle-search {
       width: 100%;
-      padding: 12px 14px;
-      font-size: 16px;
-      border-radius: 8px;
-      border: 1px solid #d0e6ff;
-      margin-bottom: 18px;
-      transition: border 0.2s;
+      padding: 12px 15px;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      font-size: 1rem;
+      margin-bottom: 20px;
+      transition: all 0.3s ease;
     }
+    
     .bundle-search:focus {
-      border: 1.5px solid #007BFF;
       outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
     }
+    
     .saas-list {
-      max-height: 180px;
+      max-height: 250px;
       overflow-y: auto;
-      margin-bottom: 10px;
+      margin-bottom: 20px;
       display: flex;
       flex-direction: column;
       gap: 10px;
+      padding-right: 10px;
     }
+    
+    .saas-list::-webkit-scrollbar {
+      width: 6px;
+    }
+    
+    .saas-list::-webkit-scrollbar-track {
+      background: #f1f5f9;
+      border-radius: 10px;
+    }
+    
+    .saas-list::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 10px;
+    }
+    
+    .saas-list::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+    
     .saas-list label {
       display: flex;
       align-items: center;
       gap: 10px;
-      font-size: 16px;
-      background: #f7faff;
-      border-radius: 8px;
-      padding: 8px 12px;
+      font-size: 1rem;
+      background: #f8fafc;
+      border-radius: 10px;
+      padding: 10px 15px;
       cursor: pointer;
-      transition: background 0.2s;
+      transition: all 0.3s ease;
     }
+    
     .saas-list label:hover {
-      background: #e9f2ff;
+      background: #f1f5f9;
+      transform: translateX(5px);
     }
-    .saas-list img {
-      width: 22px;
-      height: 22px;
-      border-radius: 4px;
-      background: #fff;
-      border: 1px solid #e0e0e0;
+    
+    .saas-list input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--primary);
     }
+    
+    .other-bundle-section {
+      margin-top: 20px;
+    }
+    
     .confirm-btn {
-      margin-top: 24px;
-      padding: 14px 0;
-      background: linear-gradient(90deg, #007BFF 60%, #00BFFF 100%);
+      width: 100%;
+      padding: 15px;
+      background: var(--gradient-1);
       color: white;
-      font-size: 18px;
       border: none;
       border-radius: 10px;
+      font-size: 1.1rem;
+      font-weight: 600;
       cursor: pointer;
-      width: 100%;
-      font-weight: bold;
-      transition: background 0.3s;
-      box-shadow: 0 2px 8px rgba(0,123,255,0.08);
+      transition: all 0.3s ease;
+      box-shadow: var(--shadow-md);
+      margin-top: 20px;
     }
+    
     .confirm-btn:hover {
-      background: linear-gradient(90deg, #0056b3 60%, #009acc 100%);
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-lg);
     }
-    @media (max-width: 600px) {
-      .bundle-popup {
-        padding: 18px 6vw;
-        max-width: 98vw;
-      }
-    }
+    
+    /* User Dropdown */
     .dropdown {
       position: relative;
-      display: flex;
-      align-items: center;
-      margin-left: 10px;
     }
+    
     .dropdown-avatar {
-      height: 44px;
       width: 44px;
+      height: 44px;
       border-radius: 50%;
-      border: 2px solid #007BFF;
       object-fit: cover;
       cursor: pointer;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
-      transition: box-shadow 0.25s, transform 0.25s, border-color 0.25s;
-      background: #fff;
+      border: 2px solid var(--primary);
+      transition: all 0.3s ease;
     }
+    
     .dropdown-avatar:hover {
-      box-shadow: 0 8px 24px rgba(0,123,255,0.18);
-      transform: scale(1.12) rotate(-7deg);
-      border-color: #0056b3;
+      transform: scale(1.1);
+      box-shadow: var(--shadow-md);
     }
+    
     .dropdown-menu {
       position: absolute;
-      top: 54px;
+      top: 60px;
       right: 0;
-      background: #fff;
-      box-shadow: 0 12px 32px rgba(0,0,0,0.13);
-      border-radius: 14px;
-      min-width: 170px;
+      background: white;
+      border-radius: 15px;
+      min-width: 200px;
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
       display: none;
       flex-direction: column;
-      overflow: hidden;
-      z-index: 1001;
-      animation: dropdownIn 0.35s cubic-bezier(.4,0,.2,1);
-      transform-origin: top right;
+      z-index: 100;
+      animation: dropdownIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
+    
     @keyframes dropdownIn {
-      from { opacity: 0; transform: scaleY(0.7) translateY(-10px);}
-      to { opacity: 1; transform: scaleY(1) translateY(0);}
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
+    
     @keyframes dropdownOut {
-      from { opacity: 1; transform: scaleY(1) translateY(0);}
-      to { opacity: 0; transform: scaleY(0.7) translateY(-10px);}
+      from { opacity: 1; transform: translateY(0); }
+      to { opacity: 0; transform: translateY(-10px); }
     }
+    
     .dropdown-menu.show {
       display: flex;
-      animation: dropdownIn 0.35s cubic-bezier(.4,0,.2,1);
     }
-    .dropdown-menu.hide {
-      animation: dropdownOut 0.25s cubic-bezier(.4,0,.2,1);
-    }
+    
     .dropdown-menu a {
-      padding: 14px 22px;
-      color: #007BFF;
-      text-decoration: none;
+      padding: 15px 20px;
+      color: var(--dark);
       font-weight: 500;
-      font-size: 16px;
-      transition: background 0.2s, color 0.2s;
-      border-bottom: 1px solid #f1f1f1;
+      transition: all 0.3s ease;
+      border-bottom: 1px solid #f1f5f9;
     }
+    
     .dropdown-menu a:last-child {
       border-bottom: none;
     }
+    
     .dropdown-menu a:hover {
-      background: #f5faff;
-      color: #0056b3;
+      background: #f8fafc;
+      color: var(--primary);
+      padding-left: 25px;
     }
-    .scroll-fade {
-      opacity: 0;
-      transform: translateY(40px) scale(0.98);
-      transition: opacity 0.7s cubic-bezier(.4,0,.2,1), transform 0.7s cubic-bezier(.4,0,.2,1);
-      will-change: opacity, transform;
+    
+    /* Responsive Design */
+    @media (max-width: 1024px) {
+      h1 {
+        font-size: 3rem;
+      }
+      
+      h2 {
+        font-size: 2.2rem;
+      }
+      
+      .feature-card, .testimonial-card {
+        width: 280px;
+      }
     }
-    .scroll-fade.visible {
-      opacity: 1;
-      transform: translateY(0) scale(1);
-    }
-    .scroll-fade-left {
-      opacity: 0;
-      transform: translateX(-60px) scale(0.98);
-      transition: opacity 0.7s cubic-bezier(.4,0,.2,1), transform 0.7s cubic-bezier(.4,0,.2,1);
-      will-change: opacity, transform;
-    }
-    .scroll-fade-left.visible {
-      opacity: 1;
-      transform: translateX(0) scale(1);
-    }
-    .scroll-fade-right {
-      opacity: 0;
-      transform: translateX(60px) scale(0.98);
-      transition: opacity 0.7s cubic-bezier(.4,0,.2,1), transform 0.7s cubic-bezier(.4,0,.2,1);
-      will-change: opacity, transform;
-    }
-    .scroll-fade-right.visible {
-      opacity: 1;
-      transform: translateX(0) scale(1);
-    }
-    .decor-left, .decor-right {
-      display: none !important;
-    }
-    .decor-spot, .decor-spot-left, .decor-spot-right {
-      display: none !important;
-    }
-    .decor-spot {
-      position: absolute;
-      z-index: 0;
-      pointer-events: none;
-      opacity: 0.18;
-      filter: blur(60px);
-      border-radius: 50%;
-      transition: opacity 0.5s, transform 0.7s cubic-bezier(.4,0,.2,1);
-      will-change: transform;
-    }
-    .decor-spot-left {
-      left: -160px;
-      top: 420px;
-      width: 480px;
-      height: 480px;
-      background: radial-gradient(circle at 60% 40%, #007BFF 0%, #00BFFF 80%);
-    }
-    .decor-spot-right {
-      right: -140px;
-      top: 1100px;
-      width: 420px;
-      height: 420px;
-      background: radial-gradient(circle at 40% 60%, #ff416c 0%, #ffd200 90%);
-    }
-    @media (max-width: 900px) {
-      .decor-spot { display: none !important; }
-    }
-
-    :root {
-      --zapblue: #1ad1ff;
-      --zapdark: #0056b3;
-    }
-
-    /* Navbar and logo text */
-    .logo {
-      color: var(--zapdark) !important;
-    }
-
-    /* Buttons */
-    .top-button,
-    .cta-button,
-    .survey-button,
-    .confirm-btn {
-      background-color: var(--zapblue) !important;
-      color: #fff !important;
-      border: none;
-    }
-    .top-button:hover,
-    .cta-button:hover,
-    .survey-button:hover,
-    .confirm-btn:hover {
-      background-color: var(--zapdark) !important;
-    }
-
-    /* Feature box headings */
-    .feature-box h3,
-    .contact-heading {
-      color: var(--zapblue) !important;
-    }
-
-    /* Borders for blue elements */
-    .logo-img,
-    .dropdown-avatar {
-      border-color: var(--zapblue) !important;
-    }
-    .feature-box {
-      border: 2px solid var(--zapblue);
-    }
-
-    /* Dropdown menu links */
-    .dropdown-menu a {
-      color: var(--zapblue) !important;
-    }
-    .dropdown-menu a:hover {
-      color: var(--zapdark) !important;
-    }
-
-    /* Minor: update close button color */
-    .close-btn {
-      color: var(--zapblue) !important;
-    }
-    .close-btn:hover {
-      color: #ff416c !important;
-    }
-
-    @media (max-width: 600px) {
+    
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 2.5rem;
+      }
+      
+      h2 {
+        font-size: 2rem;
+      }
+      
       .navbar {
-        flex-direction: row;
-        flex-wrap: wrap;
-        padding: 0 10px;
+        padding: 0 20px;
+      }
+      
+      .hero-section, .features-section, .bundles-section, 
+      .survey-section, .testimonials-section, .join-section, 
+      .contact-section {
+        padding: 80px 20px;
+      }
+      
+      .footer-content {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+      }
+      
+      .footer-logo, .footer-links {
+        align-items: center;
+      }
+      
+      .footer-description {
+        text-align: center;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 2rem;
+      }
+      
+      h2 {
+        font-size: 1.8rem;
+      }
+      
+      .navbar {
         height: auto;
+        padding: 15px 20px;
       }
-      .logo-bar {
-        flex: 1 1 100px;
+      
+      .logo-text {
+        font-size: 1.5rem;
       }
-      .top-button {
-        flex: 1 1 100px;
-        margin-left: auto;
-        margin-right: 0;
-        font-size: 15px;
-        padding: 10px 8px;
-        width: auto;
+      
+      .top-button, .cta-button, .survey-button, .join-button {
+        padding: 10px 20px;
+        font-size: 0.9rem;
+      }
+      
+      .popup {
+        padding: 30px 20px;
       }
     }
   </style>
 </head>
 <body>
-<div class="decor-spot decor-spot-left"></div>
-<div class="decor-spot decor-spot-right"></div>
-<!-- Navbar -->
-<div class="navbar" id="mainNavbar">
-  <div class="logo-bar">
-    <img src="icons/your-logo.png" alt="Logo" class="logo-img" />
-    <span style="font-size:30px; font-weight:bold; line-height:1;">
-      <span style="color:#1ad1ff;">Zap</span><span style="color:#0056b3;">Bundle</span>
-    </span>
-  </div>
-  <div id="nav-button-area"></div>
-</div>
-<!-- Main Section -->
-<div class="main-content scroll-fade">
-  <h1>Save Money on SaaS — Get the Perfect Bundle for Your Business!</h1>
-  <p>We bundle SaaS into business agencies, and smooth the way and get exclusive access.</p>
-  <a href="signup.html" class="cta-button hide-on-login">Get Early Access</a>
-</div>
-
-<!-- Why Choose Section -->
-<div class="why-choose scroll-fade">
-  <h2>Why Choose Our Bundles?</h2>
-  <div class="features">
-    <div class="feature-box scroll-fade-left">
-      <h3>Save up to 40%</h3>
-      <p>Significant discounts on SaaS tools compared to buying individually.</p>
+  <!-- Background Shapes -->
+  <div class="bg-shape bg-shape-1"></div>
+  <div class="bg-shape bg-shape-2"></div>
+  <div class="bg-shape bg-shape-3"></div>
+  
+  <!-- Navbar -->
+  <nav class="navbar" id="mainNavbar">
+    <div class="logo-bar">
+      <img src="icons/your-logo.png" alt="ZapBundle Logo" class="logo-img">
+      <span class="logo-text">ZapBundle</span>
     </div>
-    <div class="feature-box scroll-fade">
-      <h3>Simplified Management</h3>
-      <p>Manage all your subscriptions with ease in one bundle.</p>
+    <div id="nav-button-area"></div>
+  </nav>
+  
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="hero-content fade-in">
+      <h1>Save Money on SaaS with Perfect Bundles for Your Business</h1>
+      <p class="hero-description">We bundle premium SaaS tools into cost-effective packages, giving you exclusive access to the tools you need at prices you'll love.</p>
+      <a href="signup.html" class="cta-button hide-on-login">Get Early Access</a>
+      <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" alt="SaaS Dashboard" class="hero-image">
     </div>
-    <div class="feature-box scroll-fade-right">
-      <h3>Expertly Curated</h3>
-      <p>Bundles selected by experts for maximum compatibility and efficiency.</p>
+  </section>
+  
+  <!-- Features Section -->
+  <section class="features-section">
+    <h2 class="fade-in">Why Choose Our Bundles?</h2>
+    <div class="features-container">
+      <div class="feature-card fade-in-left">
+        <i class="fas fa-piggy-bank feature-icon"></i>
+        <h3 class="feature-title">Save up to 40%</h3>
+        <p class="feature-description">Significant discounts on premium SaaS tools compared to purchasing them individually.</p>
+      </div>
+      
+      <div class="feature-card fade-in">
+        <i class="fas fa-tasks feature-icon"></i>
+        <h3 class="feature-title">Simplified Management</h3>
+        <p class="feature-description">Manage all your subscriptions with ease in one centralized bundle dashboard.</p>
+      </div>
+      
+      <div class="feature-card fade-in-right">
+        <i class="fas fa-star feature-icon"></i>
+        <h3 class="feature-title">Expertly Curated</h3>
+        <p class="feature-description">Bundles selected by industry experts for maximum compatibility and efficiency.</p>
+      </div>
     </div>
-  </div>
-</div>
-
-<!-- Popular Bundles -->
-
-<div class="popular-bundles scroll-fade">
-  <h2>Popular Bundles</h2>
-  <div class="bundle-container">
-    <div class="bundle-card scroll-fade-left" onclick="handleBundleClick('Marketing Master Bundle')">
-      <div class="card-inner">
-        <div class="card-front" style="background: linear-gradient(135deg, #ff416c, #ff4b2b);">
-          Marketing Master Bundle
+  </section>
+  
+  <!-- How It Works Section -->
+  <section class="how-it-works-section">
+    <h2 class="fade-in">Get Started in 3 Simple Steps</h2>
+    <div class="steps-container">
+      <div class="step-card fade-in-left">
+        <div class="step-number">1</div>
+        <div class="step-icon"><i class="fas fa-user-plus"></i></div>
+        <h3 class="step-title">Sign Up</h3>
+        <p class="step-description">Create your free ZapBundle account to get started. No credit card required for early access.</p>
+      </div>
+      
+      <div class="step-card fade-in">
+        <div class="step-number">2</div>
+        <div class="step-icon"><i class="fas fa-clipboard-list"></i></div>
+        <h3 class="step-title">Complete Short Survey</h3>
+        <p class="step-description">Tell us about your business needs and which SaaS tools you're interested in bundling together.</p>
+      </div>
+      
+      <div class="step-card fade-in-right">
+        <div class="step-number">3</div>
+        <div class="step-icon"><i class="fas fa-box-open"></i></div>
+        <h3 class="step-title">Choose Your Bundle</h3>
+        <p class="step-description">Select from our recommended bundles based on your survey or create your own custom package.</p>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Bundles Section -->
+  <section class="bundles-section">
+    <h2 class="fade-in">Popular Bundles</h2>
+    <div class="bundles-container">
+      <div class="bundle-card fade-in-left" onclick="handleBundleClick('Marketing Master Bundle')">
+        <div class="bundle-inner">
+          <div class="bundle-front" style="background: var(--gradient-2);">
+            <i class="fas fa-bullhorn bundle-icon"></i>
+            <span>Marketing Master Bundle</span>
+          </div>
+          <div class="bundle-back">
+            <h3>Marketing Master</h3>
+            <p>Includes tools for email campaigns, analytics & ad management — ideal for growth hackers & marketers.</p>
+          </div>
         </div>
-        <div class="card-back">
-          Includes tools for email campaigns, analytics & ad management — ideal for growth hackers & marketers.
+      </div>
+      
+      <div class="bundle-card fade-in" onclick="handleBundleClick('Productivity Power Bundle')">
+        <div class="bundle-inner">
+          <div class="bundle-front" style="background: var(--gradient-1);">
+            <i class="fas fa-bolt bundle-icon"></i>
+            <span>Productivity Power Bundle</span>
+          </div>
+          <div class="bundle-back">
+            <h3>Productivity Power</h3>
+            <p>Task tracking, team collaboration, note-taking & automation tools to supercharge your productivity.</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="bundle-card fade-in" onclick="handleBundleClick('Design & Dev Bundle')">
+        <div class="bundle-inner">
+          <div class="bundle-front" style="background: var(--gradient-3);">
+            <i class="fas fa-code bundle-icon"></i>
+            <span>Design & Dev Bundle</span>
+          </div>
+          <div class="bundle-back">
+            <h3>Design & Development</h3>
+            <p>UI kits, prototyping, IDE tools, version control and more for developers & designers.</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="bundle-card fade-in-right" onclick="handleBundleClick('custom')">
+        <div class="bundle-inner">
+          <div class="bundle-front" style="background: var(--gradient-4);">
+            <i class="fas fa-magic bundle-icon"></i>
+            <span>Create Your Own Bundle</span>
+          </div>
+          <div class="bundle-back">
+            <h3>Custom Bundle</h3>
+            <p>Tell us what tools you want. We're collecting feedback to focus on the most requested bundles.</p>
+          </div>
         </div>
       </div>
     </div>
-
-    <div class="bundle-card scroll-fade" onclick="handleBundleClick('Productivity Power Bundle')">
-      <div class="card-inner">
-        <div class="card-front" style="background: linear-gradient(135deg, #1e3c72, #2a5298);">
-          Productivity Power Bundle
+  </section>
+  
+  <!-- Survey Section -->
+  <section class="survey-section">
+    <h2 class="fade-in">Help Us Build the Right Bundles</h2>
+    <a href="survey.html" class="survey-button fade-in" id="surveyBtn"><i class="fas fa-clipboard-list"></i> Take the Survey</a>
+  </section>
+  
+  <!-- Testimonials Section -->
+  <section class="testimonials-section">
+    <h2 class="fade-in">What Businesses Are Saying</h2>
+    <div class="testimonials-container">
+      <div class="testimonial-card fade-in-left">
+        <p class="testimonial-text">"As a small startup, managing multiple SaaS subscriptions was becoming expensive and complicated. ZapBundle's idea would greatly help us streamline our tools and save money."</p>
+        <div class="testimonial-author">
+          <div class="author-info">
+            <div class="author-title">Tech Startup</div>
+          </div>
         </div>
-        <div class="card-back">
-          Task tracking, team collaboration, note-taking & automation tools to supercharge your productivity.
+      </div>
+      
+      <div class="testimonial-card fade-in">
+        <p class="testimonial-text">"The marketing bundle gave us access to premium tools we couldn't afford individually. The idea of ZapBundle would help us scale our marketing efforts without breaking the bank."</p>
+        <div class="testimonial-author">
+          <div class="author-info">
+            <div class="author-title">Growth Marketing Company</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="testimonial-card fade-in-right">
+        <p class="testimonial-text">"Finally a solution that understands the pain points of small businesses. The single invoice for all our tools will simplify our accounting significantly and save us valuable time."</p>
+        <div class="testimonial-author">
+          <div class="author-info">
+            <div class="author-title">Small Business</div>
+          </div>
         </div>
       </div>
     </div>
-
-    <div class="bundle-card scroll-fade" onclick="handleBundleClick('Design & Dev Bundle')">
-      <div class="card-inner">
-        <div class="card-front" style="background: linear-gradient(135deg, #11998e, #38ef7d);">
-          Design & Dev Bundle
+  </section>
+  
+  <!-- Join Us Section -->
+  <section class="join-section">
+    <h2 class="fade-in">Join 100+ Businesses Exploring SaaS Bundles!</h2>
+    <p class="fade-in">Be the first to know when we launch and get exclusive early access discounts on our premium SaaS bundles.</p>
+    <button onclick="window.location.href='signup.html'" class="join-button fade-in hide-on-login">Get Early Access</button>
+  </section>
+  
+  <!-- Contact Section -->
+  <section class="contact-section" id="contact-us">
+    <div class="contact-container fade-in">
+      <h2>Contact Us</h2>
+      <form action="https://formsubmit.co/zapbundle@gmail.com" method="POST" class="contact-form">
+        <div class="form-group">
+          <label for="name" class="form-label">Your Name</label>
+          <input type="text" id="name" name="name" class="form-input" required>
         </div>
-        <div class="card-back">
-          UI kits, prototyping, IDE tools, version control and more for developers & designers.
+        
+        <div class="form-group">
+          <label for="email" class="form-label">Your Email</label>
+          <input type="email" id="email" name="email" class="form-input" required>
         </div>
+        
+        <div class="form-group">
+          <label for="message" class="form-label">Your Message</label>
+          <textarea id="message" name="message" class="form-input form-textarea" required></textarea>
+        </div>
+        
+        <button type="submit" class="submit-button">Send Message</button>
+      </form>
+    </div>
+  </section>
+  
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-logo">
+        <img src="icons/your-logo.png" alt="ZapBundle Logo">
+        <p class="footer-description">ZapBundle helps businesses save money on SaaS subscriptions through expertly curated bundles.</p>
+        <div class="footer-social">
+          <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+          <a href="#" class="social-icon"><i class="fab fa-linkedin-in"></i></a>
+          <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+          <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+        </div>
+      </div>
+      
+      <div class="footer-links">
+        <h3>Company</h3>
+        <a href="#">About Us</a>
+        <a href="#">Our Team</a>
+        <a href="#">Careers</a>
+        <a href="#">Press</a>
+      </div>
+      
+      <div class="footer-links">
+        <h3>Resources</h3>
+        <a href="#">Blog</a>
+        <a href="#">Guides</a>
+        <a href="#">Support</a>
+        <a href="#">FAQ</a>
+      </div>
+      
+      <div class="footer-links">
+        <h3>Legal</h3>
+        <a href="#">Terms of Service</a>
+        <a href="#">Privacy Policy</a>
+        <a href="#">Cookie Policy</a>
+        <a href="#">GDPR</a>
       </div>
     </div>
-
-    <div class="bundle-card scroll-fade-right" onclick="handleBundleClick('custom')">
-      <div class="card-inner">
-        <div class="card-front" style="background: linear-gradient(135deg, #f7971e, #ffd200);">
-          Create Your Own Bundle
-        </div>
-        <div class="card-back">
-          Tell us what tools you want. We’re collecting feedback to focus on the most requested bundles and build early support.
-        </div>
+    
+    <div class="footer-bottom">
+      &copy; 2025 ZapBundle. All rights reserved.<br>
+      Helping businesses save on SaaS since day one.
+    </div>
+  </footer>
+  
+  <!-- Bundle Selection Popup -->
+  <div class="overlay" id="bundleOverlay" onclick="closeOnOutside(event)">
+    <div class="popup" onclick="event.stopPropagation()">
+      <button class="close-btn" onclick="closeMenu()"><i class="fas fa-times"></i></button>
+      <h2>Select SaaS Tools for Your Custom Bundle</h2>
+      <input type="text" placeholder="Search SaaS tools..." onkeyup="filterSaaS(this.value)" class="bundle-search">
+      
+      <div class="saas-list" id="saasList">
+        <label><input type="checkbox" value="Slack"> Slack</label>
+        <label><input type="checkbox" value="Trello"> Trello</label>
+        <label><input type="checkbox" value="Notion"> Notion</label>
+        <label><input type="checkbox" value="Asana"> Asana</label>
+        <label><input type="checkbox" value="GitHub"> GitHub</label>
+        <label><input type="checkbox" value="Zoom"> Zoom</label>
+        <label><input type="checkbox" value="Dropbox"> Dropbox</label>
+        <label><input type="checkbox" value="Google Workspace"> Google Workspace</label>
+        <label><input type="checkbox" value="Microsoft 365"> Microsoft 365</label>
+        <label><input type="checkbox" value="Salesforce"> Salesforce</label>
+        <label><input type="checkbox" value="HubSpot"> HubSpot</label>
+        <label><input type="checkbox" value="Mailchimp"> Mailchimp</label>
+        <label><input type="checkbox" value="Zendesk"> Zendesk</label>
+        <label><input type="checkbox" value="Airtable"> Airtable</label>
+        <label><input type="checkbox" value="Monday.com"> Monday.com</label>
+        <label><input type="checkbox" value="Figma"> Figma</label>
+        <label><input type="checkbox" value="Canva"> Canva</label>
+        <label><input type="checkbox" value="ClickUp"> ClickUp</label>
+        <label><input type="checkbox" value="Intercom"> Intercom</label>
+        <label><input type="checkbox" value="Freshdesk"> Freshdesk</label>
       </div>
+      
+      <div class="other-bundle-section">
+        <label>
+          <input type="checkbox" id="otherBundleCheck" onchange="toggleOtherInput(this)">
+          <span>Other (not listed)</span>
+        </label>
+        <input type="text" id="otherBundleInput" class="bundle-search" placeholder="Enter your desired SaaS tool(s)" style="display:none; margin-top:10px;">
+      </div>
+      
+      <button class="confirm-btn" onclick="submitCustomBundle()">Confirm Selection</button>
     </div>
   </div>
-</div>
-
-<div class="overlay" id="bundleOverlay" onclick="closeOnOutside(event)">
-  <div class="menu bundle-popup" onclick="event.stopPropagation()">
-    <div class="close-btn" onclick="closeMenu()">✕</div>
-    <h2 style="margin-bottom:18px; color:#007BFF;">Select SaaS Tools for Your Custom Bundle</h2>
-    <input type="text" placeholder="Search SaaS..." onkeyup="filterSaaS(this.value)" class="bundle-search" />
-    <div class="saas-list" id="saasList">
-      <label><input type="checkbox" value="Slack"> Slack</label>
-      <label><input type="checkbox" value="Trello"> Trello</label>
-      <label><input type="checkbox" value="Notion"> Notion</label>
-      <label><input type="checkbox" value="Asana"> Asana</label>
-      <label><input type="checkbox" value="GitHub"> GitHub</label>
-      <label><input type="checkbox" value="Zoom"> Zoom</label>
-      <label><input type="checkbox" value="Dropbox"> Dropbox</label>
-      <label><input type="checkbox" value="Google Workspace"> Google Workspace</label>
-      <label><input type="checkbox" value="Microsoft 365"> Microsoft 365</label>
-      <label><input type="checkbox" value="Salesforce"> Salesforce</label>
-      <label><input type="checkbox" value="HubSpot"> HubSpot</label>
-      <label><input type="checkbox" value="Mailchimp"> Mailchimp</label>
-      <label><input type="checkbox" value="Zendesk"> Zendesk</label>
-      <label><input type="checkbox" value="Airtable"> Airtable</label>
-      <label><input type="checkbox" value="Monday.com"> Monday.com</label>
-      <label><input type="checkbox" value="Figma"> Figma</label>
-      <label><input type="checkbox" value="Canva"> Canva</label>
-      <label><input type="checkbox" value="ClickUp"> ClickUp</label>
-      <label><input type="checkbox" value="Intercom"> Intercom</label>
-      <label><input type="checkbox" value="Freshdesk"> Freshdesk</label>
-      <!-- Add more as needed -->
-    </div>
-    <div class="other-bundle-section" style="margin-top:18px;">
-      <label style="font-weight:500; color:#333;">
-        <input type="checkbox" id="otherBundleCheck" onchange="toggleOtherInput(this)">
-        <span style="margin-left:8px;">Other (not listed)</span>
-      </label>
-      <input type="text" id="otherBundleInput" class="bundle-search" placeholder="Enter your desired SaaS tool(s)" style="display:none; margin-top:10px;" />
-    </div>
-    <button class="confirm-btn" onclick="submitCustomBundle()">Confirm Selection</button>
-  </div>
-</div>
-
-<script>
-  // Navbar animation on page load
-  window.addEventListener('DOMContentLoaded', function() {
-    setTimeout(() => {
-      document.getElementById('mainNavbar').classList.add('visible');
-    }, 80);
-  });
-
-  // Modern scroll animation: always reveal on scroll, hide when out of view
-  function revealOnScroll() {
-    const reveals = document.querySelectorAll('.scroll-fade, .scroll-fade-left, .scroll-fade-right');
-    const windowHeight = window.innerHeight;
-    reveals.forEach(el => {
-      const top = el.getBoundingClientRect().top;
-      if (top < windowHeight - 60) {
-        el.classList.add('visible');
-      } else {
-        el.classList.remove('visible');
-      }
-    });
-  }
-  window.addEventListener('scroll', revealOnScroll);
-  window.addEventListener('DOMContentLoaded', revealOnScroll);
-
-  // Parallax effect for decor spots (background moves slower than content)
-  window.addEventListener('scroll', function() {
-    const scrollY = window.scrollY || window.pageYOffset;
-    const left = document.querySelector('.decor-spot-left');
-    const right = document.querySelector('.decor-spot-right');
-    if (left) left.style.transform = `translateY(${scrollY * 0.10}px)`;
-    if (right) right.style.transform = `translateY(${scrollY * 0.06}px)`;
-  });
-
-  // Custom Bundle Popup Logic
-  function openMenu(enable) {
-    const overlay = document.getElementById('bundleOverlay');
-    const popup = overlay.querySelector('.bundle-popup');
-    if (enable) {
-      overlay.style.display = 'flex';
+  
+  <script>
+    // Navbar animation on page load
+    window.addEventListener('DOMContentLoaded', function() {
       setTimeout(() => {
-        popup.style.animation = 'popupIn 0.45s cubic-bezier(.4,0,.2,1)';
-      }, 10);
-    } else {
-      closeMenu();
+        document.getElementById('mainNavbar').classList.add('visible');
+      }, 100);
+    });
+    
+    // Scroll animations
+    function revealOnScroll() {
+      const elements = document.querySelectorAll('.fade-in, .fade-in-left, .fade-in-right');
+      const windowHeight = window.innerHeight;
+      
+      elements.forEach(el => {
+        const elementTop = el.getBoundingClientRect().top;
+        if (elementTop < windowHeight - 100) {
+          el.classList.add('visible');
+        }
+      });
     }
-  }
-  function closeMenu() {
-    const overlay = document.getElementById('bundleOverlay');
-    const popup = overlay.querySelector('.bundle-popup');
-    if (popup) {
-      popup.style.animation = 'popupOut 0.3s cubic-bezier(.4,0,.2,1)';
+    
+    window.addEventListener('scroll', revealOnScroll);
+    window.addEventListener('load', revealOnScroll);
+    
+    // Custom Bundle Popup Logic
+    function openMenu(enable) {
+      const overlay = document.getElementById('bundleOverlay');
+      const popup = overlay.querySelector('.popup');
+      
+      if (enable) {
+        overlay.style.display = 'flex';
+        popup.style.animation = 'popupIn 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
+      } else {
+        closeMenu();
+      }
+    }
+    
+    function closeMenu() {
+      const overlay = document.getElementById('bundleOverlay');
+      const popup = overlay.querySelector('.popup');
+      
+      popup.style.animation = 'popupOut 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
       setTimeout(() => {
         overlay.style.display = 'none';
-        popup.style.animation = '';
-      }, 280);
-    } else {
-      overlay.style.display = 'none';
+      }, 300);
     }
-  }
-  function closeOnOutside(e) {
-    if (e.target.id === 'bundleOverlay') closeMenu();
-  }
-  function filterSaaS(query) {
-    const items = document.querySelectorAll('#saasList label');
-    items.forEach(label => {
-      const name = label.textContent.toLowerCase();
-      label.style.display = name.includes(query.toLowerCase()) ? 'flex' : 'none';
-    });
-  }
-  document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') closeMenu();
-  });
-
-  function toggleOtherInput(checkbox) {
-    document.getElementById('otherBundleInput').style.display = checkbox.checked ? 'block' : 'none';
-  }
-
-  // =========================
-  // BACKEND-AWARE LOGIN/PROFILE LOGIC
-  // =========================
-
-  const API_URL = "https://zapbundle.onrender.com";
-
-  function getToken() {
-    return localStorage.getItem('token');
-  }
-
-  function authHeader() {
-    return { "Authorization": "Bearer " + getToken() };
-  }
-
-  async function getProfile() {
-    const token = getToken();
-    if (!token) return null;
-    try {
-      const res = await fetch(`${API_URL}/api/profile`, { headers: authHeader() });
-      if (!res.ok) return null;
-      return await res.json();
-    } catch {
-      return null;
+    
+    function closeOnOutside(e) {
+      if (e.target.id === 'bundleOverlay') closeMenu();
     }
-  }
-
-  async function renderNavButtonArea() {
-    const navArea = document.getElementById('nav-button-area');
-    if (!navArea) return;
-    navArea.innerHTML = "";
-
-    const profile = await getProfile();
-
-    // Hide or show all .hide-on-login elements
-    document.querySelectorAll('.hide-on-login').forEach(el => {
-      el.style.display = profile ? 'none' : '';
-    });
-
-    if (!profile) {
-      navArea.innerHTML = `<a href="signup.html" class="top-button" id="main-cta-btn">Get Early Access</a>`;
-      return;
+    
+    function filterSaaS(query) {
+      const items = document.querySelectorAll('#saasList label');
+      items.forEach(label => {
+        const name = label.textContent.toLowerCase();
+        label.style.display = name.includes(query.toLowerCase()) ? 'flex' : 'none';
+      });
     }
-
-    // Show avatar/profile dropdown
-    const profilePic = profile.profilePic || 'icons/default-profile.png';
-    navArea.innerHTML = `
-      <div class="dropdown" id="dropdown">
-        <img id="navProfilePic" class="dropdown-avatar" src="${profilePic}" alt="Profile" />
-        <div class="dropdown-menu" id="dropdownMenu">
-          <a href="index.html">Home</a>
-          <a href="profile.html">Profile</a>
-          <a href="index.html#contact-us">Contact Us</a>
-          <a href="#" onclick="logout()">Logout</a>
-        </div>
-      </div>
-    `;
-
-    // Dropdown logic
-    const dropdown = document.getElementById('dropdown');
-    const dropdownMenu = document.getElementById('dropdownMenu');
-    const navProfilePic = document.getElementById('navProfilePic');
-    navProfilePic.addEventListener('click', function(e) {
-      e.stopPropagation();
-      if (dropdownMenu.classList.contains('show')) {
-        dropdownMenu.classList.remove('show');
-        dropdownMenu.classList.add('hide');
-        setTimeout(() => dropdownMenu.style.display = 'none', 250);
-      } else {
-        dropdownMenu.style.display = 'flex';
-        dropdownMenu.classList.remove('hide');
-        setTimeout(() => dropdownMenu.classList.add('show'), 10);
-      }
-    });
-    document.addEventListener('click', function(e) {
-      if (!dropdown.contains(e.target) && dropdownMenu.classList.contains('show')) {
-        dropdownMenu.classList.remove('show');
-        dropdownMenu.classList.add('hide');
-        setTimeout(() => dropdownMenu.style.display = 'none', 250);
-      }
-    });
+    
+    function toggleOtherInput(checkbox) {
+      document.getElementById('otherBundleInput').style.display = checkbox.checked ? 'block' : 'none';
+    }
+    
     document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape' && dropdownMenu.classList.contains('show')) {
-        dropdownMenu.classList.remove('show');
-        dropdownMenu.classList.add('hide');
-        setTimeout(() => dropdownMenu.style.display = 'none', 250);
-      }
+      if (e.key === 'Escape') closeMenu();
     });
-  }
-
-  function logout() {
-    localStorage.removeItem('token');
-    location.href = "index.html";
-  }
-
-  // Ensure this runs after DOM is fully loaded
-  window.addEventListener('DOMContentLoaded', renderNavButtonArea);
-
-  async function handleBundleClick(bundleName) {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      window.location.href = "signup.html";
-      return;
+    
+    // Backend-aware login/profile logic
+    const API_URL = "https://zapbundle.onrender.com";
+    
+    function getToken() {
+      return localStorage.getItem('token');
     }
-
-    // If "Create Your Own Bundle", show popup
-    if (bundleName === 'custom') {
-      openMenu(true);
-      return;
+    
+    function authHeader() {
+      return { "Authorization": "Bearer " + getToken() };
     }
-
-    // Otherwise, register the bundle to the user's account
-    try {
-      const res = await fetch("https://zapbundle.onrender.com/api/register-bundle", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer " + token
-        },
-        body: JSON.stringify({ bundle: bundleName })
-      });
-      const data = await res.json();
-      if (res.ok) {
-        alert(`Bundle "${bundleName}" registered to your account!`);
-      } else {
-        alert(data.error || "Failed to register bundle.");
+    
+    async function getProfile() {
+      const token = getToken();
+      if (!token) return null;
+      
+      try {
+        const res = await fetch(`${API_URL}/api/profile`, { headers: authHeader() });
+        if (!res.ok) return null;
+        return await res.json();
+      } catch {
+        return null;
       }
-    } catch (err) {
-      alert("Network error. Please try again.");
     }
-  }
-
-  async function submitCustomBundle() {
-    const token = getToken();
-    if (!token) {
-      window.location.href = "signup.html";
-      return;
-    }
-    // Gather selected SaaS tools
-    const checked = Array.from(document.querySelectorAll('#saasList input[type="checkbox"]:checked'))
-      .map(cb => cb.value);
-    const otherChecked = document.getElementById('otherBundleCheck').checked;
-    let otherValue = "";
-    if (otherChecked) {
-      otherValue = document.getElementById('otherBundleInput').value.trim();
-      if (otherValue) checked.push(otherValue);
-    }
-    if (checked.length === 0) {
-      alert("Please select at least one SaaS tool.");
-      return;
-    }
-    try {
-      const res = await fetch("https://zapbundle.onrender.com/api/register-bundle", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer " + token
-        },
-        body: JSON.stringify({ bundle: checked.join(", ") }) // Save as a single string, or send as array if backend supports
+    
+    async function renderNavButtonArea() {
+      const navArea = document.getElementById('nav-button-area');
+      if (!navArea) return;
+      navArea.innerHTML = "";
+      
+      const profile = await getProfile();
+      
+      // Hide or show all .hide-on-login elements
+      document.querySelectorAll('.hide-on-login').forEach(el => {
+        el.style.display = profile ? 'none' : '';
       });
-      const data = await res.json();
-      if (res.ok) {
-        alert("Custom bundle registered to your account!");
-        closeMenu();
-        // Optionally, redirect to profile or refresh profile if on that page
-        // window.location.href = "profile.html";
-      } else {
-        alert(data.error || "Failed to register custom bundle.");
+      
+      if (!profile) {
+        navArea.innerHTML = `<a href="signup.html" class="top-button" id="main-cta-btn">Get Early Access</a>`;
+        return;
       }
-    } catch (err) {
-      alert("Network error. Please try again.");
+      
+      // Show avatar/profile dropdown
+      const profilePic = profile.profilePic || 'icons/default-profile.png';
+      navArea.innerHTML = `
+        <div class="dropdown" id="dropdown">
+          <img id="navProfilePic" class="dropdown-avatar" src="${profilePic}" alt="Profile" />
+          <div class="dropdown-menu" id="dropdownMenu">
+            <a href="index.html"><i class="fas fa-home"></i> Home</a>
+            <a href="profile.html"><i class="fas fa-user"></i> Profile</a>
+            <a href="index.html#contact-us"><i class="fas fa-envelope"></i> Contact Us</a>
+            <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+          </div>
+        </div>
+      `;
+      
+      // Dropdown logic
+      const dropdown = document.getElementById('dropdown');
+      const dropdownMenu = document.getElementById('dropdownMenu');
+      const navProfilePic = document.getElementById('navProfilePic');
+      
+      navProfilePic.addEventListener('click', function(e) {
+        e.stopPropagation();
+        dropdownMenu.classList.toggle('show');
+      });
+      
+      document.addEventListener('click', function(e) {
+        if (!dropdown.contains(e.target)) {
+          dropdownMenu.classList.remove('show');
+        }
+      });
     }
-  }
-</script>
-
-
-
-<!-- Survey Section -->
-<div class="survey-section scroll-fade">
-  <h2>Help Us Build the Right Bundles</h2>
-  <a href="#" class="survey-button" id="surveyBtn">Take the Survey</a>
-</div>
-
-<!-- Testimonials -->
-<div class="testimonials scroll-fade">
-  <h2>What Businesses are saying</h2>
-  <div class="testimonial-list">
-    <div class="testimonial-box scroll-fade-left">"As a small startup, managing multiple SaaS subscriptions was becoming expensive and complicated. SaaSlink's idea would greatly help us."</div>
-    <div class="testimonial-box scroll-fade">"The marketing bundle gave us access to premium tools we couldn't afford individually. The idea of SaaSlink would help us."</div>
-    <div class="testimonial-box scroll-fade-right">"Finally a solution that understands the pain points of small businesses. The single invoice for all our tools will simplify our accounting significantly."</div>
-  </div>
-</div>
-
-<!-- Join Us -->
-<div class="join-us scroll-fade">
-  <h2>Join 100+ Businesses Exploring SaaS Bundles!</h2>
-  <p>Be the first to know when we launch and get exclusive early access discounts.</p>
-  <button onclick="window.location.href='signup.html'" class="join-button hide-on-login">Get Early Access</button>
-</div>
-
-<!-- Contact Us Section -->
-<div class="contact-us-container scroll-fade" id="contact-us">
-  <h2 class="contact-heading">Contact Us</h2>
-  <form action="https://formsubmit.co/zapbundle@gmail.com" method="POST" class="contact-form">
-    <input type="text" name="name" placeholder="Your Name" required class="contact-box" />
-    <input type="email" name="email" placeholder="Your Email" required class="contact-box" />
-    <textarea name="message" placeholder="Your Message" required class="contact-box message-box"></textarea>
-    <button type="submit" class="send-button">Send</button>
-  </form>
-</div>
-
-<!-- Footer -->
-<div class="footer scroll-fade">
-  @2025 ZapBundle. All rights reserved.<br />
-  Helping businesses Save on SaaS since day one.
-</div>
-
+    
+    function logout() {
+      localStorage.removeItem('token');
+      location.href = "index.html";
+    }
+    
+    // Ensure this runs after DOM is fully loaded
+    window.addEventListener('DOMContentLoaded', renderNavButtonArea);
+    
+    async function handleBundleClick(bundleName) {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        window.location.href = "signup.html";
+        return;
+      }
+      
+      // If "Create Your Own Bundle", show popup
+      if (bundleName === 'custom') {
+        openMenu(true);
+        return;
+      }
+      
+      // Otherwise, register the bundle to the user's account
+      try {
+        const res = await fetch("https://zapbundle.onrender.com/api/register-bundle", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + token
+          },
+          body: JSON.stringify({ bundle: bundleName })
+        });
+        
+        const data = await res.json();
+        if (res.ok) {
+          alert(`Bundle "${bundleName}" registered to your account!`);
+        } else {
+          alert(data.error || "Failed to register bundle.");
+        }
+      } catch (err) {
+        alert("Network error. Please try again.");
+      }
+    }
+    
+    async function submitCustomBundle() {
+      const token = getToken();
+      if (!token) {
+        window.location.href = "signup.html";
+        return;
+      }
+      
+      // Gather selected SaaS tools
+      const checked = Array.from(document.querySelectorAll('#saasList input[type="checkbox"]:checked'))
+        .map(cb => cb.value);
+      
+      const otherChecked = document.getElementById('otherBundleCheck').checked;
+      let otherValue = "";
+      
+      if (otherChecked) {
+        otherValue = document.getElementById('otherBundleInput').value.trim();
+        if (otherValue) checked.push(otherValue);
+      }
+      
+      if (checked.length === 0) {
+        alert("Please select at least one SaaS tool.");
+        return;
+      }
+      
+      try {
+        const res = await fetch("https://zapbundle.onrender.com/api/register-bundle", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + token
+          },
+          body: JSON.stringify({ bundle: checked.join(", ") })
+        });
+        
+        const data = await res.json();
+        if (res.ok) {
+          alert("Custom bundle registered to your account!");
+          closeMenu();
+        } else {
+          alert(data.error || "Failed to register custom bundle.");
+        }
+      } catch (err) {
+        alert("Network error. Please try again.");
+      }
+    }
+  </script>
 </body>
 </html>
