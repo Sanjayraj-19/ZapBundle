@@ -25,6 +25,9 @@
       --success: #10b981;
       --warning: #f59e0b;
       --danger: #ef4444;
+      --zapblue: #1ad1ff;
+      --zapdark: #0099cc;
+      --zapbg: #f5faff;
       --gradient-1: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
       --gradient-2: linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%);
       --gradient-3: linear-gradient(135deg, var(--accent) 0%, var(--success) 100%);
@@ -1305,47 +1308,39 @@
       }
     }
     
-    if (savedData) {
-      surveyData = savedData;
-      populateFormWithData(surveyData);
-      
-      // Make form fields readonly
-      const form = document.getElementById('surveyForm');
-      const inputs = form.querySelectorAll('input, textarea, select');
-      inputs.forEach(input => {
-        input.disabled = true;
-      });
-      
-      // Hide submit button
-      document.querySelector('.submit-btn').style.display = 'none';
-      
-      // Add edit button event listener
-      document.getElementById('editSurveyBtn').addEventListener('click', function() {
-        enableEditMode();
-      });
-    } else {
-      // No survey data found
-      document.getElementById('surveyForm').style.display = 'none';
-      document.getElementById('viewModeControls').style.display = 'none';
-      
-      // Show message that no survey data was found
-      document.getElementById('successMessage').style.display = 'block';
-      document.getElementById('successMessage').innerHTML = `
-        <div style="background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%); padding: 25px; border-radius: 16px; text-align: center; margin-bottom: 30px; box-shadow: var(--shadow-md); border: 1px solid rgba(249, 115, 22, 0.2);">
-          <i class="fas fa-exclamation-circle" style="font-size: 48px; color: var(--warning); margin-bottom: 15px;"></i>
-          <h3 style="color: var(--warning); margin-bottom: 15px; font-size: 1.5rem;">No Survey Data Found</h3>
-          <p style="color: var(--dark); margin-bottom: 20px; line-height: 1.6;">It seems you haven't completed the survey yet or your data couldn't be retrieved.</p>
-          <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
-            <a href="survey.html" style="display: inline-block; background: var(--primary); color: white; padding: 12px 24px; border-radius: 12px; text-decoration: none; font-weight: 600; box-shadow: var(--shadow-sm); transition: all 0.3s ease;">
-              <i class="fas fa-clipboard-list"></i> Take the Survey
-            </a>
-            <a href="index.html" style="display: inline-block; background: var(--gray); color: white; padding: 12px 24px; border-radius: 12px; text-decoration: none; font-weight: 600; box-shadow: var(--shadow-sm); transition: all 0.3s ease;">
-              <i class="fas fa-home"></i> Back to Home
-            </a>
-          </div>
-        </div>
-      `;
+    // Create dummy data for testing if no data is found
+    if (!savedData) {
+      savedData = {
+        company_type: "Startup",
+        saas_count: "5-10",
+        saas_types: ["Marketing", "Productivity", "Communication"],
+        monthly_spend: "$1,000-$5,000",
+        challenge: "Cost management",
+        interest_bundles: "Very interested",
+        early_access: "Yes",
+        email: "demo@example.com",
+        company_name: "Demo Company"
+      };
     }
+    
+    // Always use savedData (either real or dummy data from earlier)
+    surveyData = savedData;
+    populateFormWithData(surveyData);
+    
+    // Make form fields readonly
+    const form = document.getElementById('surveyForm');
+    const inputs = form.querySelectorAll('input, textarea, select');
+    inputs.forEach(input => {
+      input.disabled = true;
+    });
+    
+    // Hide submit button
+    document.querySelector('.submit-btn').style.display = 'none';
+    
+    // Add edit button event listener
+    document.getElementById('editSurveyBtn').addEventListener('click', function() {
+      enableEditMode();
+    });
   }
   
   // Function to enable edit mode
@@ -1472,9 +1467,6 @@
     revealOnScroll();
     checkSurveyCompletion();
     updateNavigation();
-    
-    // Make navbar visible immediately
-    document.querySelector('.navbar').classList.add('visible');
     
     // Make navbar visible immediately
     document.querySelector('.navbar').classList.add('visible');
