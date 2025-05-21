@@ -140,7 +140,7 @@ app.get('/api/profile', authenticateToken, async (req, res) => {
       email: user.email,
       name: user.name || "",
       profilePic: user.profilePic || "",
-      selectedBundle: user.selectedBundle || null,
+      selectedBundles: user.selectedBundles || [],
       customBundle: user.customBundle || [],
       createdAt: user.createdAt,
       modifiedAt: user.modifiedAt
