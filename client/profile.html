@@ -128,50 +128,43 @@
     
     .dropdown-menu {
       position: absolute;
-      top: 54px;
+      top: 60px;
       right: 0;
-      background: #fff;
+      background: white;
+      border-radius: 15px;
+      min-width: 200px;
       box-shadow: var(--shadow-lg);
-      border-radius: 12px;
-      min-width: 180px;
+      overflow: hidden;
       display: none;
       flex-direction: column;
-      overflow: hidden;
-      z-index: 1001;
-      animation: dropdownIn 0.35s cubic-bezier(.4,0,.2,1);
-      transform-origin: top right;
+      z-index: 100;
+      animation: dropdownIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
     
     @keyframes dropdownIn {
-      from { opacity: 0; transform: scaleY(0.7) translateY(-10px);}
-      to { opacity: 1; transform: scaleY(1) translateY(0);}
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
     
     @keyframes dropdownOut {
-      from { opacity: 1; transform: scaleY(1) translateY(0);}
-      to { opacity: 0; transform: scaleY(0.7) translateY(-10px);}
+      from { opacity: 1; transform: translateY(0); }
+      to { opacity: 0; transform: translateY(-10px); }
     }
     
     .dropdown-menu.show {
       display: flex;
-      animation: dropdownIn 0.35s cubic-bezier(.4,0,.2,1);
-    }
-    
-    .dropdown-menu.hide {
-      animation: dropdownOut 0.25s cubic-bezier(.4,0,.2,1);
     }
     
     .dropdown-menu a {
-      padding: 14px 22px;
+      padding: 15px 20px;
       color: var(--dark);
-      text-decoration: none;
       font-weight: 500;
-      font-size: 0.95rem;
-      transition: all 0.2s ease;
-      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      transition: all 0.3s ease;
+      border-bottom: 1px solid #f1f5f9;
       display: flex;
       align-items: center;
       gap: 10px;
+      text-decoration: none;
     }
     
     .dropdown-menu a i {
@@ -179,13 +172,14 @@
       font-size: 1rem;
     }
     
-    .dropdown-menu a:last-child { 
-      border-bottom: none; 
+    .dropdown-menu a:last-child {
+      border-bottom: none;
     }
     
     .dropdown-menu a:hover {
-      background: var(--light);
+      background: #f8fafc;
       color: var(--primary);
+      padding-left: 25px;
     }
     /* Background shapes */
     .bg-shape {
@@ -575,42 +569,33 @@ async function renderNavButtonArea(profile) {
     <div class="dropdown" id="dropdown">
       <img id="navProfilePic" class="dropdown-avatar" src="${profilePic}" alt="Profile" />
       <div class="dropdown-menu" id="dropdownMenu">
-        <a href="index.html">Home</a>
-        <a href="profile.html">Profile</a>
-        <a href="index.html#contact-us">Contact Us</a>
-        <a href="#" onclick="logout()">Logout</a>
+        <a href="index.html"><i class="fas fa-home"></i> Home</a>
+        <a href="profile.html"><i class="fas fa-user"></i> Profile</a>
+        <a href="index.html#contact-us"><i class="fas fa-envelope"></i> Contact Us</a>
+        <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
       </div>
     </div>
   `;
 
-  // Dropdown logic (animation, outside click, ESC)
+  // Dropdown logic
   const dropdown = document.getElementById('dropdown');
   const dropdownMenu = document.getElementById('dropdownMenu');
   const navProfilePic = document.getElementById('navProfilePic');
+  
   navProfilePic.addEventListener('click', function(e) {
     e.stopPropagation();
-    if (dropdownMenu.classList.contains('show')) {
-      dropdownMenu.classList.remove('show');
-      dropdownMenu.classList.add('hide');
-      setTimeout(() => dropdownMenu.style.display = 'none', 250);
-    } else {
-      dropdownMenu.style.display = 'flex';
-      dropdownMenu.classList.remove('hide');
-      setTimeout(() => dropdownMenu.classList.add('show'), 10);
-    }
+    dropdownMenu.classList.toggle('show');
   });
+  
   document.addEventListener('click', function(e) {
-    if (!dropdown.contains(e.target) && dropdownMenu.classList.contains('show')) {
+    if (!dropdown.contains(e.target)) {
       dropdownMenu.classList.remove('show');
-      dropdownMenu.classList.add('hide');
-      setTimeout(() => dropdownMenu.style.display = 'none', 250);
     }
   });
+  
   document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape' && dropdownMenu.classList.contains('show')) {
+    if (e.key === 'Escape') {
       dropdownMenu.classList.remove('show');
-      dropdownMenu.classList.add('hide');
-      setTimeout(() => dropdownMenu.style.display = 'none', 250);
     }
   });
 }
@@ -735,7 +720,7 @@ async function renderProfile() {
   // Filter out any null or undefined values
   profile.selectedBundles = profile.selectedBundles.filter(bundle => bundle);
   
-  // Remove duplicate SaaS selections
+  // Remove duplicate SaaS selections by converting to Set and back to Array
   profile.selectedBundles = [...new Set(profile.selectedBundles)];
   
   console.log("Final selectedBundles after removing duplicates:", profile.selectedBundles);
@@ -827,7 +812,16 @@ async function renderProfile() {
   `;
 }
 
-window.addEventListener('DOMContentLoaded', renderProfile);
+window.addEventListener('DOMContentLoaded', function() {
+  // Make navbar visible immediately
+  const navbar = document.querySelector('.navbar');
+  if (navbar) {
+    navbar.classList.add('visible');
+  }
+  
+  // Render profile
+  renderProfile();
+});
 </script>
 </body>
 </html>
