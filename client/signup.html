@@ -199,7 +199,7 @@
         // Save JWT token for authenticated requests
         localStorage.setItem('token', data.token);
         // Check survey status and redirect accordingly
-        fetch(`${API_URL}/profile`, {
+        fetch(`${API_URL}/api/profile`, {
           headers: { "Authorization": "Bearer " + data.token }
         })
         .then(res => res.json())
