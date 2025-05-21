@@ -153,7 +153,9 @@
         const resCheck = await fetch(`${API_URL}/check-email?email=${encodeURIComponent(email)}`);
         const dataCheck = await resCheck.json();
         if (!dataCheck.available) {
-          alert("Email is already registered.");
+          alert("Email already registered. Please login.");
+          // Switch to login form automatically
+          toggleForm();
           return;
         }
       } catch {

@@ -873,17 +873,14 @@
 
   const API_URL = "https://zapbundle.onrender.com";
 
-  // Helper: Get JWT token
   function getToken() {
     return localStorage.getItem('token');
   }
 
-  // Helper: Auth header
   function authHeader() {
     return { "Authorization": "Bearer " + getToken() };
   }
 
-  // Fetch profile from backend
   async function getProfile() {
     const token = getToken();
     if (!token) return null;
@@ -896,11 +893,10 @@
     }
   }
 
-  // Render nav button area (avatar or CTA)
   async function renderNavButtonArea() {
     const navArea = document.getElementById('nav-button-area');
     if (!navArea) return;
-    navArea.innerHTML = ""; // Clear previous
+    navArea.innerHTML = "";
 
     const profile = await getProfile();
 
@@ -914,7 +910,7 @@
       return;
     }
 
-    // Logged in: show avatar dropdown
+    // Show avatar/profile dropdown
     const profilePic = profile.profilePic || 'icons/default-profile.png';
     navArea.innerHTML = `
       <div class="dropdown" id="dropdown">
@@ -928,7 +924,7 @@
       </div>
     `;
 
-    // Dropdown logic (animation, outside click, ESC)
+    // Dropdown logic
     const dropdown = document.getElementById('dropdown');
     const dropdownMenu = document.getElementById('dropdownMenu');
     const navProfilePic = document.getElementById('navProfilePic');
@@ -965,7 +961,7 @@
     location.href = "index.html";
   }
 
-  // On DOMContentLoaded, render the nav button area
+  // Ensure this runs after DOM is fully loaded
   window.addEventListener('DOMContentLoaded', renderNavButtonArea);
 </script>
 

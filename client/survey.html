@@ -629,11 +629,20 @@
       company_name: form.company_name.value
     };
 
-    // Send to backend
+    // Send to backend WITH JWT TOKEN
     try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert("Session expired. Please log in again.");
+        window.location.href = "signup.html";
+        return;
+      }
       const res = await fetch(`${API_URL}/survey`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + token
+        },
         body: JSON.stringify(data)
       });
       const result = await res.json();

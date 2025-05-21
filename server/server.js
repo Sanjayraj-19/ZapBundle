@@ -133,17 +133,21 @@ app.post('/api/login', async (req, res) => {
 
 // Get profile
 app.get('/api/profile', authenticateToken, async (req, res) => {
-  const user = await usersCollection.findOne({ _id: new ObjectId(req.user.userId) });
-  if (!user) return res.status(404).json({ error: "User not found" });
-  res.json({
-    email: user.email,
-    name: user.name || "",
-    profilePic: user.profilePic || "",
-    selectedBundle: user.selectedBundle || null,
-    customBundle: user.customBundle || [],
-    createdAt: user.createdAt,
-    modifiedAt: user.modifiedAt
-  });
+  try {
+    const user = await usersCollection.findOne({ _id: new ObjectId(req.user.userId) });
+    if (!user) return res.status(404).json({ error: "User not found" });
+    res.json({
+      email: user.email,
+      name: user.name || "",
+      profilePic: user.profilePic || "",
+      selectedBundle: user.selectedBundle || null,
+      customBundle: user.customBundle || [],
+      createdAt: user.createdAt,
+      modifiedAt: user.modifiedAt
+    });
+  } catch (err) {
+    res.status(500).json({ error: "Server error" });
+  }
 });
 
 // Update profile (optional, for profile editing)
