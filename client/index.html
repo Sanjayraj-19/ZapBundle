@@ -963,6 +963,40 @@
 
   // Ensure this runs after DOM is fully loaded
   window.addEventListener('DOMContentLoaded', renderNavButtonArea);
+
+  async function handleBundleClick(bundleName) {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      window.location.href = "signup.html";
+      return;
+    }
+
+    // If "Create Your Own Bundle", show popup
+    if (bundleName === 'custom') {
+      openMenu(true);
+      return;
+    }
+
+    // Otherwise, register the bundle to the user's account
+    try {
+      const res = await fetch("https://zapbundle.onrender.com/api/register-bundle", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + token
+        },
+        body: JSON.stringify({ bundle: bundleName })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        alert(`Bundle "${bundleName}" registered to your account!`);
+      } else {
+        alert(data.error || "Failed to register bundle.");
+      }
+    } catch (err) {
+      alert("Network error. Please try again.");
+    }
+  }
 </script>
 
 

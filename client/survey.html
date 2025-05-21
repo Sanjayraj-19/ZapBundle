@@ -637,7 +637,7 @@
         window.location.href = "signup.html";
         return;
       }
-      const res = await fetch(`${API_URL}/survey`, {
+      const res = await fetch(`${API_URL}/api/survey`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

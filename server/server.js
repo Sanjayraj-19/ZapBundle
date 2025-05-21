@@ -239,6 +239,21 @@ app.get('/', (req, res) => {
   res.send('SaaSLink backend is running.');
 });
 
+// Register bundle
+app.post('/api/register-bundle', authenticateToken, async (req, res) => {
+  const { bundle } = req.body;
+  if (!bundle) return res.status(400).json({ error: "Bundle name required." });
+  try {
+    await usersCollection.updateOne(
+      { _id: new ObjectId(req.user.userId) },
+      { $addToSet: { selectedBundles: bundle } }
+    );
+    res.json({ message: "Bundle registered." });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to register bundle." });
+  }
+});
+
 // Start server
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
