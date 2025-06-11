@@ -34,9 +34,23 @@ connectDB().catch(err => {
 
 // Middleware
 app.use(cors({
-  origin: "https://sanjayraj-19.github.io",
-  credentials: true
+  origin: ["https://sanjayraj-19.github.io", "http://localhost:5500"],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
+
+// Set additional headers for CORS
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', req.headers.origin);
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+  next();
+});
 app.use(express.json());
 
 // JWT middleware
@@ -184,8 +198,8 @@ app.post('/api/register', async (req, res) => {
       console.log('Verification URL:', verificationUrl);
     }
     
-    // Build the verification URL, defaulting to the right domain if FRONTEND_URL is not set
-    const frontendUrl = process.env.FRONTEND_URL || 'https://saasbundilo.com';
+    // Build the verification URL for GitHub Pages
+    const frontendUrl = process.env.FRONTEND_URL || 'https://sanjayraj-19.github.io/FrontEndZapBundle';
     const verificationUrl = `${frontendUrl}/verify.html?token=${verificationToken}`;
     console.log('Generated verification URL:', verificationUrl);
     
@@ -542,7 +556,7 @@ app.get('/api/auth/google/callback', passport.authenticate('google', { failureRe
   async (req, res) => {
     // Issue JWT and redirect to frontend with token
     const token = jwt.sign({ userId: req.user._id, email: req.user.email }, JWT_SECRET, { expiresIn: '7d' });
-    const frontendUrl = process.env.FRONTEND_URL || 'https://saasbundilo.com';
+    const frontendUrl = process.env.FRONTEND_URL || 'https://sanjayraj-19.github.io/FrontEndZapBundle';
     res.redirect(`${frontendUrl}/oauth-success.html?token=${token}`);
   }
 );
