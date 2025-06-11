@@ -185,9 +185,14 @@
         const data = await response.json();
         
         if (response.ok && data.success) {
-          // Show success state
+          // Show success state briefly
           loadingState.style.display = 'none';
           successState.style.display = 'block';
+          
+          // Redirect to home page after 2 seconds
+          setTimeout(() => {
+            window.location.href = "index.html";
+          }, 2000);
         } else {
           // Show error state with message from API
           showError(data.error || 'Verification failed. Please try again.');
