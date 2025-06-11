@@ -645,7 +645,7 @@
       }
       
       try {
-        const res = await fetch(`${API_URL}/check-email?email=${encodeURIComponent(email)}`);
+        const res = await fetch(`${API_URL}/api/check-email?email=${encodeURIComponent(email)}`);
         const data = await res.json();
         
         if (data.available) {
@@ -696,7 +696,7 @@
         
         // Check email availability
         try {
-          const resCheck = await fetch(`${API_URL}/check-email?email=${encodeURIComponent(email)}`);
+          const resCheck = await fetch(`${API_URL}/api/check-email?email=${encodeURIComponent(email)}`);
           const dataCheck = await resCheck.json();
           
           if (!dataCheck.available) {
@@ -713,7 +713,7 @@
         
         // Register new account
         try {
-          const res = await fetch(`${API_URL}/register`, {
+          const res = await fetch(`${API_URL}/api/register`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ email, password, name })
@@ -737,7 +737,7 @@
       } else {
         // Login
         try {
-          const res = await fetch(`${API_URL}/login`, {
+          const res = await fetch(`${API_URL}/api/login`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ email, password })
