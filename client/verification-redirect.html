@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Redirecting to Verification - SaaSBundilo</title>
+  <style>
+    body {
+      font-family: 'Poppins', Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      color: #343a40;
+      text-align: center;
+    }
+    .container {
+      max-width: 600px;
+      padding: 40px 20px;
+    }
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 20px;
+      color: #4361ee;
+    }
+    p {
+      font-size: 1.1rem;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+    .loader {
+      display: inline-block;
+      width: 50px;
+      height: 50px;
+      border: 5px solid rgba(75, 85, 99, 0.2);
+      border-radius: 50%;
+      border-top-color: #4361ee;
+      animation: spin 1s ease-in-out infinite;
+      margin: 20px 0;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+  <script>
+    // Extract token and redirect to the verify page
+    window.onload = function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const token = urlParams.get('token');
+      
+      if (token) {
+        // Add a slight delay for better UX
+        setTimeout(function() {
+          window.location.href = "/FrontEndZapBundle/verify.html?token=" + token;
+        }, 1500);
+      } else {
+        document.getElementById('message').textContent = 'No verification token found. Redirecting to homepage...';
+        setTimeout(function() {
+          window.location.href = "/FrontEndZapBundle/";
+        }, 2000);
+      }
+    };
+  </script>
+</head>
+<body>
+  <div class="container">
+    <h1>Processing Your Verification</h1>
+    <p id="message">Please wait while we redirect you to the verification page...</p>
+    <div class="loader"></div>
+  </div>
+</body>
+</html>

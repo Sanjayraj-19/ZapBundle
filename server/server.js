@@ -198,9 +198,19 @@ app.post('/api/register', async (req, res) => {
       console.log('Verification URL:', verificationUrl);
     }
     
-    // Build the verification URL for GitHub Pages
-    const frontendUrl = process.env.FRONTEND_URL || 'https://sanjayraj-19.github.io/FrontEndZapBundle';
-    const verificationUrl = `${frontendUrl}/verify.html?token=${verificationToken}`;
+    // Build the verification URL for GitHub Pages with proper path joining
+    let frontendUrl = process.env.FRONTEND_URL || 'https://sanjayraj-19.github.io/FrontEndZapBundle';
+    
+    // Ensure URL doesn't end with a slash before adding path
+    if (frontendUrl.endsWith('/')) {
+      frontendUrl = frontendUrl.slice(0, -1);
+    }
+    
+    // Generate absolute URL to verification page through the redirect
+    const verificationUrl = `${frontendUrl}/verification-redirect.html?token=${verificationToken}`;
+    
+    // Log for debugging
+    console.log('Generated verification URL:', verificationUrl);
     console.log('Generated verification URL:', verificationUrl);
     
     const mailOptions = {

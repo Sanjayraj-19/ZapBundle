@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="refresh" content="0;url=/FrontEndZapBundle/verify.html">
+  <title>Redirecting...</title>
+</head>
+<body>
+  <p>Redirecting to verification page...</p>
+  <script>
+    // Get the token from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('token');
+    
+    // Redirect to the proper verify.html with token
+    if (token) {
+      window.location.href = "/FrontEndZapBundle/verify.html?token=" + token;
+    } else {
+      window.location.href = "/FrontEndZapBundle/verify.html";
+    }
+  </script>
+</body>
+</html>

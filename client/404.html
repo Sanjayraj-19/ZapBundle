@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Page Not Found - SaaSBundilo</title>
+  <style>
+    body {
+      font-family: 'Poppins', Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      color: #343a40;
+      text-align: center;
+    }
+    .container {
+      max-width: 600px;
+      padding: 40px 20px;
+    }
+    h1 {
+      font-size: 3rem;
+      margin-bottom: 10px;
+      color: #4361ee;
+    }
+    p {
+      font-size: 1.2rem;
+      margin-bottom: 30px;
+      line-height: 1.6;
+    }
+    .btn {
+      display: inline-block;
+      background: linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%);
+      color: white;
+      text-decoration: none;
+      padding: 12px 30px;
+      border-radius: 50px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      margin-top: 20px;
+    }
+    .btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+    .redirect-msg {
+      margin-top: 30px;
+      font-size: 1rem;
+      color: #6c757d;
+    }
+  </style>
+  <script>
+    // Check if this is a verification attempt
+    window.onload = function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const token = urlParams.get('token');
+      
+      if (token && window.location.pathname.includes('verify.html')) {
+        // Redirect to the correct verify.html with token
+        window.location.href = '/FrontEndZapBundle/verify.html?token=' + token;
+      } else {
+        // Set redirect countdown
+        let seconds = 5;
+        const countdownEl = document.getElementById('countdown');
+        
+        setInterval(function() {
+          seconds--;
+          countdownEl.textContent = seconds;
+          
+          if (seconds <= 0) {
+            window.location.href = '/FrontEndZapBundle/';
+          }
+        }, 1000);
+      }
+    };
+  </script>
+</head>
+<body>
+  <div class="container">
+    <h1>404</h1>
+    <p>Oops! The page you're looking for cannot be found.</p>
+    <p>It might have been moved, deleted, or never existed in the first place.</p>
+    <a href="/FrontEndZapBundle/" class="btn">Go to Homepage</a>
+    <p class="redirect-msg">You will be redirected to the homepage in <span id="countdown">5</span> seconds.</p>
+  </div>
+</body>
+</html>
