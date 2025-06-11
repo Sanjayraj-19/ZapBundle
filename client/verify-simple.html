@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Email Verification</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #f0f2f5;
+    }
+    .container {
+      background-color: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      text-align: center;
+      max-width: 400px;
+      width: 90%;
+    }
+    h1 {
+      color: #4267B2;
+      margin-bottom: 20px;
+    }
+    .status {
+      margin: 20px 0;
+    }
+    .success {
+      color: green;
+    }
+    .error {
+      color: red;
+    }
+    .loading {
+      display: inline-block;
+      width: 30px;
+      height: 30px;
+      border: 3px solid rgba(0,0,0,0.1);
+      border-radius: 50%;
+      border-top-color: #4267B2;
+      animation: spin 1s ease-in-out infinite;
+      margin-bottom: 20px;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    .hidden {
+      display: none;
+    }
+    .button {
+      background-color: #4267B2;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Email Verification</h1>
+    
+    <div id="loading" class="status">
+      <div class="loading"></div>
+      <p>Verifying your email...</p>
+    </div>
+    
+    <div id="success" class="status hidden">
+      <p class="success">Your email has been verified successfully!</p>
+      <p>You will be redirected to the login page shortly.</p>
+      <a href="https://sanjayraj-19.github.io/FrontEndZapBundle/index.html" class="button">Go to Homepage</a>
+    </div>
+    
+    <div id="error" class="status hidden">
+      <p class="error">There was a problem verifying your email.</p>
+      <p id="error-message">Please try again or contact support.</p>
+      <a href="https://sanjayraj-19.github.io/FrontEndZapBundle/index.html" class="button">Go to Homepage</a>
+    </div>
+  </div>
+
+  <script>
+    // Function to get URL parameters
+    function getUrlParameter(name) {
+      name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+      var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+      var results = regex.exec(location.search);
+      return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+    }
+
+    // Function to show a specific status section
+    function showStatus(id) {
+      document.getElementById('loading').classList.add('hidden');
+      document.getElementById('success').classList.add('hidden');
+      document.getElementById('error').classList.add('hidden');
+      document.getElementById(id).classList.remove('hidden');
+    }
+
+    // Verify the email when the page loads
+    window.onload = function() {
+      // Get the verification token from the URL
+      const token = getUrlParameter('token');
+      
+      // Log the token for debugging
+      console.log('Token from URL:', token);
+      
+      if (!token) {
+        showStatus('error');
+        document.getElementById('error-message').textContent = 'No verification token provided.';
+        return;
+      }
+
+      // Make API request to verify the email
+      fetch(`https://zapbundle.onrender.com/api/verify-email?token=${token}`)
+        .then(response => {
+          console.log('API Response status:', response.status);
+          return response.json();
+        })
+        .then(data => {
+          console.log('API Response data:', data);
+          
+          if (data.success) {
+            showStatus('success');
+            // Redirect to homepage after 3 seconds
+            setTimeout(() => {
+              window.location.href = "https://sanjayraj-19.github.io/FrontEndZapBundle/index.html";
+            }, 3000);
+          } else {
+            showStatus('error');
+            document.getElementById('error-message').textContent = data.message || 'Verification failed.';
+          }
+        })
+        .catch(error => {
+          console.error('Error during verification:', error);
+          showStatus('error');
+          document.getElementById('error-message').textContent = 'Error connecting to the server.';
+        });
+    };
+  </script>
+</body>
+</html>

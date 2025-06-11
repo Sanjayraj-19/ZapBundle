@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Email Verification</title>
+  <meta http-equiv="refresh" content="0;url=verify-simple.html">
+  <script>
+    // Extract the token from the URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('token');
+    
+    // Redirect to the simple verification page with the token
+    if (token) {
+      window.location.href = "verify-simple.html?token=" + token;
+    } else {
+      window.location.href = "verify-simple.html";
+    }
+  </script>
+</head>
+<body>
+  <p>Redirecting to verification page...</p>
+</body>
+</html>

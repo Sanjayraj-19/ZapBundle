@@ -206,11 +206,11 @@ app.post('/api/register', async (req, res) => {
       frontendUrl = frontendUrl.slice(0, -1);
     }
     
-    // Generate absolute URL to verification page through the redirect
-    const verificationUrl = `${frontendUrl}/verification-redirect.html?token=${verificationToken}`;
+    // SUPER SIMPLIFIED: Use the simplest possible URL with the simple verify page
+    const verificationUrl = `https://sanjayraj-19.github.io/FrontEndZapBundle/verify-simple.html?token=${verificationToken}`;
     
     // Log for debugging
-    console.log('Generated verification URL:', verificationUrl);
+    console.log('SUPER SIMPLIFIED verification URL:', verificationUrl);
     console.log('Generated verification URL:', verificationUrl);
     
     const mailOptions = {
