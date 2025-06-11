@@ -9,6 +9,7 @@ import session from 'express-session';
 import passport from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import crypto from 'crypto';
+import validator from 'email-validator';
 
 dotenv.config();
 
@@ -105,6 +106,26 @@ app.post('/api/register', async (req, res) => {
     const { email, password, name } = req.body;
     if (!email || !password)
       return res.status(400).json({ error: 'Email and password required.' });
+      
+    // Validate email format
+    if (!validator.validate(email)) {
+      return res.status(400).json({ error: 'Please enter a valid email address.' });
+    }
+    
+    // Check for disposable/temporary email domains
+    const disposableDomains = [
+      'mailinator.com', 'tempmail.com', 'temp-mail.org', 'guerrillamail.com',
+      'throwawaymail.com', '10minutemail.com', 'yopmail.com', 'mailnesia.com',
+      'fakeinbox.com', 'sharklasers.com', 'guerrillamail.info', 'mailexpire.com',
+      'maildrop.cc', 'dispostable.com', 'mintemail.com', 'temp-mail.ru',
+      'getnada.com', 'tempmailo.com', 'emailna.co', 'emailondeck.com',
+      'mohmal.com', 'tempr.email', 'tempmail.de', 'generator.email'
+    ];
+    
+    const emailDomain = email.split('@')[1];
+    if (disposableDomains.includes(emailDomain.toLowerCase())) {
+      return res.status(400).json({ error: 'Please use a permanent email address. Temporary emails are not allowed.' });
+    }
 
     const existing = await usersCollection.findOne({ email });
     if (existing)
@@ -145,12 +166,28 @@ app.post('/api/register', async (req, res) => {
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
-      }
+        user: process.env.EMAIL_USER || 'zapbundle@gmail.com',
+        pass: process.env.EMAIL_PASS || '' // You'll need to set this in your .env file
+      },
+      debug: true, // Enable debug output
+      logger: true // Log information about the transport mechanism
     });
     
-    const verificationUrl = `${process.env.FRONTEND_URL || 'http://localhost:5500'}/verify.html?token=${verificationToken}`;
+    // Verify the connection configuration
+    try {
+      await transporter.verify();
+      console.log('SMTP connection verified successfully');
+    } catch (error) {
+      console.error('SMTP connection error:', error);
+      // Fall back to console log if email sending fails
+      console.log('Verification token for', email, ':', verificationToken);
+      console.log('Verification URL:', verificationUrl);
+    }
+    
+    // Build the verification URL, defaulting to the right domain if FRONTEND_URL is not set
+    const frontendUrl = process.env.FRONTEND_URL || 'https://saasbundilo.com';
+    const verificationUrl = `${frontendUrl}/verify.html?token=${verificationToken}`;
+    console.log('Generated verification URL:', verificationUrl);
     
     const mailOptions = {
       from: `"SaaSBundilo" <zapbundle@gmail.com>`,
@@ -214,9 +251,22 @@ app.post('/api/register', async (req, res) => {
       `
     };
     
-    await transporter.sendMail(mailOptions);
-
-    res.status(201).json({ message: 'Registration initiated. Please check your email to verify your account.' });
+    try {
+      await transporter.sendMail(mailOptions);
+      console.log('Verification email sent to:', email);
+      res.status(201).json({ message: 'Registration initiated. Please check your email to verify your account.' });
+    } catch (emailError) {
+      console.error('Failed to send verification email:', emailError);
+      
+      // Create a verification link anyway so user can still verify
+      console.log('Verification URL for manual verification:', verificationUrl);
+      
+      // Return success but mention potential email delivery issues
+      res.status(201).json({ 
+        message: 'Account created, but there was an issue sending the verification email. Please try again later or contact support.',
+        token: verificationToken // Only in development - remove in production
+      });
+    }
   } catch (err) {
     console.error('Registration error:', err);
     res.status(500).json({ error: 'Registration failed: ' + err.message });
@@ -371,10 +421,20 @@ app.get('/api/verify-email', async (req, res) => {
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
-      }
+        user: process.env.EMAIL_USER || 'zapbundle@gmail.com',
+        pass: process.env.EMAIL_PASS || '' // You'll need to set this in your .env file
+      },
+      debug: true,
+      logger: true
     });
+    
+    // Verify the connection configuration
+    try {
+      await transporter.verify();
+      console.log('SMTP connection verified successfully for welcome email');
+    } catch (error) {
+      console.error('SMTP connection error for welcome email:', error);
+    }
     
     const mailOptions = {
       from: `"SaaSBundilo" <zapbundle@gmail.com>`,
@@ -461,7 +521,13 @@ app.get('/api/verify-email', async (req, res) => {
       `
     };
     
-    await transporter.sendMail(mailOptions);
+    try {
+      await transporter.sendMail(mailOptions);
+      console.log('Welcome email sent to:', user.email);
+    } catch (emailError) {
+      console.error('Failed to send welcome email:', emailError);
+      // Continue with verification even if welcome email fails
+    }
     
     res.json({ success: true, message: "Email verified successfully. You can now log in." });
   } catch (err) {
@@ -476,7 +542,8 @@ app.get('/api/auth/google/callback', passport.authenticate('google', { failureRe
   async (req, res) => {
     // Issue JWT and redirect to frontend with token
     const token = jwt.sign({ userId: req.user._id, email: req.user.email }, JWT_SECRET, { expiresIn: '7d' });
-    res.redirect(`https://sanjayraj-19.github.io/FrontEndZapBundle/oauth-success.html?token=${token}`);
+    const frontendUrl = process.env.FRONTEND_URL || 'https://saasbundilo.com';
+    res.redirect(`${frontendUrl}/oauth-success.html?token=${token}`);
   }
 );
 

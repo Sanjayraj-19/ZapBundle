@@ -819,6 +819,22 @@
         return;
       }
       
+      // Check for common disposable email domains
+      const disposableDomains = [
+        'mailinator.com', 'tempmail.com', 'temp-mail.org', 'guerrillamail.com',
+        'throwawaymail.com', '10minutemail.com', 'yopmail.com', 'mailnesia.com',
+        'fakeinbox.com', 'sharklasers.com', 'guerrillamail.info', 'mailexpire.com',
+        'maildrop.cc', 'dispostable.com', 'mintemail.com', 'temp-mail.ru',
+        'getnada.com', 'tempmailo.com', 'emailna.co', 'emailondeck.com',
+        'mohmal.com', 'tempr.email', 'tempmail.de', 'generator.email'
+      ];
+      
+      const emailDomain = email.split('@')[1].toLowerCase();
+      if (disposableDomains.includes(emailDomain)) {
+        showAlert("Please use a permanent email address. Temporary emails are not allowed.");
+        return;
+      }
+      
       // Validate password strength for signup
       if (isSignup) {
         const hasLength = password.length >= 8;
