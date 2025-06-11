@@ -812,6 +812,13 @@
         return;
       }
       
+      // Validate email format
+      const emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+      if (!emailRegex.test(email)) {
+        showAlert("Please enter a valid email address.");
+        return;
+      }
+      
       // Validate password strength for signup
       if (isSignup) {
         const hasLength = password.length >= 8;
@@ -880,8 +887,7 @@
             return;
           }
           
-          showAlert("Account created successfully! Please login.", "success");
-          toggleForm();
+          showAlert("Registration successful! Please check your email to verify your account.", "success");
           resetButton();
         } catch (err) {
           showAlert("Network error. Please try again.");

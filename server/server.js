@@ -8,6 +8,7 @@ import nodemailer from 'nodemailer';
 import session from 'express-session';
 import passport from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
+import crypto from 'crypto';
 
 dotenv.config();
 
@@ -153,8 +154,8 @@ app.post('/api/register', async (req, res) => {
 
     res.status(201).json({ message: 'Registration initiated. Please check your email to verify your account.' });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Registration failed.' });
+    console.error('Registration error:', err);
+    res.status(500).json({ error: 'Registration failed: ' + err.message });
   }
 });
 
@@ -172,6 +173,11 @@ app.post('/api/login', async (req, res) => {
     const valid = await bcrypt.compare(password, user.password);
     if (!valid)
       return res.status(401).json({ error: 'Invalid credentials.' });
+      
+    // Check if user has verified their email
+    if (user.verified === false) {
+      return res.status(403).json({ error: 'Please verify your email before logging in.' });
+    }
 
     const token = jwt.sign(
       { userId: user._id, email: user.email },
@@ -270,6 +276,79 @@ app.get('/api/check-email', async (req, res) => {
   if (!email) return res.json({ available: false });
   const existing = await usersCollection.findOne({ email });
   res.json({ available: !existing });
+});
+
+// Email verification endpoint
+app.get('/api/verify-email', async (req, res) => {
+  try {
+    const { token } = req.query;
+    if (!token) return res.status(400).json({ error: "Verification token required" });
+    
+    // Find user with matching token
+    const user = await usersCollection.findOne({ 
+      verificationToken: token,
+      verificationExpires: { $gt: new Date() } // Token must not be expired
+    });
+    
+    if (!user) {
+      return res.status(400).json({ error: "Invalid or expired verification token" });
+    }
+    
+    // Update user to verified status
+    await usersCollection.updateOne(
+      { _id: user._id },
+      { 
+        $set: { verified: true },
+        $unset: { verificationToken: "", verificationExpires: "" }
+      }
+    );
+    
+    // Send welcome email
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+      }
+    });
+    
+    const mailOptions = {
+      from: `"SaaSBundilo" <${process.env.EMAIL_USER}>`,
+      to: user.email,
+      subject: 'Welcome to SaaSBundilo!',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 10px; background-color: #f9fafb;">
+          <div style="text-align: center; margin-bottom: 20px;">
+            <img src="https://example.com/logo.png" alt="SaaSBundilo Logo" style="max-width: 150px;">
+          </div>
+          <h2 style="color: #4f46e5; text-align: center;">Welcome to SaaSBundilo!</h2>
+          <p style="font-size: 16px; line-height: 1.6; color: #374151;">Hi ${user.name || 'there'},</p>
+          <p style="font-size: 16px; line-height: 1.6; color: #374151;">Thank you for verifying your email address. Your SaaSBundilo account has been successfully activated!</p>
+          <p style="font-size: 16px; line-height: 1.6; color: #374151;">Now you can:</p>
+          <ul style="font-size: 16px; line-height: 1.6; color: #374151;">
+            <li>Explore our curated SaaS bundles at discounted prices</li>
+            <li>Save up to 40% on your SaaS subscriptions</li>
+            <li>Simplify your tech stack with our recommended tools</li>
+          </ul>
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="${process.env.FRONTEND_URL || 'http://localhost:5500'}/signup.html" style="background-color: #4f46e5; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">Login to Your Account</a>
+          </div>
+          <p style="font-size: 16px; line-height: 1.6; color: #374151;">If you have any questions or need assistance, please don't hesitate to contact our support team.</p>
+          <p style="font-size: 16px; line-height: 1.6; color: #374151;">Best regards,<br>The SaaSBundilo Team</p>
+          <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0; text-align: center; color: #6b7280; font-size: 14px;">
+            <p>&copy; 2025 SaaSBundilo. All rights reserved.</p>
+          </div>
+        </div>
+      `
+    };
+    
+    await transporter.sendMail(mailOptions);
+    
+    res.json({ success: true, message: "Email verified successfully. You can now log in." });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Verification failed. Please try again later." });
+  }
 });
 
 // Google OAuth routes
