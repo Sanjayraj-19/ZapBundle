@@ -464,6 +464,77 @@
       font-size: 0.9rem;
     }
     
+    /* Password Strength Meter */
+    .password-strength-meter {
+      margin-top: 8px;
+      font-size: 0.8rem;
+    }
+    
+    .strength-meter-bar {
+      height: 4px;
+      background: #e5e7eb;
+      border-radius: 2px;
+      margin-bottom: 8px;
+    }
+    
+    .strength-meter-fill {
+      height: 100%;
+      border-radius: 2px;
+      transition: width 0.3s ease, background-color 0.3s ease;
+      width: 0%;
+    }
+    
+    .strength-weak .strength-meter-fill {
+      background-color: #ef4444;
+      width: 25%;
+    }
+    
+    .strength-fair .strength-meter-fill {
+      background-color: #f59e0b;
+      width: 50%;
+    }
+    
+    .strength-good .strength-meter-fill {
+      background-color: #10b981;
+      width: 75%;
+    }
+    
+    .strength-strong .strength-meter-fill {
+      background-color: #3b82f6;
+      width: 100%;
+    }
+    
+    .password-requirements {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4px;
+    }
+    
+    .password-requirements li {
+      color: #9ca3af;
+      position: relative;
+      padding-left: 18px;
+    }
+    
+    .password-requirements li.valid {
+      color: #10b981;
+    }
+    
+    .password-requirements li:before {
+      content: "✕";
+      position: absolute;
+      left: 0;
+      color: #ef4444;
+    }
+    
+    .password-requirements li.valid:before {
+      content: "✓";
+      color: #10b981;
+    }
+    
     /* Responsive Design */
     @media (max-width: 768px) {
       .form-box {
@@ -548,6 +619,16 @@
               <input type="password" id="password" class="form-input" placeholder="Enter your password">
               <i class="toggle-password fas fa-eye" id="togglePassword"></i>
             </div>
+            <div id="passwordStrength" class="password-strength-meter" style="display:none;">
+              <div class="strength-meter-bar"><div class="strength-meter-fill"></div></div>
+              <ul class="password-requirements">
+                <li id="req-length">8+ characters</li>
+                <li id="req-uppercase">Uppercase letter</li>
+                <li id="req-lowercase">Lowercase letter</li>
+                <li id="req-number">Number</li>
+                <li id="req-special">Special character</li>
+              </ul>
+            </div>
           </div>
           
           <!-- Confirm Password Field (Only for Signup) -->
@@ -626,6 +707,64 @@
       this.classList.toggle('fa-eye-slash');
     });
     
+    // Password strength validation
+    const passwordField = document.getElementById('password');
+    const passwordStrength = document.getElementById('passwordStrength');
+    const reqLength = document.getElementById('req-length');
+    const reqUppercase = document.getElementById('req-uppercase');
+    const reqLowercase = document.getElementById('req-lowercase');
+    const reqNumber = document.getElementById('req-number');
+    const reqSpecial = document.getElementById('req-special');
+    
+    passwordField.addEventListener('focus', function() {
+      passwordStrength.style.display = 'block';
+    });
+    
+    passwordField.addEventListener('input', function() {
+      const password = this.value;
+      
+      // Check requirements
+      const hasLength = password.length >= 8;
+      const hasUppercase = /[A-Z]/.test(password);
+      const hasLowercase = /[a-z]/.test(password);
+      const hasNumber = /[0-9]/.test(password);
+      const hasSpecial = /[^A-Za-z0-9]/.test(password);
+      
+      // Update visual indicators
+      toggleClass(reqLength, hasLength);
+      toggleClass(reqUppercase, hasUppercase);
+      toggleClass(reqLowercase, hasLowercase);
+      toggleClass(reqNumber, hasNumber);
+      toggleClass(reqSpecial, hasSpecial);
+      
+      // Calculate strength
+      const strength = [hasLength, hasUppercase, hasLowercase, hasNumber, hasSpecial].filter(Boolean).length;
+      
+      // Remove all classes
+      passwordStrength.className = 'password-strength-meter';
+      
+      // Add appropriate class based on strength
+      if (strength === 0) {
+        // No class
+      } else if (strength < 3) {
+        passwordStrength.classList.add('strength-weak');
+      } else if (strength < 4) {
+        passwordStrength.classList.add('strength-fair');
+      } else if (strength < 5) {
+        passwordStrength.classList.add('strength-good');
+      } else {
+        passwordStrength.classList.add('strength-strong');
+      }
+    });
+    
+    function toggleClass(element, isValid) {
+      if (isValid) {
+        element.classList.add('valid');
+      } else {
+        element.classList.remove('valid');
+      }
+    }
+    
     document.getElementById('toggleConfirmPassword').addEventListener('click', function() {
       const confirmField = document.getElementById('confirmPassword');
       const type = confirmField.type === 'password' ? 'text' : 'password';
@@ -671,6 +810,20 @@
       if (!email || !password) {
         showAlert("Please fill in all required fields.");
         return;
+      }
+      
+      // Validate password strength for signup
+      if (isSignup) {
+        const hasLength = password.length >= 8;
+        const hasUppercase = /[A-Z]/.test(password);
+        const hasLowercase = /[a-z]/.test(password);
+        const hasNumber = /[0-9]/.test(password);
+        const hasSpecial = /[^A-Za-z0-9]/.test(password);
+        
+        if (!hasLength || !hasUppercase || !hasLowercase || !hasNumber || !hasSpecial) {
+          showAlert("Please create a stronger password that meets all requirements.");
+          return;
+        }
       }
       
       // Show loading state

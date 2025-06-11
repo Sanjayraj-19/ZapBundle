@@ -94,13 +94,66 @@ app.post('/api/register', async (req, res) => {
     const existing = await usersCollection.findOne({ email });
     if (existing)
       return res.status(409).json({ error: 'Email already registered.' });
-
+      
+    // Generate verification token
+    const verificationToken = crypto.randomBytes(32).toString('hex');
+    const tokenExpiry = new Date();
+    tokenExpiry.setHours(tokenExpiry.getHours() + 24); // Token valid for 24 hours
+    
+    // Save user with verification pending status
     const hashed = await bcrypt.hash(password, 12);
-    const user = { email, password: hashed, name: name || "", createdAt: new Date() };
+    const user = { 
+      email, 
+      password: hashed, 
+      name: name || "", 
+      createdAt: new Date(),
+      verified: false,
+      verificationToken,
+      verificationExpires: tokenExpiry
+    };
+    
     await usersCollection.insertOne(user);
+    
+    // Send verification email
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+      }
+    });
+    
+    const verificationUrl = `${process.env.FRONTEND_URL || 'http://localhost:5500'}/verify.html?token=${verificationToken}`;
+    
+    const mailOptions = {
+      from: `"SaaSBundilo" <${process.env.EMAIL_USER}>`,
+      to: email,
+      subject: 'Verify Your SaaSBundilo Account',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 10px; background-color: #f9fafb;">
+          <div style="text-align: center; margin-bottom: 20px;">
+            <img src="https://example.com/logo.png" alt="SaaSBundilo Logo" style="max-width: 150px;">
+          </div>
+          <h2 style="color: #4f46e5; text-align: center;">Welcome to SaaSBundilo!</h2>
+          <p style="font-size: 16px; line-height: 1.6; color: #374151;">Hi ${name || 'there'},</p>
+          <p style="font-size: 16px; line-height: 1.6; color: #374151;">Thank you for signing up! Please verify your email address to complete your registration and access exclusive SaaS bundles at discounted prices.</p>
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="${verificationUrl}" style="background-color: #4f46e5; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">Verify Email Address</a>
+          </div>
+          <p style="font-size: 16px; line-height: 1.6; color: #374151;">This verification link will expire in 24 hours. If you did not create an account, please disregard this email.</p>
+          <p style="font-size: 16px; line-height: 1.6; color: #374151;">Best regards,<br>The SaaSBundilo Team</p>
+          <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0; text-align: center; color: #6b7280; font-size: 14px;">
+            <p>&copy; 2025 SaaSBundilo. All rights reserved.</p>
+          </div>
+        </div>
+      `
+    };
+    
+    await transporter.sendMail(mailOptions);
 
-    res.status(201).json({ message: 'User registered successfully.' });
+    res.status(201).json({ message: 'Registration initiated. Please check your email to verify your account.' });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: 'Registration failed.' });
   }
 });
