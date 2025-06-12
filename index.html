@@ -1103,6 +1103,10 @@
       background: var(--gradient-3);
     }
 
+    .notification-btn.popular {
+      background: var(--gradient-4);
+    }
+
     /* Mobile responsiveness */
     @media (max-width: 768px) {
       .notification-popup {
@@ -1263,7 +1267,6 @@
     <h2 class="fade-in">Help Us Build the Right Bundles</h2>
     <button class="survey-button fade-in" id="surveyBtn" onclick="startSurvey()"><i class="fas fa-clipboard-list"></i> Take the Survey</button>
     <button class="survey-button fade-in" id="resetSurveyBtn" onclick="resetSurveyData()" style="background: #dc3545; margin-left: 10px; font-size: 0.8rem; padding: 8px 16px;"><i class="fas fa-redo"></i> Reset Survey (Debug)</button>
-    <button class="survey-button fade-in" onclick="testNotification()" style="background: #28a745; margin-left: 10px; font-size: 0.8rem; padding: 8px 16px;"><i class="fas fa-bell"></i> Test Notification</button>
   </section>
   
   <!-- Testimonials Section -->
@@ -1710,7 +1713,7 @@
           console.log('❌ Bundles API not available - assuming no bundles');
         }
 
-        // Determine what notification to show - only for incomplete survey OR no bundles
+        // Determine what notification to show
         console.log('🔍 Analyzing notification conditions...');
         console.log('Survey completed (profile):', profile.surveyCompleted);
         console.log('Survey complete (data):', surveyData.isComplete);
@@ -1740,10 +1743,20 @@
             'fas fa-box-open'
           );
           shouldShowNotification = true;
+        } else if (profile.surveyCompleted && userBundles.length > 0) {
+          // User has completed survey and has bundles - show popular bundle notification
+          console.log('✅ Showing popular bundle notification');
+          showNotification(
+            'Discover Popular Bundles!',
+            'Check out trending bundles or create your own custom bundle',
+            'Explore Popular',
+            'popular',
+            'fas fa-fire'
+          );
+          shouldShowNotification = true;
         } else {
-          console.log('❌ No notification needed - user has completed survey and has bundles');
+          console.log('❌ No notification needed');
         }
-        // Don't show notification if user has completed survey AND has bundles
       } catch (error) {
         console.error('Error checking notification status:', error);
       }
@@ -1775,6 +1788,8 @@
         actionBtn.classList.add('secondary');
       } else if (action === 'create') {
         actionBtn.classList.add('success');
+      } else if (action === 'popular') {
+        actionBtn.classList.add('popular');
       }
 
       // Show notification
@@ -1790,8 +1805,14 @@
     }
 
     function closeNotification() {
+      console.log('🔴 Closing notification...');
       const popup = document.getElementById('notificationPopup');
-      popup.classList.remove('show');
+      if (popup) {
+        popup.classList.remove('show');
+        console.log('✅ Notification closed');
+      } else {
+        console.error('❌ Popup element not found when trying to close');
+      }
     }
 
 
@@ -1809,9 +1830,19 @@
             behavior: 'smooth' 
           });
           break;
+        case 'popular':
+          // Scroll to bundles section to show popular bundles
+          document.querySelector('.bundles-section').scrollIntoView({ 
+            behavior: 'smooth' 
+          });
+          break;
         case 'create':
           // Redirect to create bundle page (you can change this URL)
           window.location.href = '#create-bundle'; // Update with actual create bundle URL
+          break;
+        case 'signup':
+          // Redirect to signup page
+          window.location.href = 'signup.html';
           break;
         default:
           startSurvey();
@@ -1826,39 +1857,49 @@
       }, 2000);
     }
 
-    // Test function to manually trigger notification
-    function testNotification() {
-      console.log('🧪 Testing notification manually...');
-      
-      // Check if popup element exists
-      const popup = document.getElementById('notificationPopup');
-      console.log('Popup element found:', popup);
-      
-      if (!popup) {
-        console.error('❌ Notification popup element not found in DOM!');
-        alert('Notification popup element not found! Check console.');
+    // Show engagement notification for users who haven't taken action
+    async function showEngagementNotification() {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        // Show notification for non-logged-in users
+        if (!notificationShown) {
+          showNotification(
+            'Join SaaSBundilo Today!',
+            'Get early access to exclusive SaaS bundles and save up to 70%',
+            'Get Early Access',
+            'signup',
+            'fas fa-rocket'
+          );
+        }
         return;
       }
-      
-      // Reset flag and show notification
-      notificationShown = false;
-      
-      // Try direct approach first
-      console.log('Attempting to show popup directly...');
-      popup.style.display = 'block';
-      popup.style.opacity = '1';
-      popup.style.transform = 'translateX(0)';
-      popup.classList.add('show');
-      
-      // Also try the normal function
-      showNotification(
-        'Test Notification!',
-        'This is a test notification to check if the popup works',
-        'Test Action',
-        'survey',
-        'fas fa-bell'
-      );
+
+      // For logged-in users, check if they need encouragement
+      try {
+        const profileResponse = await fetch('https://zapbundle.onrender.com/api/profile', {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        
+        if (profileResponse.ok) {
+          const profile = await profileResponse.json();
+          
+          // If user hasn't completed survey after 30 seconds, show encouragement
+          if (!profile.surveyCompleted && !notificationShown) {
+            showNotification(
+              'Quick Survey - 2 Minutes!',
+              'Help us recommend the perfect SaaS bundles for your needs',
+              'Start Survey',
+              'survey',
+              'fas fa-clock'
+            );
+          }
+        }
+      } catch (error) {
+        console.log('Engagement notification error:', error);
+      }
     }
+
+
     
     // Ensure this runs after DOM is fully loaded
     window.addEventListener('DOMContentLoaded', function() {
@@ -1870,6 +1911,11 @@
       setTimeout(() => {
         checkAndShowNotification();
       }, 3000); // 3 second delay
+      
+      // Show additional engagement notification after 30 seconds if user is still on page
+      setTimeout(() => {
+        showEngagementNotification();
+      }, 30000); // 30 second delay
     });
     
     // Check if user already has this bundle
