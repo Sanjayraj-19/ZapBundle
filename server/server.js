@@ -32,15 +32,18 @@ const client = new MongoClient(process.env.MONGODB_URI);
 let usersCollection;
 
 async function connectDB() {
-  await client.connect();
-  const db = client.db('saaslink');
-  usersCollection = db.collection('users');
-  console.log('Connected to MongoDB');
+  try {
+    await client.connect();
+    const db = client.db('saaslink');
+    usersCollection = db.collection('users');
+    console.log('Connected to MongoDB');
+  } catch (error) {
+    console.error('MongoDB connection error:', error);
+    // Don't exit the process, just log the error
+    console.log('Server will continue without MongoDB connection');
+  }
 }
-connectDB().catch(err => {
-  console.error('MongoDB connection error:', err);
-  process.exit(1);
-});
+connectDB();
 
 // Middleware
 app.use(cors({
@@ -76,6 +79,11 @@ app.use('/api', (req, res, next) => {
 // Test endpoint for debugging
 app.get('/api/test', (req, res) => {
   res.json({ message: 'API is working', timestamp: new Date().toISOString() });
+});
+
+// Simple test endpoint without dependencies
+app.get('/test', (req, res) => {
+  res.send('Simple test working');
 });
 
 // JWT middleware
