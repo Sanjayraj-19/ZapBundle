@@ -203,35 +203,7 @@
       box-shadow: var(--shadow-lg);
     }
 
-    .notification-bell {
-      background: none;
-      border: none;
-      color: var(--primary);
-      font-size: 1.2rem;
-      cursor: pointer;
-      padding: 8px;
-      border-radius: 50%;
-      transition: all 0.3s ease;
-      margin-right: 15px;
-      position: relative;
-    }
 
-    .notification-bell:hover {
-      background-color: rgba(99, 102, 241, 0.1);
-      transform: scale(1.1);
-    }
-
-    .notification-bell.has-notification::after {
-      content: '';
-      position: absolute;
-      top: 5px;
-      right: 5px;
-      width: 8px;
-      height: 8px;
-      background-color: var(--danger);
-      border-radius: 50%;
-      animation: notificationPulse 2s infinite;
-    }
     
     /* Hero Section */
     .hero-section {
@@ -1027,7 +999,7 @@
     /* Notification Popup Styles */
     .notification-popup {
       position: fixed;
-      top: 20px;
+      top: 100px;
       right: 20px;
       width: 350px;
       background: white;
@@ -1134,7 +1106,7 @@
       .notification-popup {
         width: 300px;
         right: 10px;
-        top: 10px;
+        top: 90px;
       }
 
       .notification-content {
@@ -1517,9 +1489,6 @@
       // Show avatar/profile dropdown
       const profilePic = profile.profilePic || 'icons/default-profile.png';
       navArea.innerHTML = `
-        <button class="notification-bell" onclick="checkAndShowNotification(true)" title="Show recommendations">
-          <i class="fas fa-bell"></i>
-        </button>
         <div class="dropdown" id="dropdown">
           <img id="navProfilePic" class="dropdown-avatar" src="${profilePic}" alt="Profile" />
           <div class="dropdown-menu" id="dropdownMenu">
@@ -1671,12 +1640,12 @@
     let notificationAction = 'survey'; // 'survey', 'bundles', 'create'
     let notificationShown = false;
 
-    async function checkAndShowNotification(forceShow = false) {
+    async function checkAndShowNotification() {
       const token = localStorage.getItem('token');
       if (!token) return; // Don't show notifications for non-logged-in users
 
-      // Don't show if already shown in this session (unless forced)
-      if (notificationShown && !forceShow) return;
+      // Don't show if already shown in this session
+      if (notificationShown) return;
 
       try {
         // Check user's current status
@@ -1714,11 +1683,11 @@
           userBundles = await bundlesResponse.json();
         }
 
-        // Determine what notification to show
+        // Determine what notification to show - only for incomplete survey OR no bundles
         let shouldShowNotification = false;
         
         if (!profile.surveyCompleted && !surveyData.isComplete) {
-          // User hasn't completed survey
+          // User hasn't completed survey - PRIORITY 1
           showNotification(
             'Complete Your Journey!',
             'Take our survey to get personalized bundle recommendations',
@@ -1728,7 +1697,7 @@
           );
           shouldShowNotification = true;
         } else if (profile.surveyCompleted && userBundles.length === 0) {
-          // User completed survey but has no bundles
+          // User completed survey but has no bundles - PRIORITY 2
           showNotification(
             'Ready for Bundles!',
             'Great! Now choose from our curated bundles or create your own',
@@ -1737,20 +1706,8 @@
             'fas fa-box-open'
           );
           shouldShowNotification = true;
-        } else if (userBundles.length > 0) {
-          // User has bundles, encourage creating more
-          showNotification(
-            'Expand Your Toolkit!',
-            `You have ${userBundles.length} bundle${userBundles.length > 1 ? 's' : ''}. Create more to save even more!`,
-            'Create Bundle',
-            'create',
-            'fas fa-plus-circle'
-          );
-          shouldShowNotification = true;
         }
-        
-        // Update notification bell indicator
-        updateNotificationBell(shouldShowNotification);
+        // Don't show notification if user has completed survey AND has bundles
       } catch (error) {
         console.error('Error checking notification status:', error);
       }
@@ -1795,16 +1752,7 @@
       popup.classList.remove('show');
     }
 
-    function updateNotificationBell(hasNotification) {
-      const bell = document.querySelector('.notification-bell');
-      if (bell) {
-        if (hasNotification) {
-          bell.classList.add('has-notification');
-        } else {
-          bell.classList.remove('has-notification');
-        }
-      }
-    }
+
 
     function handleNotificationAction() {
       closeNotification();
@@ -1841,7 +1789,11 @@
       clearOldSurveyData(); // Clear old localStorage data
       renderNavButtonArea();
       updateSurveyButton();
-      checkAndShowNotification(); // Check if notification should be shown
+      
+      // Show notification after a delay so users can see the page first
+      setTimeout(() => {
+        checkAndShowNotification();
+      }, 3000); // 3 second delay
     });
     
     // Check if user already has this bundle
