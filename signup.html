@@ -805,6 +805,16 @@
               <input type="password" id="newPassword" class="form-input" placeholder="Enter new password">
               <i class="toggle-password fas fa-eye" onclick="togglePasswordVisibility('newPassword', this)"></i>
             </div>
+            <div id="newPasswordStrength" class="password-strength-meter" style="display:none;">
+              <div class="strength-meter-bar"><div class="strength-meter-fill"></div></div>
+              <ul class="password-requirements">
+                <li id="new-req-length">8+ characters</li>
+                <li id="new-req-uppercase">Uppercase letter</li>
+                <li id="new-req-lowercase">Lowercase letter</li>
+                <li id="new-req-number">Number</li>
+                <li id="new-req-special">Special character</li>
+              </ul>
+            </div>
           </div>
           <div class="form-group">
             <label for="confirmNewPassword">Confirm New Password</label>
@@ -1425,9 +1435,50 @@
       return emailRegex.test(email);
     }
 
+    // Password strength validation function
+    function validatePasswordStrength(password) {
+      const requirements = {
+        length: password.length >= 8,
+        uppercase: /[A-Z]/.test(password),
+        lowercase: /[a-z]/.test(password),
+        number: /[0-9]/.test(password),
+        special: /[^A-Za-z0-9]/.test(password)
+      };
+
+      const failedRequirements = [];
+      if (!requirements.length) failedRequirements.push('at least 8 characters');
+      if (!requirements.uppercase) failedRequirements.push('an uppercase letter');
+      if (!requirements.lowercase) failedRequirements.push('a lowercase letter');
+      if (!requirements.number) failedRequirements.push('a number');
+      if (!requirements.special) failedRequirements.push('a special character');
+
+      if (failedRequirements.length > 0) {
+        return {
+          isValid: false,
+          message: `Password must contain ${failedRequirements.join(', ')}`
+        };
+      }
+
+      return { isValid: true };
+    }
+
     // Forgot Password Functions
     let resetEmail = '';
     let resetOtpToken = '';
+
+    // Check server connectivity
+    async function checkServerConnection() {
+      try {
+        const response = await fetch(`${API_URL}/api/health`, { 
+          method: 'GET',
+          timeout: 5000 
+        });
+        return response.ok;
+      } catch (error) {
+        console.warn('Server connectivity check failed:', error);
+        return false;
+      }
+    }
 
     function showForgotPasswordModal() {
       document.getElementById('forgotPasswordModal').style.display = 'flex';
@@ -1459,7 +1510,7 @@
 
     async function sendResetCode() {
       const email = document.getElementById('forgotEmail').value.trim();
-      const button = event.target;
+      const button = document.querySelector('#forgotStep1 .form-button');
       
       if (!email) {
         showAlert('Please enter your email address', 'error');
@@ -1500,7 +1551,11 @@
         }
       } catch (error) {
         console.error('Reset code error:', error);
-        showAlert('Network error. Please try again.', 'error');
+        if (error.message.includes('Failed to fetch') || error.message.includes('ERR_CONNECTION_CLOSED')) {
+          showAlert('Unable to connect to server. Please check your internet connection and try again.', 'error');
+        } else {
+          showAlert('Network error. Please try again.', 'error');
+        }
       } finally {
         button.classList.remove('loading');
         button.disabled = false;
@@ -1509,7 +1564,7 @@
 
     async function verifyResetCode() {
       const otp = document.getElementById('resetOtp').value.trim();
-      const button = event.target;
+      const button = document.querySelector('#forgotStep2 .form-button');
       
       if (!otp) {
         showAlert('Please enter the verification code', 'error');
@@ -1552,7 +1607,11 @@
         }
       } catch (error) {
         console.error('OTP verification error:', error);
-        showAlert('Network error. Please try again.', 'error');
+        if (error.message.includes('Failed to fetch') || error.message.includes('ERR_CONNECTION_CLOSED')) {
+          showAlert('Unable to connect to server. Please check your internet connection and try again.', 'error');
+        } else {
+          showAlert('Network error. Please try again.', 'error');
+        }
       } finally {
         button.classList.remove('loading');
         button.disabled = false;
@@ -1590,7 +1649,7 @@
     async function resetPassword() {
       const newPassword = document.getElementById('newPassword').value;
       const confirmPassword = document.getElementById('confirmNewPassword').value;
-      const button = event.target;
+      const button = document.querySelector('#forgotStep3 .form-button');
       
       if (!newPassword || !confirmPassword) {
         showAlert('Please fill in both password fields', 'error');
@@ -1602,8 +1661,10 @@
         return;
       }
 
-      if (newPassword.length < 8) {
-        showAlert('Password must be at least 8 characters long', 'error');
+      // Validate password strength
+      const passwordValidation = validatePasswordStrength(newPassword);
+      if (!passwordValidation.isValid) {
+        showAlert(passwordValidation.message, 'error');
         return;
       }
 
@@ -1648,7 +1709,11 @@
         }
       } catch (error) {
         console.error('Password reset error:', error);
-        showAlert('Network error. Please try again.', 'error');
+        if (error.message.includes('Failed to fetch') || error.message.includes('ERR_CONNECTION_CLOSED')) {
+          showAlert('Unable to connect to server. Please check your internet connection and try again.', 'error');
+        } else {
+          showAlert('Network error. Please try again.', 'error');
+        }
       } finally {
         button.classList.remove('loading');
         button.disabled = false;
@@ -1688,7 +1753,7 @@
       }
     });
 
-    // Auto-format OTP input (numbers only)
+    // Auto-format OTP input (numbers only) and handle password strength
     document.addEventListener('input', function(event) {
       if (event.target.id === 'resetOtp') {
         // Remove non-numeric characters
@@ -1700,8 +1765,50 @@
             verifyResetCode();
           }, 500); // Small delay for better UX
         }
+      } else if (event.target.id === 'newPassword') {
+        // Show password strength indicator
+        const strengthMeter = document.getElementById('newPasswordStrength');
+        strengthMeter.style.display = 'block';
+        updatePasswordStrength(event.target.value, 'new-');
       }
     });
+
+    // Show password strength on focus
+    document.addEventListener('focus', function(event) {
+      if (event.target.id === 'newPassword') {
+        document.getElementById('newPasswordStrength').style.display = 'block';
+      }
+    }, true);
+
+    // Update password strength indicators
+    function updatePasswordStrength(password, prefix) {
+      const requirements = {
+        length: password.length >= 8,
+        uppercase: /[A-Z]/.test(password),
+        lowercase: /[a-z]/.test(password),
+        number: /[0-9]/.test(password),
+        special: /[^A-Za-z0-9]/.test(password)
+      };
+
+      // Update visual indicators
+      document.getElementById(prefix + 'req-length').classList.toggle('valid', requirements.length);
+      document.getElementById(prefix + 'req-uppercase').classList.toggle('valid', requirements.uppercase);
+      document.getElementById(prefix + 'req-lowercase').classList.toggle('valid', requirements.lowercase);
+      document.getElementById(prefix + 'req-number').classList.toggle('valid', requirements.number);
+      document.getElementById(prefix + 'req-special').classList.toggle('valid', requirements.special);
+
+      // Update strength meter
+      const validCount = Object.values(requirements).filter(Boolean).length;
+      const strengthMeter = document.querySelector(`#${prefix.slice(0, -1)}PasswordStrength .strength-meter-bar`);
+      
+      if (strengthMeter) {
+        strengthMeter.className = 'strength-meter-bar';
+        if (validCount >= 5) strengthMeter.classList.add('strength-strong');
+        else if (validCount >= 4) strengthMeter.classList.add('strength-good');
+        else if (validCount >= 2) strengthMeter.classList.add('strength-fair');
+        else if (validCount >= 1) strengthMeter.classList.add('strength-weak');
+      }
+    }
   </script>
 </body>
 </html>
