@@ -554,7 +554,7 @@ app.get('/api/verify-email', async (req, res) => {
     }
     
     // Generate a login token for the user so they're automatically logged in
-    const token = jwt.sign(
+    const authToken = jwt.sign(
       { userId: user._id, email: user.email },
       JWT_SECRET,
       { expiresIn: '7d' }
@@ -563,7 +563,7 @@ app.get('/api/verify-email', async (req, res) => {
     res.json({ 
       success: true, 
       message: "Email verified successfully. You are now logged in.",
-      token: token,
+      token: authToken,
       email: user.email  // Include the email to help with multi-device verification
     });
   } catch (err) {
