@@ -1276,6 +1276,7 @@
     </p>
     <button class="survey-button fade-in" onclick="scrollToCreateBundle()"><i class="fas fa-plus-circle"></i> Create Your Own Bundle</button>
     <button class="survey-button fade-in" id="surveyBtn" onclick="startSurvey()" style="background: var(--gradient-2); margin-left: 10px;"><i class="fas fa-clipboard-list"></i> Take Survey</button>
+    <button class="survey-button fade-in" onclick="forceRefreshSurveyStatus()" style="background: #28a745; margin-left: 10px; font-size: 0.8rem; padding: 8px 16px;"><i class="fas fa-sync"></i> Refresh Status</button>
     <button class="survey-button fade-in" id="resetSurveyBtn" onclick="resetSurveyData()" style="background: #dc3545; margin-left: 10px; font-size: 0.8rem; padding: 8px 16px;"><i class="fas fa-redo"></i> Reset Survey (Debug)</button>
   </section>
   
@@ -1564,15 +1565,18 @@
         
         if (response.ok) {
           const profile = await response.json();
+          console.log('🔍 Profile survey status:', profile.surveyCompleted);
           
           if (profile.surveyCompleted) {
             // User has completed the survey in database
+            console.log('✅ Survey completed - updating button');
             surveyBtn.innerHTML = '<i class="fas fa-check-circle"></i> Survey Completed';
             surveyBtn.style.background = 'linear-gradient(135deg, var(--success) 0%, var(--accent) 100%)';
             surveyBtn.onclick = function() {
               alert('Thank you for completing our survey! 🎉');
             };
           } else {
+            console.log('❌ Survey not completed - checking partial data');
             // Check if user has partial survey data
             try {
               const surveyResponse = await fetch('https://zapbundle.onrender.com/api/survey', {
@@ -1686,6 +1690,7 @@
 
         const profile = await profileResponse.json();
         console.log('👤 Profile data:', profile);
+        console.log('👤 Profile surveyCompleted field:', profile.surveyCompleted, typeof profile.surveyCompleted);
         
         // Check survey status
         console.log('📋 Fetching survey data...');
@@ -1865,6 +1870,21 @@
       setTimeout(() => {
         checkAndShowNotification();
       }, 2000);
+    }
+
+    // Force refresh survey status (debug function)
+    async function forceRefreshSurveyStatus() {
+      console.log('🔄 Force refreshing survey status...');
+      
+      // Update survey button
+      await updateSurveyButton();
+      
+      // Reset and check notifications
+      notificationShown = false;
+      await checkAndShowNotification();
+      
+      console.log('✅ Survey status refreshed');
+      alert('Survey status refreshed! Check console for details.');
     }
 
     // Scroll to create bundle section
@@ -2743,6 +2763,8 @@
         );
         
         const isComplete = unansweredRequired.length === 0;
+        console.log('📋 Survey submission - isComplete:', isComplete);
+        console.log('📋 Unanswered required questions:', unansweredRequired.length);
         
         const response = await fetch('https://zapbundle.onrender.com/api/survey', {
           method: 'POST',
