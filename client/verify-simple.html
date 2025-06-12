@@ -76,8 +76,8 @@
     
     <div id="success" class="status hidden">
       <p class="success">Your email has been verified successfully!</p>
-      <p>You will be redirected to the login page shortly.</p>
-      <a href="https://sanjayraj-19.github.io/FrontEndZapBundle/index.html" class="button">Go to Homepage</a>
+      <p>You are now logged in. Redirecting to your profile page...</p>
+      <a href="https://sanjayraj-19.github.io/FrontEndZapBundle/profile.html" class="button">Go to Profile</a>
     </div>
     
     <div id="error" class="status hidden">
@@ -129,10 +129,41 @@
           
           if (data.success) {
             showStatus('success');
-            // Redirect to homepage after 3 seconds
+            
+            // Get the verified email from the response if available
+            const verifiedEmail = data.email || '';
+            
+            // Clear any pending verification status in localStorage to help multi-device flow
+            if (verifiedEmail) {
+              localStorage.removeItem('pendingVerification');
+              localStorage.removeItem('pendingVerificationTime');
+            }
+            
+            // Store the user's login token in localStorage to maintain login state
+            localStorage.setItem('token', data.token);
+            
+            // Redirect to profile page after 2 seconds with authentication token
             setTimeout(() => {
-              window.location.href = "https://sanjayraj-19.github.io/FrontEndZapBundle/index.html";
-            }, 3000);
+              // Check if survey is completed
+              fetch("https://zapbundle.onrender.com/api/profile", {
+                headers: { "Authorization": "Bearer " + data.token }
+              })
+              .then(response => response.json())
+              .then(profile => {
+                const surveyCompleted = localStorage.getItem('surveyCompleted') === 'true';
+                
+                // Redirect based on survey completion
+                if (profile.surveyCompleted || surveyCompleted) {
+                  window.location.replace("https://sanjayraj-19.github.io/FrontEndZapBundle/profile.html");
+                } else {
+                  window.location.replace("https://sanjayraj-19.github.io/FrontEndZapBundle/survey.html");
+                }
+              })
+              .catch(() => {
+                // Fallback to profile page if API call fails
+                window.location.replace("https://sanjayraj-19.github.io/FrontEndZapBundle/profile.html");
+              });
+            }, 2000);
           } else {
             showStatus('error');
             document.getElementById('error-message').textContent = data.message || 'Verification failed.';

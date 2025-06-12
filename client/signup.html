@@ -120,22 +120,21 @@
     }
     
     .logo-img {
-      height: 44px;
-      width: 44px;
-      border-radius: 12px;
-      background: #fff;
-      box-shadow: var(--shadow-md);
-      border: 2px solid var(--primary);
-      object-fit: cover;
+      height: 60px;
+      width: auto;
+      background: transparent;
+      box-shadow: none;
+      border: none;
+      object-fit: contain;
       transition: transform 0.3s ease;
     }
     
     .logo-img:hover {
-      transform: rotate(-5deg) scale(1.1);
+      transform: scale(1.05);
     }
     
     .logo-text {
-      font-size: 1.8rem;
+      font-size: 2.2rem;
       font-weight: 700;
       background: var(--gradient-1);
       -webkit-background-clip: text;
@@ -559,7 +558,7 @@
   <!-- Navbar -->
   <nav class="navbar">
     <a href="index.html" class="logo-bar">
-      <img src="icons/SaaSBundilo.jpg" alt="SaaSBundilo Logo" class="logo-img" style="border-radius: 12px; object-fit: cover; display: block;">
+      <img src="icons/SaaSBundilo.jpg" alt="SaaSBundilo Logo" class="logo-img" style="display: block;">
     </a>
     <a href="index.html" class="top-button">Back to Home</a>
   </nav>
@@ -921,9 +920,24 @@
           const data = await res.json();
           
           if (!res.ok) {
-            showAlert(data.error || "Login failed.");
-            resetButton();
-            return;
+            if (data.error === "Please verify your email before logging in.") {
+              // Store email pending verification and start verification check polling
+              localStorage.setItem('pendingVerification', email);
+              localStorage.setItem('pendingVerificationTime', new Date().getTime());
+              
+              // Show special verification alert
+              showAlert("Please check your email and verify your account. This page will automatically update when verified.", "info");
+              
+              // Start polling for verification status
+              startVerificationPolling(email);
+              
+              resetButton();
+              return;
+            } else {
+              showAlert(data.error || "Login failed.");
+              resetButton();
+              return;
+            }
           }
           
           // Save JWT token
@@ -1023,6 +1037,202 @@
         }, 300);
       }, 4000);
     }
+    
+    // Update the showAlert function to support info type
+    function showInfoAlert(message) {
+      const alertBox = document.createElement('div');
+      alertBox.style.position = 'fixed';
+      alertBox.style.top = '100px';
+      alertBox.style.left = '50%';
+      alertBox.style.transform = 'translateX(-50%)';
+      alertBox.style.padding = '15px 25px';
+      alertBox.style.borderRadius = '8px';
+      alertBox.style.boxShadow = 'var(--shadow-lg)';
+      alertBox.style.zIndex = '9999';
+      alertBox.style.fontSize = '0.95rem';
+      alertBox.style.fontWeight = '500';
+      alertBox.style.display = 'flex';
+      alertBox.style.alignItems = 'center';
+      alertBox.style.gap = '10px';
+      alertBox.style.backgroundColor = '#e0f2fe';
+      alertBox.style.color = '#0369a1';
+      alertBox.innerHTML = `<i class="fas fa-info-circle"></i> ${message}`;
+      
+      document.body.appendChild(alertBox);
+      
+      // Animate in
+      alertBox.style.opacity = '0';
+      alertBox.style.transform = 'translateX(-50%) translateY(-20px)';
+      alertBox.style.transition = 'all 0.3s ease';
+      
+      setTimeout(() => {
+        alertBox.style.opacity = '1';
+        alertBox.style.transform = 'translateX(-50%) translateY(0)';
+      }, 10);
+      
+      // Return the alert element so it can be removed later
+      return alertBox;
+    }
+    
+    // Verification polling mechanism
+    let pollingInterval;
+    let verificationAlert;
+    
+    function startVerificationPolling(email) {
+      // Clear any existing polling
+      if (pollingInterval) clearInterval(pollingInterval);
+      
+      // Create or update status indicator
+      const statusIndicator = document.createElement('div');
+      statusIndicator.id = 'verification-status';
+      statusIndicator.style.position = 'fixed';
+      statusIndicator.style.bottom = '20px';
+      statusIndicator.style.right = '20px';
+      statusIndicator.style.padding = '10px 15px';
+      statusIndicator.style.backgroundColor = 'rgba(99, 102, 241, 0.1)';
+      statusIndicator.style.color = 'var(--primary)';
+      statusIndicator.style.borderRadius = '6px';
+      statusIndicator.style.boxShadow = 'var(--shadow-sm)';
+      statusIndicator.style.fontSize = '0.85rem';
+      statusIndicator.style.display = 'flex';
+      statusIndicator.style.alignItems = 'center';
+      statusIndicator.style.gap = '8px';
+      statusIndicator.innerHTML = '<i class="fas fa-sync fa-spin"></i> Waiting for email verification...';
+      
+      // Remove any existing indicator
+      if (document.getElementById('verification-status')) {
+        document.getElementById('verification-status').remove();
+      }
+      document.body.appendChild(statusIndicator);
+      
+      // Show persistent info alert
+      if (verificationAlert) {
+        document.body.removeChild(verificationAlert);
+      }
+      verificationAlert = showInfoAlert("Please verify your email. This page will update automatically when verified.");
+      verificationAlert.style.top = '20px';
+      
+      // Check every 5 seconds
+      pollingInterval = setInterval(async () => {
+        try {
+          // Try to log in with the same credentials
+          const password = document.getElementById('password').value;
+          
+          // If no password (page refresh), stop polling
+          if (!password) {
+            clearInterval(pollingInterval);
+            if (document.getElementById('verification-status')) {
+              document.getElementById('verification-status').remove();
+            }
+            return;
+          }
+          
+          const res = await fetch(`${API_URL}/api/login`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password })
+          });
+          
+          const data = await res.json();
+          
+          // If login successful, verification is complete
+          if (res.ok && data.token) {
+            clearInterval(pollingInterval);
+            
+            // Remove the indicators
+            if (document.getElementById('verification-status')) {
+              document.getElementById('verification-status').remove();
+            }
+            if (verificationAlert) {
+              document.body.removeChild(verificationAlert);
+            }
+            
+            // Save token and clear pending verification
+            localStorage.setItem('token', data.token);
+            localStorage.removeItem('pendingVerification');
+            localStorage.removeItem('pendingVerificationTime');
+            
+            // Show success message
+            showAlert("Email verified successfully! Redirecting...", "success");
+            
+            // Check if survey is completed
+            setTimeout(async () => {
+              try {
+                const profileRes = await fetch(`${API_URL}/api/profile`, {
+                  headers: { "Authorization": "Bearer " + data.token }
+                });
+                
+                if (profileRes.ok) {
+                  const profile = await profileRes.json();
+                  const surveyCompleted = localStorage.getItem('surveyCompleted') === 'true';
+                  
+                  // Redirect based on survey completion
+                  if (profile.surveyCompleted || surveyCompleted) {
+                    window.location.href = "profile.html";
+                  } else {
+                    window.location.href = "survey.html";
+                  }
+                } else {
+                  window.location.href = "profile.html";
+                }
+              } catch {
+                window.location.href = "profile.html";
+              }
+            }, 1500);
+          }
+        } catch (error) {
+          console.error("Verification check error:", error);
+        }
+      }, 5000); // Check every 5 seconds
+    }
+    
+    // Check for pending verification on page load
+    window.addEventListener('DOMContentLoaded', function() {
+      // Check if there's a pending verification
+      const pendingEmail = localStorage.getItem('pendingVerification');
+      const pendingTime = localStorage.getItem('pendingVerificationTime');
+      
+      // If verification has been pending for more than 30 minutes, clear it
+      if (pendingEmail && pendingTime) {
+        const thirtyMinutes = 30 * 60 * 1000;
+        const now = new Date().getTime();
+        
+        if (now - parseInt(pendingTime) > thirtyMinutes) {
+          localStorage.removeItem('pendingVerification');
+          localStorage.removeItem('pendingVerificationTime');
+        } else if (document.getElementById('email') && document.getElementById('password')) {
+          // Auto-fill the email field and start polling
+          document.getElementById('email').value = pendingEmail;
+          
+          // Switch to login mode if in signup mode
+          if (isSignup) {
+            toggleForm();
+          }
+          
+          // Show pending verification message
+          showInfoAlert("Waiting for email verification. Check your email and verify your account.");
+          
+          // Focus on password field
+          document.getElementById('password').focus();
+          
+          // Add event listener for password field
+          document.getElementById('password').addEventListener('keyup', function(e) {
+            if (e.key === 'Enter' && this.value.trim() !== '') {
+              startVerificationPolling(pendingEmail);
+            }
+          });
+          
+          // Add helper text
+          const helperText = document.createElement('div');
+          helperText.style.marginTop = '10px';
+          helperText.style.fontSize = '0.85rem';
+          helperText.style.color = 'var(--primary)';
+          helperText.style.textAlign = 'center';
+          helperText.innerHTML = 'Enter your password and press Enter to start verification polling';
+          document.getElementById('password').parentNode.appendChild(helperText);
+        }
+      }
+    });
   </script>
 </body>
 </html>

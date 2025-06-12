@@ -553,7 +553,19 @@ app.get('/api/verify-email', async (req, res) => {
       // Continue with verification even if welcome email fails
     }
     
-    res.json({ success: true, message: "Email verified successfully. You can now log in." });
+    // Generate a login token for the user so they're automatically logged in
+    const token = jwt.sign(
+      { userId: user._id, email: user.email },
+      JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+    
+    res.json({ 
+      success: true, 
+      message: "Email verified successfully. You are now logged in.",
+      token: token,
+      email: user.email  // Include the email to help with multi-device verification
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Verification failed. Please try again later." });
