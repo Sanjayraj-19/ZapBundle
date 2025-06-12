@@ -165,7 +165,7 @@
     <div id="success" class="status hidden">
       <p class="success">Your email has been verified successfully!</p>
       <p>You are now logged in. Redirecting to your profile page...</p>
-      <a href="https://sanjayraj-19.github.io/FrontEndZapBundle/profile.html" class="button">Go to Profile</a>
+      <a href="index.html" class="button">Go to Home</a>
     </div>
     
     <div id="error" class="status hidden">
@@ -424,14 +424,14 @@
               
               // Redirect based on survey completion
               if (profile.surveyCompleted || surveyCompleted) {
-                window.location.replace("https://sanjayraj-19.github.io/FrontEndZapBundle/profile.html");
+                window.location.replace("index.html");
               } else {
-                window.location.replace("https://sanjayraj-19.github.io/FrontEndZapBundle/survey.html");
+                window.location.replace("index.html");
               }
             })
             .catch(() => {
               // Fallback to profile page if API call fails
-              window.location.replace("https://sanjayraj-19.github.io/FrontEndZapBundle/profile.html");
+              window.location.replace("index.html");
             });
           }, 2000);
         } else {

@@ -978,16 +978,16 @@
                     console.log("Local survey data could be synced to server");
                   }
                 }
-                window.location.href = "profile.html";
+                window.location.href = "index.html";
               } else {
-                // If no survey completed, direct to survey
-                window.location.href = "survey.html";
+                // If no survey completed, direct to home page with survey popup
+                window.location.href = "index.html";
               }
             } else {
-              window.location.href = "profile.html";
+              window.location.href = "index.html";
             }
           } catch {
-            window.location.href = "profile.html";
+            window.location.href = "index.html";
           }
         } catch (err) {
           showAlert("Network error. Please try again.");
@@ -1182,15 +1182,15 @@
                   
                   // Redirect based on survey completion
                   if (profile.surveyCompleted || surveyCompleted) {
-                    window.location.href = "profile.html";
+                    window.location.href = "index.html";
                   } else {
-                    window.location.href = "survey.html";
+                    window.location.href = "index.html";
                   }
                 } else {
-                  window.location.href = "profile.html";
+                  window.location.href = "index.html";
                 }
               } catch {
-                window.location.href = "profile.html";
+                window.location.href = "index.html";
               }
             }, 1500);
           }
