@@ -1276,8 +1276,6 @@
     </p>
     <button class="survey-button fade-in" onclick="scrollToCreateBundle()"><i class="fas fa-plus-circle"></i> Create Your Own Bundle</button>
     <button class="survey-button fade-in" id="surveyBtn" onclick="startSurvey()" style="background: var(--gradient-2); margin-left: 10px;"><i class="fas fa-clipboard-list"></i> Take Survey</button>
-    <button class="survey-button fade-in" onclick="forceRefreshSurveyStatus()" style="background: #28a745; margin-left: 10px; font-size: 0.8rem; padding: 8px 16px;"><i class="fas fa-sync"></i> Refresh Status</button>
-    <button class="survey-button fade-in" id="resetSurveyBtn" onclick="resetSurveyData()" style="background: #dc3545; margin-left: 10px; font-size: 0.8rem; padding: 8px 16px;"><i class="fas fa-redo"></i> Reset Survey (Debug)</button>
   </section>
   
   <!-- Testimonials Section -->
@@ -1567,45 +1565,71 @@
           const profile = await response.json();
           console.log('🔍 Profile survey status:', profile.surveyCompleted);
           
-          if (profile.surveyCompleted) {
-            // User has completed the survey in database
-            console.log('✅ Survey completed - updating button');
-            surveyBtn.innerHTML = '<i class="fas fa-check-circle"></i> Survey Completed';
-            surveyBtn.style.background = 'linear-gradient(135deg, var(--success) 0%, var(--accent) 100%)';
-            surveyBtn.onclick = function() {
-              alert('Thank you for completing our survey! 🎉');
-            };
-          } else {
-            console.log('❌ Survey not completed - checking partial data');
-            // Check if user has partial survey data
-            try {
-              const surveyResponse = await fetch('https://zapbundle.onrender.com/api/survey', {
-                headers: {
-                  'Authorization': 'Bearer ' + token
-                }
-              });
+          // Always check survey data to get the most accurate status
+          try {
+            const surveyResponse = await fetch('https://zapbundle.onrender.com/api/survey', {
+              headers: {
+                'Authorization': 'Bearer ' + token
+              }
+            });
+            
+            if (surveyResponse.ok) {
+              const surveyData = await surveyResponse.json();
+              console.log('📋 Survey data isComplete:', surveyData.isComplete);
               
-              if (surveyResponse.ok) {
-                const surveyData = await surveyResponse.json();
+              // Use survey data as primary source, fallback to profile
+              const isSurveyCompleted = surveyData.isComplete || profile.surveyCompleted || false;
+              
+              if (isSurveyCompleted) {
+                // User has completed the survey
+                console.log('✅ Survey completed - updating button');
+                surveyBtn.innerHTML = '<i class="fas fa-check-circle"></i> Survey Completed';
+                surveyBtn.style.background = 'linear-gradient(135deg, var(--success) 0%, var(--accent) 100%)';
+                surveyBtn.onclick = function() {
+                  alert('Thank you for completing our survey! 🎉');
+                };
+              } else {
                 const hasPartialData = Object.keys(surveyData.answers || {}).length > 0;
                 
                 if (hasPartialData) {
+                  console.log('⚠️ Survey has partial data - showing continue button');
                   surveyBtn.innerHTML = '<i class="fas fa-edit"></i> Continue Survey';
                   surveyBtn.style.background = 'linear-gradient(135deg, var(--warning) 0%, var(--secondary) 100%)';
                 } else {
+                  console.log('📝 No survey data - showing take survey button');
                   surveyBtn.innerHTML = '<i class="fas fa-clipboard-list"></i> Take the Survey';
                   surveyBtn.style.background = ''; // Reset background
                 }
+                surveyBtn.onclick = startSurvey;
+              }
+            } else {
+              // Survey API failed, fallback to profile data only
+              if (profile.surveyCompleted) {
+                surveyBtn.innerHTML = '<i class="fas fa-check-circle"></i> Survey Completed';
+                surveyBtn.style.background = 'linear-gradient(135deg, var(--success) 0%, var(--accent) 100%)';
+                surveyBtn.onclick = function() {
+                  alert('Thank you for completing our survey! 🎉');
+                };
               } else {
                 surveyBtn.innerHTML = '<i class="fas fa-clipboard-list"></i> Take the Survey';
-                surveyBtn.style.background = ''; // Reset background
+                surveyBtn.style.background = '';
+                surveyBtn.onclick = startSurvey;
               }
-            } catch (surveyError) {
-              surveyBtn.innerHTML = '<i class="fas fa-clipboard-list"></i> Take the Survey';
-              surveyBtn.style.background = ''; // Reset background
             }
-            
-            surveyBtn.onclick = startSurvey;
+          } catch (surveyError) {
+            console.error('Error fetching survey data:', surveyError);
+            // Fallback to profile data only
+            if (profile.surveyCompleted) {
+              surveyBtn.innerHTML = '<i class="fas fa-check-circle"></i> Survey Completed';
+              surveyBtn.style.background = 'linear-gradient(135deg, var(--success) 0%, var(--accent) 100%)';
+              surveyBtn.onclick = function() {
+                alert('Thank you for completing our survey! 🎉');
+              };
+            } else {
+              surveyBtn.innerHTML = '<i class="fas fa-clipboard-list"></i> Take the Survey';
+              surveyBtn.style.background = '';
+              surveyBtn.onclick = startSurvey;
+            }
           }
         } else {
           // API call failed, fallback to default
@@ -1637,35 +1661,7 @@
       localStorage.removeItem('surveys');
     }
 
-    // Debug function to reset survey data
-    async function resetSurveyData() {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        alert('Please log in first');
-        return;
-      }
 
-      if (confirm('Are you sure you want to reset your survey data? This will delete all your answers.')) {
-        try {
-          const response = await fetch('https://zapbundle.onrender.com/api/survey/reset', {
-            method: 'DELETE',
-            headers: {
-              'Authorization': 'Bearer ' + token
-            }
-          });
-
-          if (response.ok) {
-            alert('Survey data reset successfully!');
-            updateSurveyButton();
-          } else {
-            alert('Failed to reset survey data');
-          }
-        } catch (error) {
-          console.error('Reset error:', error);
-          alert('Error resetting survey data');
-        }
-      }
-    }
 
     // Notification System
     let notificationAction = 'survey'; // 'survey', 'bundles', 'create'
@@ -1748,8 +1744,8 @@
         
         let shouldShowNotification = false;
         
-        // Use profile.surveyCompleted as the primary source of truth
-        const isSurveyCompleted = profile.surveyCompleted || false;
+        // Use survey data as the primary source of truth, fallback to profile
+        const isSurveyCompleted = surveyData.isComplete || profile.surveyCompleted || false;
         console.log('🎯 Final survey completion status:', isSurveyCompleted);
         
         if (!isSurveyCompleted) {
@@ -1910,49 +1906,7 @@
       }, 2000);
     }
 
-    // Force refresh survey status (debug function)
-    async function forceRefreshSurveyStatus() {
-      console.log('🔄 Force refreshing survey status...');
-      
-      const token = localStorage.getItem('token');
-      if (!token) {
-        alert('Please log in first');
-        return;
-      }
-      
-      try {
-        // Call debug endpoint to check and fix survey status
-        const response = await fetch('https://zapbundle.onrender.com/api/survey/check-status', {
-          method: 'POST',
-          headers: {
-            'Authorization': 'Bearer ' + token,
-            'Content-Type': 'application/json'
-          }
-        });
-        
-        if (response.ok) {
-          const result = await response.json();
-          console.log('🔍 Survey status check result:', result);
-          
-          if (result.fixed) {
-            alert('✅ Survey status fixed! Your survey completion has been updated.');
-          } else {
-            alert(`ℹ️ Survey Status:\n- Survey exists: ${result.surveyExists}\n- Survey complete: ${result.surveyComplete}\n- User marked complete: ${result.userMarkedComplete}`);
-          }
-        }
-      } catch (error) {
-        console.error('Survey status check failed:', error);
-      }
-      
-      // Update survey button
-      await updateSurveyButton();
-      
-      // Reset and check notifications
-      notificationShown = false;
-      await checkAndShowNotification();
-      
-      console.log('✅ Survey status refreshed');
-    }
+
 
     // Scroll to create bundle section
     function scrollToCreateBundle() {
