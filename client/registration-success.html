@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registration Successful</title>
+  <style>
+    body {
+      font-family: 'Poppins', Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      background-color: #f0f2f5;
+      color: #1e293b;
+    }
+    .container {
+      background-color: white;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      text-align: center;
+      max-width: 450px;
+      width: 90%;
+    }
+    h1 {
+      color: #4f46e5;
+      margin-bottom: 20px;
+      font-size: 28px;
+    }
+    .success-icon {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 20px;
+      background-color: #ecfdf5;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .success-icon svg {
+      width: 40px;
+      height: 40px;
+      color: #10b981;
+    }
+    .info-text {
+      color: #6b7280;
+      font-size: 16px;
+      line-height: 1.6;
+      margin-bottom: 25px;
+    }
+    .button {
+      background-color: #4f46e5;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      margin-top: 20px;
+      font-size: 16px;
+      font-weight: 600;
+      transition: background-color 0.2s;
+    }
+    .button:hover {
+      background-color: #4338ca;
+    }
+    .loading {
+      display: inline-block;
+      width: 30px;
+      height: 30px;
+      border: 3px solid rgba(0,0,0,0.1);
+      border-radius: 50%;
+      border-top-color: #4f46e5;
+      animation: spin 1s ease-in-out infinite;
+      margin-bottom: 20px;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="success-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+      </svg>
+    </div>
+    
+    <h1>Registration Successful!</h1>
+    
+    <p class="info-text">
+      Your account has been created successfully. We've sent a verification code to your email.
+      Please verify your email to complete the registration process.
+    </p>
+    
+    <div id="loading" style="display: none;">
+      <div class="loading"></div>
+      <p>Redirecting to verification page...</p>
+    </div>
+    
+    <a href="#" id="verify-button" class="button">Verify Email Now</a>
+  </div>
+
+  <script>
+    // Function to get URL parameters
+    function getUrlParameter(name) {
+      name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+      var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+      var results = regex.exec(location.search);
+      return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+    }
+    
+    // When the page loads
+    window.onload = function() {
+      // Get the email from URL parameter
+      const email = getUrlParameter('email');
+      
+      if (email) {
+        // Store email in localStorage for later use
+        localStorage.setItem('verificationEmail', email);
+      }
+      
+      // Set up the verify button
+      const verifyButton = document.getElementById('verify-button');
+      
+      verifyButton.addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        // Show loading state
+        document.getElementById('loading').style.display = 'block';
+        verifyButton.style.display = 'none';
+        
+        // Redirect to verification page
+        setTimeout(function() {
+          window.location.href = `verify-otp.html${email ? '?email=' + encodeURIComponent(email) : ''}`;
+        }, 1000);
+      });
+      
+      // Auto-redirect after 3 seconds
+      setTimeout(function() {
+        verifyButton.click();
+      }, 3000);
+    };
+  </script>
+</body>
+</html>

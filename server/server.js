@@ -114,6 +114,16 @@ passport.use(new GoogleStrategy({
   return done(null, user);
 }));
 
+// Helper function to generate a 6-digit OTP
+function generateOTP() {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+}
+
+// Helper function to hash OTP for secure storage
+async function hashOTP(otp) {
+  return await bcrypt.hash(otp, 8); // Using fewer rounds for OTP as it's temporary
+}
+
 // Register
 app.post('/api/register', async (req, res) => {
   try {
@@ -145,10 +155,13 @@ app.post('/api/register', async (req, res) => {
     if (existing)
       return res.status(409).json({ error: 'Email already registered.' });
       
-    // Generate verification token
-    const verificationToken = crypto.randomBytes(32).toString('hex');
-    const tokenExpiry = new Date();
-    tokenExpiry.setHours(tokenExpiry.getHours() + 24); // Token valid for 24 hours
+    // Generate OTP for email verification
+    const otp = generateOTP();
+    const hashedOTP = await hashOTP(otp);
+    
+    // Set OTP expiration (10 minutes)
+    const otpExpiry = new Date();
+    otpExpiry.setMinutes(otpExpiry.getMinutes() + 10);
     
     // Generate default profile picture
     let profilePic = '';
@@ -170,13 +183,15 @@ app.post('/api/register', async (req, res) => {
       profilePic: profilePic,
       createdAt: new Date(),
       verified: false,
-      verificationToken,
-      verificationExpires: tokenExpiry
+      verificationOTP: hashedOTP,
+      verificationOTPExpires: otpExpiry,
+      otpAttempts: 0, // Track failed attempts
+      lastOTPSent: new Date() // Track when OTP was last sent for rate limiting
     };
     
     await usersCollection.insertOne(user);
     
-    // Send verification email
+    // Send verification email with OTP
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
@@ -187,19 +202,8 @@ app.post('/api/register', async (req, res) => {
       logger: true // Log information about the transport mechanism
     });
     
-    // Build the verification URL for GitHub Pages with proper path joining
-    let frontendUrl = process.env.FRONTEND_URL || 'https://sanjayraj-19.github.io';
-    
-    // Ensure URL doesn't end with a slash before adding path
-    if (frontendUrl.endsWith('/')) {
-      frontendUrl = frontendUrl.slice(0, -1);
-    }
-    
-    // Use the correct path to verify-simple.html
-    const verificationUrl = `${frontendUrl}/SaaSLink/client/verify-simple.html?token=${verificationToken}`;
-    
     // Log for debugging
-    console.log('Generated verification URL:', verificationUrl);
+    console.log('Generated OTP for', email, ':', otp);
     
     // Verify the connection configuration
     try {
@@ -208,21 +212,20 @@ app.post('/api/register', async (req, res) => {
     } catch (error) {
       console.error('SMTP connection error:', error);
       // Fall back to console log if email sending fails
-      console.log('Verification token for', email, ':', verificationToken);
-      console.log('Verification URL:', verificationUrl);
+      console.log('Verification OTP for', email, ':', otp);
     }
     
     const mailOptions = {
       from: `"SaaSBundilo" <zapbundle@gmail.com>`,
       to: email,
-      subject: '🚀 One Last Step to Unlock SaaS Savings!',
+      subject: '🔐 Your Verification Code for SaaSBundilo',
       html: `
         <div style="font-family: 'Poppins', Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 0; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); background-color: #ffffff;">
           <!-- Header with gradient background -->
           <div style="background: linear-gradient(135deg, #6366f1 0%, #06b6d4 100%); padding: 40px 20px; text-align: center;">
             <h1 style="color: white; margin: 0; font-size: 28px; font-weight: 700;">SaaSBundilo</h1>
             <h2 style="color: white; margin: 10px 0; font-size: 24px; font-weight: 700;">Verify Your Email</h2>
-            <p style="color: rgba(255, 255, 255, 0.9); font-size: 16px; margin-top: 10px;">You're just one click away from accessing your account!</p>
+            <p style="color: rgba(255, 255, 255, 0.9); font-size: 16px; margin-top: 10px;">Enter the code below to verify your account</p>
           </div>
           
           <!-- Content area -->
@@ -242,15 +245,19 @@ app.post('/api/register', async (req, res) => {
               </ul>
             </div>
             
-            <!-- CTA Button -->
+            <!-- OTP Display -->
             <div style="text-align: center; margin: 35px 0;">
-              <a href="${verificationUrl}" style="display: inline-block; background: linear-gradient(135deg, #6366f1 0%, #06b6d4 100%); color: white; padding: 16px 30px; text-decoration: none; border-radius: 50px; font-weight: 600; font-size: 18px; box-shadow: 0 4px 10px rgba(99, 102, 241, 0.3); transition: all 0.3s;">
-                Verify My Email Now
-              </a>
+              <p style="color: #475569; font-size: 16px; margin-bottom: 15px;">Your verification code is:</p>
+              <div style="font-size: 32px; letter-spacing: 5px; font-weight: bold; color: #1e293b; background-color: #f1f5f9; padding: 15px; border-radius: 10px; display: inline-block;">
+                ${otp}
+              </div>
+              <p style="color: #64748b; font-size: 14px; margin-top: 15px;">
+                This code will expire in 10 minutes.
+              </p>
             </div>
             
             <p style="color: #64748b; font-size: 14px; line-height: 1.6; margin-top: 30px;">
-              This verification link will expire in 24 hours. If you didn't sign up for SaaSBundilo, you can safely ignore this email.
+              If you didn't sign up for SaaSBundilo, you can safely ignore this email.
             </p>
           </div>
           
@@ -269,18 +276,19 @@ app.post('/api/register', async (req, res) => {
     
     try {
       await transporter.sendMail(mailOptions);
-      console.log('Verification email sent to:', email);
-      res.status(201).json({ message: 'Registration initiated. Please check your email to verify your account.' });
+      console.log('Verification email with OTP sent to:', email);
+      res.status(201).json({ 
+        message: 'Registration initiated. Please check your email for the verification code.',
+        email: email // Return email to help with the verification flow
+      });
     } catch (emailError) {
       console.error('Failed to send verification email:', emailError);
-      
-      // Create a verification link anyway so user can still verify
-      console.log('Verification URL for manual verification:', verificationUrl);
       
       // Return success but mention potential email delivery issues
       res.status(201).json({ 
         message: 'Account created, but there was an issue sending the verification email. Please try again later or contact support.',
-        token: verificationToken // Only in development - remove in production
+        email: email,
+        otp: otp // Only in development - remove in production
       });
     }
   } catch (err) {
@@ -408,20 +416,48 @@ app.get('/api/check-email', async (req, res) => {
   res.json({ available: !existing });
 });
 
-// Email verification endpoint
-app.get('/api/verify-email', async (req, res) => {
+// Email verification with OTP
+app.post('/api/verify-otp', async (req, res) => {
   try {
-    const { token } = req.query;
-    if (!token) return res.status(400).json({ error: "Verification token required" });
+    const { email, otp } = req.body;
     
-    // Find user with matching token
+    if (!email || !otp) {
+      return res.status(400).json({ error: "Email and verification code required" });
+    }
+    
+    // Find user with matching email
     const user = await usersCollection.findOne({ 
-      verificationToken: token,
-      verificationExpires: { $gt: new Date() } // Token must not be expired
+      email,
+      verified: false,
+      verificationOTPExpires: { $gt: new Date() } // OTP must not be expired
     });
     
     if (!user) {
-      return res.status(400).json({ error: "Invalid or expired verification token" });
+      return res.status(400).json({ error: "Invalid email or expired verification code" });
+    }
+    
+    // Check if max attempts exceeded (5 attempts)
+    if (user.otpAttempts >= 5) {
+      return res.status(400).json({ 
+        error: "Too many failed attempts. Please request a new verification code.",
+        maxAttemptsReached: true
+      });
+    }
+    
+    // Verify OTP
+    const isValidOTP = await bcrypt.compare(otp, user.verificationOTP);
+    
+    if (!isValidOTP) {
+      // Increment failed attempts
+      await usersCollection.updateOne(
+        { _id: user._id },
+        { $inc: { otpAttempts: 1 } }
+      );
+      
+      return res.status(400).json({ 
+        error: "Invalid verification code",
+        attemptsLeft: 5 - (user.otpAttempts + 1)
+      });
     }
     
     // Update user to verified status
@@ -429,7 +465,11 @@ app.get('/api/verify-email', async (req, res) => {
       { _id: user._id },
       { 
         $set: { verified: true },
-        $unset: { verificationToken: "", verificationExpires: "" }
+        $unset: { 
+          verificationOTP: "", 
+          verificationOTPExpires: "",
+          otpAttempts: ""
+        }
       }
     );
     
@@ -556,11 +596,446 @@ app.get('/api/verify-email', async (req, res) => {
       success: true, 
       message: "Email verified successfully. You are now logged in.",
       token: authToken,
-      email: user.email  // Include the email to help with multi-device verification
+      email: user.email
     });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Verification failed. Please try again later." });
+  }
+});
+
+// Resend OTP for email verification
+app.post('/api/resend-verification-otp', async (req, res) => {
+  try {
+    const { email } = req.body;
+    
+    if (!email) {
+      return res.status(400).json({ error: "Email is required" });
+    }
+    
+    // Find user with matching email
+    const user = await usersCollection.findOne({ 
+      email,
+      verified: false
+    });
+    
+    if (!user) {
+      return res.status(404).json({ error: "User not found or already verified" });
+    }
+    
+    // Check for rate limiting (at least 60 seconds between OTP requests)
+    const lastOTPTime = user.lastOTPSent || new Date(0);
+    const timeSinceLastOTP = new Date() - lastOTPTime;
+    const cooldownPeriod = 60 * 1000; // 60 seconds in milliseconds
+    
+    if (timeSinceLastOTP < cooldownPeriod) {
+      const timeRemaining = Math.ceil((cooldownPeriod - timeSinceLastOTP) / 1000);
+      return res.status(429).json({ 
+        error: `Please wait ${timeRemaining} seconds before requesting a new code`,
+        cooldownSeconds: timeRemaining
+      });
+    }
+    
+    // Generate new OTP
+    const otp = generateOTP();
+    const hashedOTP = await hashOTP(otp);
+    
+    // Set OTP expiration (10 minutes)
+    const otpExpiry = new Date();
+    otpExpiry.setMinutes(otpExpiry.getMinutes() + 10);
+    
+    // Update user with new OTP
+    await usersCollection.updateOne(
+      { _id: user._id },
+      { 
+        $set: { 
+          verificationOTP: hashedOTP,
+          verificationOTPExpires: otpExpiry,
+          lastOTPSent: new Date(),
+          otpAttempts: 0 // Reset attempts counter
+        }
+      }
+    );
+    
+    // Send verification email with OTP
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.EMAIL_USER || 'zapbundle@gmail.com',
+        pass: process.env.EMAIL_PASS || ''
+      },
+      debug: true,
+      logger: true
+    });
+    
+    // Log for debugging
+    console.log('Generated new OTP for', email, ':', otp);
+    
+    const mailOptions = {
+      from: `"SaaSBundilo" <zapbundle@gmail.com>`,
+      to: email,
+      subject: '🔐 Your New Verification Code for SaaSBundilo',
+      html: `
+        <div style="font-family: 'Poppins', Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 0; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); background-color: #ffffff;">
+          <!-- Header with gradient background -->
+          <div style="background: linear-gradient(135deg, #6366f1 0%, #06b6d4 100%); padding: 40px 20px; text-align: center;">
+            <h1 style="color: white; margin: 0; font-size: 28px; font-weight: 700;">SaaSBundilo</h1>
+            <h2 style="color: white; margin: 10px 0; font-size: 24px; font-weight: 700;">New Verification Code</h2>
+            <p style="color: rgba(255, 255, 255, 0.9); font-size: 16px; margin-top: 10px;">Enter the code below to verify your account</p>
+          </div>
+          
+          <!-- Content area -->
+          <div style="padding: 40px 30px;">
+            <h2 style="color: #1e293b; font-size: 22px; margin-top: 0;">Hello ${user.name || 'there'}! 👋</h2>
+            
+            <p style="color: #475569; font-size: 16px; line-height: 1.6; margin-bottom: 25px;">
+              You requested a new verification code. Here it is:
+            </p>
+            
+            <!-- OTP Display -->
+            <div style="text-align: center; margin: 35px 0;">
+              <p style="color: #475569; font-size: 16px; margin-bottom: 15px;">Your new verification code is:</p>
+              <div style="font-size: 32px; letter-spacing: 5px; font-weight: bold; color: #1e293b; background-color: #f1f5f9; padding: 15px; border-radius: 10px; display: inline-block;">
+                ${otp}
+              </div>
+              <p style="color: #64748b; font-size: 14px; margin-top: 15px;">
+                This code will expire in 10 minutes.
+              </p>
+            </div>
+            
+            <p style="color: #64748b; font-size: 14px; line-height: 1.6; margin-top: 30px;">
+              If you didn't request this code, you can safely ignore this email.
+            </p>
+          </div>
+          
+          <!-- Footer -->
+          <div style="background-color: #f1f5f9; padding: 30px; text-align: center; border-top: 1px solid #e2e8f0;">
+            <p style="color: #64748b; font-size: 14px; margin: 0;">
+              Need help? Reply to this email or contact us at <a href="mailto:support@saasbundilo.com" style="color: #6366f1; text-decoration: none;">support@saasbundilo.com</a>
+            </p>
+            <p style="color: #94a3b8; font-size: 12px; margin: 20px 0 0 0;">
+              &copy; 2024 SaaSBundilo. All rights reserved.
+            </p>
+          </div>
+        </div>
+      `
+    };
+    
+    try {
+      await transporter.sendMail(mailOptions);
+      console.log('New verification email with OTP sent to:', email);
+      res.status(200).json({ 
+        message: 'New verification code sent. Please check your email.',
+        email: email
+      });
+    } catch (emailError) {
+      console.error('Failed to send verification email:', emailError);
+      
+      // Return success but mention potential email delivery issues
+      res.status(200).json({ 
+        message: 'New verification code generated, but there was an issue sending the email. Please try again later.',
+        email: email,
+        otp: otp // Only in development - remove in production
+      });
+    }
+  } catch (err) {
+    console.error('Resend OTP error:', err);
+    res.status(500).json({ error: 'Failed to resend verification code. Please try again later.' });
+  }
+});
+
+// Legacy email verification endpoint (keep for backward compatibility)
+app.get('/api/verify-email', async (req, res) => {
+  try {
+    const { token } = req.query;
+    if (!token) return res.status(400).json({ error: "Verification token required" });
+    
+    // Find user with matching token
+    const user = await usersCollection.findOne({ 
+      verificationToken: token,
+      verificationExpires: { $gt: new Date() } // Token must not be expired
+    });
+    
+    if (!user) {
+      return res.status(400).json({ error: "Invalid or expired verification token" });
+    }
+    
+    // Update user to verified status
+    await usersCollection.updateOne(
+      { _id: user._id },
+      { 
+        $set: { verified: true },
+        $unset: { verificationToken: "", verificationExpires: "" }
+      }
+    );
+    
+    // Generate a login token for the user so they're automatically logged in
+    const authToken = jwt.sign(
+      { userId: user._id, email: user.email },
+      JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+    
+    res.json({ 
+      success: true, 
+      message: "Email verified successfully. You are now logged in.",
+      token: authToken,
+      email: user.email
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Verification failed. Please try again later." });
+  }
+});
+
+// Forgot password - request OTP
+app.post('/api/forgot-password', async (req, res) => {
+  try {
+    const { email } = req.body;
+    
+    if (!email) {
+      return res.status(400).json({ error: "Email is required" });
+    }
+    
+    // Find user with matching email
+    const user = await usersCollection.findOne({ email });
+    
+    if (!user) {
+      // For security reasons, don't reveal if the email exists or not
+      return res.status(200).json({ 
+        message: "If your email is registered, you will receive a password reset code."
+      });
+    }
+    
+    // Check for rate limiting (at least 60 seconds between OTP requests)
+    const lastOTPTime = user.passwordResetLastSent || new Date(0);
+    const timeSinceLastOTP = new Date() - lastOTPTime;
+    const cooldownPeriod = 60 * 1000; // 60 seconds in milliseconds
+    
+    if (timeSinceLastOTP < cooldownPeriod) {
+      const timeRemaining = Math.ceil((cooldownPeriod - timeSinceLastOTP) / 1000);
+      return res.status(429).json({ 
+        error: `Please wait ${timeRemaining} seconds before requesting a new code`,
+        cooldownSeconds: timeRemaining
+      });
+    }
+    
+    // Generate OTP for password reset
+    const otp = generateOTP();
+    const hashedOTP = await hashOTP(otp);
+    
+    // Set OTP expiration (10 minutes)
+    const otpExpiry = new Date();
+    otpExpiry.setMinutes(otpExpiry.getMinutes() + 10);
+    
+    // Update user with password reset OTP
+    await usersCollection.updateOne(
+      { _id: user._id },
+      { 
+        $set: { 
+          passwordResetOTP: hashedOTP,
+          passwordResetOTPExpires: otpExpiry,
+          passwordResetLastSent: new Date(),
+          passwordResetAttempts: 0 // Reset attempts counter
+        }
+      }
+    );
+    
+    // Send password reset email with OTP
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.EMAIL_USER || 'zapbundle@gmail.com',
+        pass: process.env.EMAIL_PASS || ''
+      },
+      debug: true,
+      logger: true
+    });
+    
+    // Log for debugging
+    console.log('Generated password reset OTP for', email, ':', otp);
+    
+    const mailOptions = {
+      from: `"SaaSBundilo" <zapbundle@gmail.com>`,
+      to: email,
+      subject: '🔐 Reset Your Password - SaaSBundilo',
+      html: `
+        <div style="font-family: 'Poppins', Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 0; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); background-color: #ffffff;">
+          <!-- Header with gradient background -->
+          <div style="background: linear-gradient(135deg, #6366f1 0%, #06b6d4 100%); padding: 40px 20px; text-align: center;">
+            <h1 style="color: white; margin: 0; font-size: 28px; font-weight: 700;">SaaSBundilo</h1>
+            <h2 style="color: white; margin: 10px 0; font-size: 24px; font-weight: 700;">Password Reset</h2>
+            <p style="color: rgba(255, 255, 255, 0.9); font-size: 16px; margin-top: 10px;">Enter the code below to reset your password</p>
+          </div>
+          
+          <!-- Content area -->
+          <div style="padding: 40px 30px;">
+            <h2 style="color: #1e293b; font-size: 22px; margin-top: 0;">Hello ${user.name || 'there'}! 👋</h2>
+            
+            <p style="color: #475569; font-size: 16px; line-height: 1.6; margin-bottom: 25px;">
+              We received a request to reset your password. If you didn't make this request, you can safely ignore this email.
+            </p>
+            
+            <!-- OTP Display -->
+            <div style="text-align: center; margin: 35px 0;">
+              <p style="color: #475569; font-size: 16px; margin-bottom: 15px;">Your password reset code is:</p>
+              <div style="font-size: 32px; letter-spacing: 5px; font-weight: bold; color: #1e293b; background-color: #f1f5f9; padding: 15px; border-radius: 10px; display: inline-block;">
+                ${otp}
+              </div>
+              <p style="color: #64748b; font-size: 14px; margin-top: 15px;">
+                This code will expire in 10 minutes.
+              </p>
+            </div>
+            
+            <p style="color: #64748b; font-size: 14px; line-height: 1.6; margin-top: 30px;">
+              If you didn't request a password reset, please secure your account by changing your password.
+            </p>
+          </div>
+          
+          <!-- Footer -->
+          <div style="background-color: #f1f5f9; padding: 30px; text-align: center; border-top: 1px solid #e2e8f0;">
+            <p style="color: #64748b; font-size: 14px; margin: 0;">
+              Need help? Reply to this email or contact us at <a href="mailto:support@saasbundilo.com" style="color: #6366f1; text-decoration: none;">support@saasbundilo.com</a>
+            </p>
+            <p style="color: #94a3b8; font-size: 12px; margin: 20px 0 0 0;">
+              &copy; 2024 SaaSBundilo. All rights reserved.
+            </p>
+          </div>
+        </div>
+      `
+    };
+    
+    try {
+      await transporter.sendMail(mailOptions);
+      console.log('Password reset email with OTP sent to:', email);
+    } catch (emailError) {
+      console.error('Failed to send password reset email:', emailError);
+      // Continue anyway for security reasons
+    }
+    
+    // For security reasons, always return the same response
+    res.status(200).json({ 
+      message: "If your email is registered, you will receive a password reset code."
+    });
+  } catch (err) {
+    console.error('Password reset request error:', err);
+    res.status(500).json({ error: 'Failed to process password reset request. Please try again later.' });
+  }
+});
+
+// Verify password reset OTP
+app.post('/api/verify-reset-otp', async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+    
+    if (!email || !otp) {
+      return res.status(400).json({ error: "Email and verification code required" });
+    }
+    
+    // Find user with matching email
+    const user = await usersCollection.findOne({ 
+      email,
+      passwordResetOTPExpires: { $gt: new Date() } // OTP must not be expired
+    });
+    
+    if (!user) {
+      return res.status(400).json({ error: "Invalid email or expired verification code" });
+    }
+    
+    // Check if max attempts exceeded (5 attempts)
+    if (user.passwordResetAttempts >= 5) {
+      return res.status(400).json({ 
+        error: "Too many failed attempts. Please request a new verification code.",
+        maxAttemptsReached: true
+      });
+    }
+    
+    // Verify OTP
+    const isValidOTP = await bcrypt.compare(otp, user.passwordResetOTP);
+    
+    if (!isValidOTP) {
+      // Increment failed attempts
+      await usersCollection.updateOne(
+        { _id: user._id },
+        { $inc: { passwordResetAttempts: 1 } }
+      );
+      
+      return res.status(400).json({ 
+        error: "Invalid verification code",
+        attemptsLeft: 5 - (user.passwordResetAttempts + 1)
+      });
+    }
+    
+    // Generate a temporary token for password reset
+    const resetToken = jwt.sign(
+      { userId: user._id, email: user.email, purpose: 'password-reset' },
+      JWT_SECRET,
+      { expiresIn: '10m' } // Token valid for 10 minutes
+    );
+    
+    res.json({ 
+      success: true, 
+      message: "Verification successful. You can now reset your password.",
+      resetToken,
+      email: user.email
+    });
+  } catch (err) {
+    console.error('OTP verification error:', err);
+    res.status(500).json({ error: "Verification failed. Please try again later." });
+  }
+});
+
+// Reset password with token
+app.post('/api/reset-password', async (req, res) => {
+  try {
+    const { resetToken, newPassword } = req.body;
+    
+    if (!resetToken || !newPassword) {
+      return res.status(400).json({ error: "Reset token and new password required" });
+    }
+    
+    // Verify the reset token
+    let decoded;
+    try {
+      decoded = jwt.verify(resetToken, JWT_SECRET);
+      
+      // Check if token was issued for password reset
+      if (decoded.purpose !== 'password-reset') {
+        return res.status(400).json({ error: "Invalid reset token" });
+      }
+    } catch (tokenError) {
+      return res.status(400).json({ error: "Invalid or expired reset token" });
+    }
+    
+    // Check password strength
+    if (newPassword.length < 8) {
+      return res.status(400).json({ error: "Password must be at least 8 characters long" });
+    }
+    
+    // Hash the new password
+    const hashedPassword = await bcrypt.hash(newPassword, 12);
+    
+    // Update user's password and remove reset OTP data
+    await usersCollection.updateOne(
+      { _id: new ObjectId(decoded.userId) },
+      { 
+        $set: { password: hashedPassword },
+        $unset: { 
+          passwordResetOTP: "", 
+          passwordResetOTPExpires: "",
+          passwordResetAttempts: "",
+          passwordResetLastSent: ""
+        }
+      }
+    );
+    
+    res.json({ 
+      success: true, 
+      message: "Password has been reset successfully. You can now log in with your new password."
+    });
+  } catch (err) {
+    console.error('Password reset error:', err);
+    res.status(500).json({ error: "Password reset failed. Please try again later." });
   }
 });
 
