@@ -423,11 +423,19 @@ app.post('/api/survey', authenticateToken, async (req, res) => {
     }
 
     // Only mark user as completed if survey is actually complete
+    console.log('📋 Survey submission - isComplete:', isComplete);
+    console.log('📋 User ID:', req.user.userId);
+    console.log('📋 Answers received:', Object.keys(answers));
+    
     if (isComplete) {
+      console.log('✅ Marking user as survey completed');
       await usersCollection.updateOne(
         { _id: new ObjectId(req.user.userId) },
         { $set: { surveyCompleted: true, surveyCompletedAt: new Date() } }
       );
+      console.log('✅ User survey completion updated in database');
+    } else {
+      console.log('❌ Survey not complete, not updating user status');
     }
 
     // Format answers for email
@@ -1257,6 +1265,52 @@ app.get('/api/bundles', authenticateToken, async (req, res) => {
   } catch (err) {
     console.error('Get bundles error:', err);
     res.status(500).json({ error: "Failed to get bundles." });
+  }
+});
+
+// Debug endpoint to check and fix survey status
+app.post('/api/survey/check-status', authenticateToken, async (req, res) => {
+  try {
+    const db = client.db('saaslink');
+    
+    // Get user's survey data
+    const survey = await db.collection('surveys').findOne({ 
+      userId: req.user.userId 
+    });
+    
+    // Get user profile
+    const user = await usersCollection.findOne({ 
+      _id: new ObjectId(req.user.userId) 
+    });
+    
+    console.log('🔍 Debug - Survey data:', survey);
+    console.log('🔍 Debug - User surveyCompleted:', user.surveyCompleted);
+    
+    if (survey && survey.isComplete && !user.surveyCompleted) {
+      // Fix the mismatch - survey is complete but user not marked as completed
+      console.log('🔧 Fixing survey completion status mismatch');
+      await usersCollection.updateOne(
+        { _id: new ObjectId(req.user.userId) },
+        { $set: { surveyCompleted: true, surveyCompletedAt: new Date() } }
+      );
+      
+      res.json({ 
+        fixed: true, 
+        message: 'Survey completion status fixed',
+        surveyComplete: true
+      });
+    } else {
+      res.json({ 
+        fixed: false, 
+        surveyExists: !!survey,
+        surveyComplete: survey ? survey.isComplete : false,
+        userMarkedComplete: user.surveyCompleted,
+        message: 'No fix needed or survey not complete'
+      });
+    }
+  } catch (err) {
+    console.error('Survey status check error:', err);
+    res.status(500).json({ error: "Failed to check survey status." });
   }
 });
 

@@ -1703,7 +1703,8 @@
         let surveyData = { isComplete: false, answers: {} };
         if (surveyResponse.ok) {
           surveyData = await surveyResponse.json();
-          console.log('📋 Survey data:', surveyData);
+          console.log('📋 Survey data from server:', surveyData);
+          console.log('📋 Survey isComplete from server:', surveyData.isComplete);
         } else {
           console.log('❌ Survey fetch failed:', surveyResponse.status);
         }
@@ -1736,7 +1737,11 @@
         
         let shouldShowNotification = false;
         
-        if (!profile.surveyCompleted && !surveyData.isComplete) {
+        // Use profile.surveyCompleted as the primary source of truth
+        const isSurveyCompleted = profile.surveyCompleted || false;
+        console.log('🎯 Final survey completion status:', isSurveyCompleted);
+        
+        if (!isSurveyCompleted) {
           // User hasn't completed survey - PRIORITY 1
           console.log('✅ Showing survey notification');
           showNotification(
@@ -1747,7 +1752,7 @@
             'fas fa-clipboard-list'
           );
           shouldShowNotification = true;
-        } else if (profile.surveyCompleted && userBundles.length === 0) {
+        } else if (isSurveyCompleted && userBundles.length === 0) {
           // User completed survey but has no bundles - PRIORITY 2
           console.log('✅ Showing bundles notification');
           showNotification(
@@ -1758,7 +1763,7 @@
             'fas fa-box-open'
           );
           shouldShowNotification = true;
-        } else if (profile.surveyCompleted && userBundles.length > 0) {
+        } else if (isSurveyCompleted && userBundles.length > 0) {
           // User has completed survey and has bundles - show popular bundle notification
           console.log('✅ Showing popular bundle notification');
           showNotification(
@@ -1876,6 +1881,36 @@
     async function forceRefreshSurveyStatus() {
       console.log('🔄 Force refreshing survey status...');
       
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert('Please log in first');
+        return;
+      }
+      
+      try {
+        // Call debug endpoint to check and fix survey status
+        const response = await fetch('https://zapbundle.onrender.com/api/survey/check-status', {
+          method: 'POST',
+          headers: {
+            'Authorization': 'Bearer ' + token,
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (response.ok) {
+          const result = await response.json();
+          console.log('🔍 Survey status check result:', result);
+          
+          if (result.fixed) {
+            alert('✅ Survey status fixed! Your survey completion has been updated.');
+          } else {
+            alert(`ℹ️ Survey Status:\n- Survey exists: ${result.surveyExists}\n- Survey complete: ${result.surveyComplete}\n- User marked complete: ${result.userMarkedComplete}`);
+          }
+        }
+      } catch (error) {
+        console.error('Survey status check failed:', error);
+      }
+      
       // Update survey button
       await updateSurveyButton();
       
@@ -1884,7 +1919,6 @@
       await checkAndShowNotification();
       
       console.log('✅ Survey status refreshed');
-      alert('Survey status refreshed! Check console for details.');
     }
 
     // Scroll to create bundle section
