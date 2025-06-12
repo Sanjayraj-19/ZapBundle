@@ -11,6 +11,16 @@ import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import crypto from 'crypto';
 import validator from 'email-validator';
 
+// Helper function to generate a 6-digit OTP
+function generateOTP() {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+}
+
+// Helper function to hash OTP for secure storage
+async function hashOTP(otp) {
+  return await bcrypt.hash(otp, 12);
+}
+
 dotenv.config();
 
 const app = express();
@@ -279,7 +289,8 @@ app.post('/api/register', async (req, res) => {
       console.log('Verification email with OTP sent to:', email);
       res.status(201).json({ 
         message: 'Registration initiated. Please check your email for the verification code.',
-        email: email // Return email to help with the verification flow
+        email: email, // Return email to help with the verification flow
+        redirectUrl: `${process.env.FRONTEND_URL || 'https://sanjayraj-19.github.io/FrontEndZapBundle'}/verify-otp.html?email=${encodeURIComponent(email)}`
       });
     } catch (emailError) {
       console.error('Failed to send verification email:', emailError);
@@ -288,7 +299,8 @@ app.post('/api/register', async (req, res) => {
       res.status(201).json({ 
         message: 'Account created, but there was an issue sending the verification email. Please try again later or contact support.',
         email: email,
-        otp: otp // Only in development - remove in production
+        otp: otp, // Only in development - remove in production
+        redirectUrl: `${process.env.FRONTEND_URL || 'https://sanjayraj-19.github.io/FrontEndZapBundle'}/verify-otp.html?email=${encodeURIComponent(email)}`
       });
     }
   } catch (err) {

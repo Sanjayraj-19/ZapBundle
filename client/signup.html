@@ -902,7 +902,21 @@
             return;
           }
           
-          showAlert("Registration successful! Please check your email to verify your account.", "success");
+          // Store email for verification
+          localStorage.setItem('verificationEmail', data.email);
+          
+          // Show success message
+          showAlert("Registration successful! Redirecting to verification page...", "success");
+          
+          // Redirect to OTP verification page
+          setTimeout(() => {
+            if (data.redirectUrl) {
+              window.location.href = data.redirectUrl;
+            } else {
+              window.location.href = `verify-otp.html?email=${encodeURIComponent(data.email)}`;
+            }
+          }, 2000);
+          
           resetButton();
         } catch (err) {
           showAlert("Network error. Please try again.");

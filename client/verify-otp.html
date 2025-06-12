@@ -176,6 +176,9 @@
   </div>
 
   <script>
+    // API URL
+    const API_URL = 'https://zapbundle.onrender.com';
+    
     // Function to get URL parameters
     function getUrlParameter(name) {
       name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
@@ -304,7 +307,7 @@
       setInterval(updateCountdown, 1000);
       
       // API call to resend verification code
-      fetch('https://zapbundle.onrender.com/api/resend-verification-otp', {
+      fetch(`${API_URL}/api/resend-verification-otp`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -391,7 +394,7 @@
       showStatus('loading');
       
       // API call to verify OTP
-      fetch('https://zapbundle.onrender.com/api/verify-otp', {
+      fetch(`${API_URL}/api/verify-otp`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -412,7 +415,7 @@
           // Redirect to profile page after 2 seconds
           setTimeout(() => {
             // Check if survey is completed
-            fetch("https://zapbundle.onrender.com/api/profile", {
+            fetch(`${API_URL}/api/profile`, {
               headers: { "Authorization": "Bearer " + data.token }
             })
             .then(response => response.json())
