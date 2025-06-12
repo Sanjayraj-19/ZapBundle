@@ -1626,11 +1626,15 @@
     .survey-modal-content {
       position: relative;
       background-color: white;
-      margin: 5% auto;
+      margin: 2% auto;
       padding: 40px;
       border-radius: 20px;
       width: 90%;
       max-width: 600px;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
       box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
       animation: slideIn 0.3s ease-out;
     }
@@ -1664,7 +1668,10 @@
 
     .survey-question-container {
       min-height: 200px;
-      margin-bottom: 30px;
+      margin-bottom: 20px;
+      padding-bottom: 20px;
+      flex: 1;
+      overflow-y: auto;
     }
 
     .survey-question {
@@ -1697,35 +1704,49 @@
     .survey-option {
       display: flex;
       align-items: center;
-      padding: 15px;
+      padding: 18px 20px;
       border: 2px solid #e2e8f0;
       border-radius: 12px;
       cursor: pointer;
       transition: all 0.3s ease;
       background-color: #f8fafc;
+      user-select: none;
+      min-height: 60px;
     }
 
     .survey-option:hover {
       border-color: var(--primary);
       background-color: #f1f5f9;
       transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
     }
 
     .survey-option.selected {
       border-color: var(--primary);
       background-color: #eef2ff;
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+      transform: translateY(-1px);
+    }
+
+    .survey-option:active {
+      transform: translateY(0);
     }
 
     .survey-option input[type="radio"],
     .survey-option input[type="checkbox"] {
-      margin-right: 12px;
-      transform: scale(1.2);
+      margin-right: 15px;
+      transform: scale(1.3);
+      accent-color: var(--primary);
+      cursor: pointer;
     }
 
     .survey-option label {
       cursor: pointer;
       font-weight: 500;
       color: var(--dark);
+      flex: 1;
+      font-size: 1rem;
+      line-height: 1.4;
     }
 
     .survey-text-input {
@@ -1748,6 +1769,13 @@
       justify-content: space-between;
       align-items: center;
       gap: 15px;
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px solid #e2e8f0;
+      position: sticky;
+      bottom: 0;
+      background-color: white;
+      z-index: 10;
     }
 
     .survey-skip-btn,
@@ -1827,18 +1855,33 @@
 
     @media (max-width: 768px) {
       .survey-modal-content {
-        margin: 10% auto;
-        padding: 30px 20px;
+        margin: 5% auto;
+        padding: 25px 15px;
         width: 95%;
+        max-height: 95vh;
       }
 
       .survey-question h3 {
         font-size: 1.3rem;
       }
 
+      .survey-option {
+        padding: 15px;
+        min-height: 50px;
+      }
+
       .survey-navigation {
-        flex-direction: column;
+        flex-wrap: wrap;
         gap: 10px;
+        padding: 15px 0;
+      }
+
+      .survey-skip-btn,
+      .survey-next-btn,
+      .survey-prev-btn,
+      .survey-submit-btn {
+        flex: 1;
+        min-width: 120px;
       }
 
       .survey-skip-btn,
@@ -2037,20 +2080,27 @@
     }
 
     function selectOption(questionId, value, type, element) {
-      if (type === 'radio' || type === 'text') {
+      if (type === 'radio') {
         surveyAnswers[questionId] = value;
-        if (type === 'radio') {
-          // Update visual selection for radio buttons
-          const allOptions = element.parentNode.querySelectorAll('.survey-option');
-          allOptions.forEach(opt => opt.classList.remove('selected'));
-          element.classList.add('selected');
-        }
+        // Update visual selection for radio buttons
+        const allOptions = element.parentNode.querySelectorAll('.survey-option');
+        allOptions.forEach(opt => {
+          opt.classList.remove('selected');
+          const radio = opt.querySelector('input[type="radio"]');
+          if (radio) radio.checked = false;
+        });
+        element.classList.add('selected');
+        const radio = element.querySelector('input[type="radio"]');
+        if (radio) radio.checked = true;
       } else if (type === 'checkbox') {
         if (!surveyAnswers[questionId]) {
           surveyAnswers[questionId] = [];
         }
         
         const checkbox = element.querySelector('input[type="checkbox"]');
+        // Toggle checkbox state when option is clicked
+        checkbox.checked = !checkbox.checked;
+        
         if (checkbox.checked) {
           if (!surveyAnswers[questionId].includes(value)) {
             surveyAnswers[questionId].push(value);
@@ -2060,6 +2110,8 @@
           surveyAnswers[questionId] = surveyAnswers[questionId].filter(item => item !== value);
           element.classList.remove('selected');
         }
+      } else if (type === 'text') {
+        surveyAnswers[questionId] = value;
       }
     }
 
