@@ -1760,29 +1760,19 @@
           );
           shouldShowNotification = true;
         } else if (isSurveyCompleted && userBundles.length === 0) {
-          // User completed survey but has no bundles - PRIORITY 2
-          console.log('✅ Showing bundles notification');
+          // User completed survey but has no bundles - show create bundle notification
+          console.log('✅ Showing create bundle notification');
           showNotification(
-            'Ready for Bundles!',
-            'Great! Now choose from our curated bundles or create your own',
-            'View Bundles',
-            'bundles',
-            'fas fa-box-open'
-          );
-          shouldShowNotification = true;
-        } else if (isSurveyCompleted && userBundles.length > 0) {
-          // User has completed survey and has bundles - show popular bundle notification
-          console.log('✅ Showing popular bundle notification');
-          showNotification(
-            'Discover Popular Bundles!',
-            'Check out trending bundles or create your own custom bundle',
-            'Explore Popular',
-            'popular',
-            'fas fa-fire'
+            'Create Your Perfect Bundle!',
+            'You\'ve completed the survey! Now create your own custom bundle with the tools you need',
+            'Create Bundle',
+            'create',
+            'fas fa-plus-circle'
           );
           shouldShowNotification = true;
         } else {
-          console.log('❌ No notification needed');
+          // User has bundles or survey completed with bundles - no notification needed
+          console.log('❌ No notification needed - user has bundles or completed setup');
         }
       } catch (error) {
         console.error('Error checking notification status:', error);
@@ -1882,8 +1872,8 @@
           });
           break;
         case 'create':
-          // Redirect to create bundle page (you can change this URL)
-          window.location.href = '#create-bundle'; // Update with actual create bundle URL
+          // Scroll to create bundle section
+          scrollToCreateBundle();
           break;
         case 'signup':
           // Redirect to signup page

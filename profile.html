@@ -757,35 +757,79 @@ async function renderProfile() {
     bundlesHtml = `<div style="margin-top:18px;color:#888;">No bundles selected yet.</div>`;
   }
 
-  // Check if user has completed survey
-  const surveyCompleted = localStorage.getItem('surveyCompleted') === 'true';
-  const surveyData = JSON.parse(localStorage.getItem('surveys') || '[]');
-  const lastSurvey = surveyData.length > 0 ? surveyData[surveyData.length - 1] : null;
-  
-  // Survey section HTML
+  // Check survey completion from server
   let surveyHtml = '';
-  if (surveyCompleted && lastSurvey) {
-    surveyHtml = `
-      <div class="section-container">
-        <h3 class="section-title">Your Survey Responses</h3>
-        <div class="survey-summary">
-          <div class="survey-item"><i class="fas fa-building"></i> <b>Company Type:</b> ${lastSurvey.company_type || 'Not specified'}</div>
-          <div class="survey-item"><i class="fas fa-tools"></i> <b>SaaS Tools Used:</b> ${lastSurvey.saas_count || 'Not specified'}</div>
-          <div class="survey-item"><i class="fas fa-dollar-sign"></i> <b>Monthly Spend:</b> ${lastSurvey.monthly_spend || 'Not specified'}</div>
-          <div class="survey-item"><i class="fas fa-star"></i> <b>Interested in:</b> ${lastSurvey.interest_bundles || 'Not specified'}</div>
+  try {
+    const surveyResponse = await fetch(`${API_URL}/api/survey`, {
+      headers: { 'Authorization': 'Bearer ' + getToken() }
+    });
+    
+    if (surveyResponse.ok) {
+      const surveyData = await surveyResponse.json();
+      const isSurveyCompleted = surveyData.isComplete || profile.surveyCompleted || false;
+      
+      if (isSurveyCompleted) {
+        // Survey completed - show completed status
+        surveyHtml = `
+          <div class="section-container">
+            <h3 class="section-title">Survey Completed ✅</h3>
+            <div class="survey-summary">
+              <div class="survey-item"><i class="fas fa-check-circle"></i> <b>Status:</b> Survey completed on ${surveyData.completedAt ? new Date(surveyData.completedAt).toLocaleDateString() : 'Recently'}</div>
+              <div class="survey-item"><i class="fas fa-lightbulb"></i> <b>Recommendations:</b> Based on your responses, we've personalized your bundle suggestions</div>
+            </div>
+            <div class="action-buttons">
+              <button class="action-btn primary-btn" onclick="window.location.href='index.html#bundles'"><i class="fas fa-box-open"></i> View Bundles</button>
+            </div>
+          </div>
+        `;
+      } else {
+        const hasPartialData = Object.keys(surveyData.answers || {}).length > 0;
+        
+        if (hasPartialData) {
+          // Has partial data - show continue survey
+          surveyHtml = `
+            <div class="section-container">
+              <h3 class="section-title">Continue Your Survey</h3>
+              <p class="section-desc">You've started the survey but haven't completed it yet. Continue where you left off to get personalized bundle recommendations.</p>
+              <div class="action-buttons">
+                <button class="action-btn primary-btn" onclick="window.location.href='index.html#survey'"><i class="fas fa-edit"></i> Continue Survey</button>
+              </div>
+            </div>
+          `;
+        } else {
+          // No survey data - show take survey
+          surveyHtml = `
+            <div class="section-container">
+              <h3 class="section-title">Complete Your Survey</h3>
+              <p class="section-desc">Help us understand your needs by completing a short survey. This will help us recommend the best SaaS bundles for your business.</p>
+              <div class="action-buttons">
+                <button class="action-btn primary-btn" onclick="window.location.href='index.html#survey'"><i class="fas fa-clipboard-list"></i> Take Survey</button>
+              </div>
+            </div>
+          `;
+        }
+      }
+    } else {
+      // Survey API failed - show default
+      surveyHtml = `
+        <div class="section-container">
+          <h3 class="section-title">Complete Your Survey</h3>
+          <p class="section-desc">Help us understand your needs by completing a short survey. This will help us recommend the best SaaS bundles for your business.</p>
+          <div class="action-buttons">
+            <button class="action-btn primary-btn" onclick="window.location.href='index.html#survey'"><i class="fas fa-clipboard-list"></i> Take Survey</button>
+          </div>
         </div>
-        <div class="action-buttons">
-          <button class="action-btn edit-btn" onclick="window.location.href='survey.html'"><i class="fas fa-edit"></i> Edit Survey</button>
-        </div>
-      </div>
-    `;
-  } else {
+      `;
+    }
+  } catch (error) {
+    console.error('Error fetching survey data:', error);
+    // Fallback survey section
     surveyHtml = `
       <div class="section-container">
         <h3 class="section-title">Complete Your Survey</h3>
         <p class="section-desc">Help us understand your needs by completing a short survey. This will help us recommend the best SaaS bundles for your business.</p>
         <div class="action-buttons">
-          <button class="action-btn primary-btn" onclick="window.location.href='survey.html'"><i class="fas fa-clipboard-list"></i> Take Survey</button>
+          <button class="action-btn primary-btn" onclick="window.location.href='index.html#survey'"><i class="fas fa-clipboard-list"></i> Take Survey</button>
         </div>
       </div>
     `;

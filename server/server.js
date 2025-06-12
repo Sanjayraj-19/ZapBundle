@@ -700,14 +700,17 @@ app.post('/api/verify-otp', async (req, res) => {
           <div style="background: linear-gradient(135deg, #6366f1 0%, #ec4899 100%); padding: 40px 20px; text-align: center; position: relative; overflow: hidden;">
             <!-- Confetti elements (SVG pattern) -->
             <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0.2; background-image: url('data:image/svg+xml;utf8,<svg width=\"60\" height=\"60\" viewBox=\"0 0 60 60\" xmlns=\"http://www.w3.org/2000/svg\"><g fill=\"none\" fill-rule=\"evenodd\"><g fill=\"%23ffffff\" fill-opacity=\"0.8\"><path d=\"M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\"/></g></g></svg>');"></div>
-            <img src="https://saasbundilo.com/logo.png" alt="SaaSBundilo" style="width: 90px; height: 90px; border-radius: 16px; background: white; padding: 10px; margin-bottom: 20px; box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2); position: relative; z-index: 2;">
-            <h1 style="color: white; margin: 0; font-size: 32px; font-weight: 700; position: relative; z-index: 2;">Welcome to SaaSBundilo!</h1>
-            <p style="color: rgba(255, 255, 255, 0.9); font-size: 18px; margin-top: 10px; position: relative; z-index: 2;">Your email is verified and your account is ready!</p>
+            <!-- Logo as text since image might not load -->
+            <div style="background: white; border-radius: 16px; padding: 15px; margin: 0 auto 20px auto; width: fit-content; box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2); position: relative; z-index: 2;">
+              <h2 style="margin: 0; font-size: 24px; font-weight: 700; background: linear-gradient(135deg, #6366f1 0%, #06b6d4 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">SaaSBundilo</h2>
+            </div>
+            <h1 style="color: white; margin: 0; font-size: clamp(24px, 5vw, 32px); font-weight: 700; position: relative; z-index: 2;">Welcome to SaaSBundilo!</h1>
+            <p style="color: rgba(255, 255, 255, 0.9); font-size: clamp(16px, 4vw, 18px); margin-top: 10px; position: relative; z-index: 2;">Your email is verified and your account is ready!</p>
           </div>
           
           <!-- Content area -->
-          <div style="padding: 40px 30px;">
-            <h2 style="color: #1e293b; font-size: 24px; margin-top: 0;">Hello ${user.name || 'there'}! 🎉</h2>
+          <div style="padding: clamp(20px, 5vw, 40px) clamp(15px, 4vw, 30px);">
+            <h2 style="color: #1e293b; font-size: clamp(20px, 4vw, 24px); margin-top: 0;">Hello ${user.name || 'there'}! 🎉</h2>
             
             <p style="color: #475569; font-size: 16px; line-height: 1.6; margin-bottom: 25px;">
               Thank you for joining the SaaSBundilo community! We're excited to help you discover and save on premium SaaS subscriptions. Your account has been successfully activated.
