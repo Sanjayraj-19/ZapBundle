@@ -202,6 +202,36 @@
       transform: translateY(-3px);
       box-shadow: var(--shadow-lg);
     }
+
+    .notification-bell {
+      background: none;
+      border: none;
+      color: var(--primary);
+      font-size: 1.2rem;
+      cursor: pointer;
+      padding: 8px;
+      border-radius: 50%;
+      transition: all 0.3s ease;
+      margin-right: 15px;
+      position: relative;
+    }
+
+    .notification-bell:hover {
+      background-color: rgba(99, 102, 241, 0.1);
+      transform: scale(1.1);
+    }
+
+    .notification-bell.has-notification::after {
+      content: '';
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      width: 8px;
+      height: 8px;
+      background-color: var(--danger);
+      border-radius: 50%;
+      animation: notificationPulse 2s infinite;
+    }
     
     /* Hero Section */
     .hero-section {
@@ -993,6 +1023,132 @@
         padding: 30px 20px;
       }
     }
+
+    /* Notification Popup Styles */
+    .notification-popup {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      width: 350px;
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      z-index: 9999;
+      transform: translateX(400px);
+      opacity: 0;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      border-left: 5px solid var(--primary);
+    }
+
+    .notification-popup.show {
+      transform: translateX(0);
+      opacity: 1;
+    }
+
+    .notification-content {
+      padding: 20px;
+      position: relative;
+    }
+
+    .notification-close {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      background: none;
+      border: none;
+      font-size: 20px;
+      color: var(--gray);
+      cursor: pointer;
+      transition: color 0.3s ease;
+    }
+
+    .notification-close:hover {
+      color: var(--danger);
+    }
+
+    .notification-icon {
+      display: inline-block;
+      width: 40px;
+      height: 40px;
+      background: var(--gradient-1);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 15px;
+      animation: notificationPulse 2s infinite;
+    }
+
+    .notification-icon i {
+      color: white;
+      font-size: 18px;
+    }
+
+    @keyframes notificationPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
+    .notification-text h4 {
+      font-size: 1.1rem;
+      margin-bottom: 8px;
+      color: var(--dark);
+      font-weight: 600;
+    }
+
+    .notification-text p {
+      font-size: 0.9rem;
+      color: var(--gray);
+      margin-bottom: 15px;
+      line-height: 1.4;
+    }
+
+    .notification-btn {
+      background: var(--gradient-1);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 25px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      width: 100%;
+    }
+
+    .notification-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(99, 102, 241, 0.3);
+    }
+
+    .notification-btn.secondary {
+      background: var(--gradient-2);
+    }
+
+    .notification-btn.success {
+      background: var(--gradient-3);
+    }
+
+    /* Mobile responsiveness */
+    @media (max-width: 768px) {
+      .notification-popup {
+        width: 300px;
+        right: 10px;
+        top: 10px;
+      }
+
+      .notification-content {
+        padding: 15px;
+      }
+
+      .notification-text h4 {
+        font-size: 1rem;
+      }
+
+      .notification-text p {
+        font-size: 0.85rem;
+      }
+    }
   </style>
 </head>
 <body>
@@ -1361,6 +1517,9 @@
       // Show avatar/profile dropdown
       const profilePic = profile.profilePic || 'icons/default-profile.png';
       navArea.innerHTML = `
+        <button class="notification-bell" onclick="checkAndShowNotification(true)" title="Show recommendations">
+          <i class="fas fa-bell"></i>
+        </button>
         <div class="dropdown" id="dropdown">
           <img id="navProfilePic" class="dropdown-avatar" src="${profilePic}" alt="Profile" />
           <div class="dropdown-menu" id="dropdownMenu">
@@ -1507,12 +1666,182 @@
         }
       }
     }
+
+    // Notification System
+    let notificationAction = 'survey'; // 'survey', 'bundles', 'create'
+    let notificationShown = false;
+
+    async function checkAndShowNotification(forceShow = false) {
+      const token = localStorage.getItem('token');
+      if (!token) return; // Don't show notifications for non-logged-in users
+
+      // Don't show if already shown in this session (unless forced)
+      if (notificationShown && !forceShow) return;
+
+      try {
+        // Check user's current status
+        const profileResponse = await fetch('https://zapbundle.onrender.com/api/profile', {
+          headers: {
+            'Authorization': 'Bearer ' + token
+          }
+        });
+
+        if (!profileResponse.ok) return;
+
+        const profile = await profileResponse.json();
+        
+        // Check survey status
+        const surveyResponse = await fetch('https://zapbundle.onrender.com/api/survey', {
+          headers: {
+            'Authorization': 'Bearer ' + token
+          }
+        });
+
+        let surveyData = { isComplete: false, answers: {} };
+        if (surveyResponse.ok) {
+          surveyData = await surveyResponse.json();
+        }
+
+        // Check bundles status
+        const bundlesResponse = await fetch('https://zapbundle.onrender.com/api/bundles', {
+          headers: {
+            'Authorization': 'Bearer ' + token
+          }
+        });
+
+        let userBundles = [];
+        if (bundlesResponse.ok) {
+          userBundles = await bundlesResponse.json();
+        }
+
+        // Determine what notification to show
+        let shouldShowNotification = false;
+        
+        if (!profile.surveyCompleted && !surveyData.isComplete) {
+          // User hasn't completed survey
+          showNotification(
+            'Complete Your Journey!',
+            'Take our survey to get personalized bundle recommendations',
+            'Take Survey',
+            'survey',
+            'fas fa-clipboard-list'
+          );
+          shouldShowNotification = true;
+        } else if (profile.surveyCompleted && userBundles.length === 0) {
+          // User completed survey but has no bundles
+          showNotification(
+            'Ready for Bundles!',
+            'Great! Now choose from our curated bundles or create your own',
+            'View Bundles',
+            'bundles',
+            'fas fa-box-open'
+          );
+          shouldShowNotification = true;
+        } else if (userBundles.length > 0) {
+          // User has bundles, encourage creating more
+          showNotification(
+            'Expand Your Toolkit!',
+            `You have ${userBundles.length} bundle${userBundles.length > 1 ? 's' : ''}. Create more to save even more!`,
+            'Create Bundle',
+            'create',
+            'fas fa-plus-circle'
+          );
+          shouldShowNotification = true;
+        }
+        
+        // Update notification bell indicator
+        updateNotificationBell(shouldShowNotification);
+      } catch (error) {
+        console.error('Error checking notification status:', error);
+      }
+    }
+
+    function showNotification(title, message, buttonText, action, icon = 'fas fa-bell') {
+      const popup = document.getElementById('notificationPopup');
+      const titleEl = document.getElementById('notificationTitle');
+      const messageEl = document.getElementById('notificationMessage');
+      const actionBtn = document.getElementById('notificationAction');
+      const iconEl = popup.querySelector('.notification-icon i');
+
+      titleEl.textContent = title;
+      messageEl.textContent = message;
+      actionBtn.textContent = buttonText;
+      iconEl.className = icon;
+      
+      notificationAction = action;
+      
+      // Update button style based on action
+      actionBtn.className = 'notification-btn';
+      if (action === 'bundles') {
+        actionBtn.classList.add('secondary');
+      } else if (action === 'create') {
+        actionBtn.classList.add('success');
+      }
+
+      // Show notification
+      popup.classList.add('show');
+      notificationShown = true;
+
+      // Auto-hide after 10 seconds
+      setTimeout(() => {
+        if (popup.classList.contains('show')) {
+          closeNotification();
+        }
+      }, 10000);
+    }
+
+    function closeNotification() {
+      const popup = document.getElementById('notificationPopup');
+      popup.classList.remove('show');
+    }
+
+    function updateNotificationBell(hasNotification) {
+      const bell = document.querySelector('.notification-bell');
+      if (bell) {
+        if (hasNotification) {
+          bell.classList.add('has-notification');
+        } else {
+          bell.classList.remove('has-notification');
+        }
+      }
+    }
+
+    function handleNotificationAction() {
+      closeNotification();
+      
+      switch(notificationAction) {
+        case 'survey':
+          startSurvey();
+          break;
+        case 'bundles':
+          // Scroll to bundles section
+          document.querySelector('.bundles-section').scrollIntoView({ 
+            behavior: 'smooth' 
+          });
+          break;
+        case 'create':
+          // Redirect to create bundle page (you can change this URL)
+          window.location.href = '#create-bundle'; // Update with actual create bundle URL
+          break;
+        default:
+          startSurvey();
+      }
+    }
+
+    // Show notification again after certain actions
+    function resetNotificationStatus() {
+      notificationShown = false;
+      setTimeout(() => {
+        checkAndShowNotification();
+      }, 2000);
+    }
     
     // Ensure this runs after DOM is fully loaded
     window.addEventListener('DOMContentLoaded', function() {
       clearOldSurveyData(); // Clear old localStorage data
       renderNavButtonArea();
       updateSurveyButton();
+      checkAndShowNotification(); // Check if notification should be shown
     });
     
     // Check if user already has this bundle
@@ -1661,6 +1990,23 @@
       </div>
       
       <button class="survey-close-btn" onclick="closeSurvey()">&times;</button>
+    </div>
+  </div>
+
+  <!-- Notification Popup -->
+  <div id="notificationPopup" class="notification-popup">
+    <div class="notification-content">
+      <button class="notification-close" onclick="closeNotification()">&times;</button>
+      <div class="notification-icon">
+        <i class="fas fa-bell"></i>
+      </div>
+      <div class="notification-text">
+        <h4 id="notificationTitle">Complete Your Journey!</h4>
+        <p id="notificationMessage">Take our survey to get personalized bundle recommendations</p>
+      </div>
+      <button id="notificationAction" class="notification-btn" onclick="handleNotificationAction()">
+        Take Survey
+      </button>
     </div>
   </div>
 
@@ -2310,6 +2656,11 @@
           
           // Update survey button to reflect database status
           updateSurveyButton();
+          
+          // Reset notification status to show next step
+          if (isComplete) {
+            resetNotificationStatus();
+          }
         } else {
           throw new Error('Failed to submit survey');
         }
