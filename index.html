@@ -1063,6 +1063,12 @@
       50% { transform: scale(1.1); }
     }
 
+    @keyframes pulse {
+      0% { transform: scale(1.05); }
+      50% { transform: scale(1.08); }
+      100% { transform: scale(1.05); }
+    }
+
     .notification-text h4 {
       font-size: 1.1rem;
       margin-bottom: 8px;
@@ -1265,7 +1271,11 @@
   <!-- Survey Section -->
   <section class="survey-section">
     <h2 class="fade-in">Help Us Build the Right Bundles</h2>
-    <button class="survey-button fade-in" id="surveyBtn" onclick="startSurvey()"><i class="fas fa-clipboard-list"></i> Take the Survey</button>
+    <p class="fade-in" style="color: var(--gray); font-size: 1.1rem; margin-bottom: 2rem; max-width: 600px; margin-left: auto; margin-right: auto;">
+      Can't find the perfect bundle? Create your own custom bundle with the SaaS tools you need most!
+    </p>
+    <button class="survey-button fade-in" onclick="scrollToCreateBundle()"><i class="fas fa-plus-circle"></i> Create Your Own Bundle</button>
+    <button class="survey-button fade-in" id="surveyBtn" onclick="startSurvey()" style="background: var(--gradient-2); margin-left: 10px;"><i class="fas fa-clipboard-list"></i> Take Survey</button>
     <button class="survey-button fade-in" id="resetSurveyBtn" onclick="resetSurveyData()" style="background: #dc3545; margin-left: 10px; font-size: 0.8rem; padding: 8px 16px;"><i class="fas fa-redo"></i> Reset Survey (Debug)</button>
   </section>
   
@@ -1855,6 +1865,36 @@
       setTimeout(() => {
         checkAndShowNotification();
       }, 2000);
+    }
+
+    // Scroll to create bundle section
+    function scrollToCreateBundle() {
+      const bundlesSection = document.querySelector('.bundles-section');
+      if (bundlesSection) {
+        bundlesSection.scrollIntoView({ 
+          behavior: 'smooth' 
+        });
+        
+        // Highlight the "Create Your Own" bundle card after scrolling
+        setTimeout(() => {
+          const createBundleCard = document.querySelector('.bundle-card.fade-in-right');
+          if (createBundleCard) {
+            createBundleCard.style.transform = 'scale(1.05)';
+            createBundleCard.style.boxShadow = '0 20px 40px rgba(255, 165, 0, 0.4)';
+            createBundleCard.style.transition = 'all 0.3s ease';
+            
+            // Add a pulsing effect
+            createBundleCard.style.animation = 'pulse 2s infinite';
+            
+            // Reset after 4 seconds
+            setTimeout(() => {
+              createBundleCard.style.transform = '';
+              createBundleCard.style.boxShadow = '';
+              createBundleCard.style.animation = '';
+            }, 4000);
+          }
+        }, 1000);
+      }
     }
 
     // Show engagement notification for users who haven't taken action
