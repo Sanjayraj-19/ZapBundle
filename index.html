@@ -1614,9 +1614,20 @@
         }
       } catch (error) {
         console.error('Error checking survey status:', error);
-        // Fallback to default survey button
-        surveyBtn.innerHTML = '<i class="fas fa-clipboard-list"></i> Take the Survey';
-        surveyBtn.onclick = startSurvey;
+        // Fallback for when server is unavailable
+        if (token) {
+          surveyBtn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Server Offline';
+          surveyBtn.style.background = '#dc3545';
+          surveyBtn.onclick = function() {
+            alert('Server is temporarily unavailable. Please try again later.');
+          };
+        } else {
+          surveyBtn.innerHTML = '<i class="fas fa-clipboard-list"></i> Take the Survey';
+          surveyBtn.onclick = function() {
+            alert('Please log in to take the survey.');
+            window.location.href = 'signup.html';
+          };
+        }
       }
     }
     
@@ -1779,6 +1790,24 @@
         }
       } catch (error) {
         console.error('Error checking notification status:', error);
+        // Server is down - show offline notification
+        if (!localStorage.getItem('token')) {
+          showNotification(
+            'Welcome to SaaSBundilo!',
+            'Discover amazing SaaS bundles and save up to 70% on your favorite tools',
+            'Get Started',
+            'signup',
+            'fas fa-rocket'
+          );
+        } else {
+          showNotification(
+            'Server Temporarily Unavailable',
+            'We are working to restore service. Please try again in a few minutes.',
+            'Refresh Page',
+            'refresh',
+            'fas fa-exclamation-triangle'
+          );
+        }
       }
     }
 
@@ -1863,6 +1892,10 @@
         case 'signup':
           // Redirect to signup page
           window.location.href = 'signup.html';
+          break;
+        case 'refresh':
+          // Refresh the page
+          window.location.reload();
           break;
         default:
           startSurvey();
