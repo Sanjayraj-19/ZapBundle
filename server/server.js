@@ -47,7 +47,7 @@ connectDB();
 
 // Middleware
 app.use(cors({
-  origin: ["https://sanjayraj-19.github.io/FrontEndZapBundle", "https://sanjayraj-19.github.io", "http://localhost:5500", "http://127.0.0.1:5500"],
+  origin: ["https://sanjayraj-19.github.io/ZapBundle", "https://sanjayraj-19.github.io", "http://localhost:5500", "http://127.0.0.1:5500"],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
@@ -305,7 +305,7 @@ app.post('/api/register', async (req, res) => {
       res.status(201).json({ 
         message: 'Registration initiated. Please check your email for the verification code.',
         email: email, // Return email to help with the verification flow
-        redirectUrl: `${process.env.FRONTEND_URL || 'https://sanjayraj-19.github.io/FrontEndZapBundle'}/verify-otp.html?email=${encodeURIComponent(email)}`
+        redirectUrl: `${process.env.FRONTEND_URL || 'https://sanjayraj-19.github.io/ZapBundle'}/verify-otp.html?email=${encodeURIComponent(email)}`
       });
     } catch (emailError) {
       console.error('Failed to send verification email:', emailError);
@@ -315,7 +315,7 @@ app.post('/api/register', async (req, res) => {
         message: 'Account created, but there was an issue sending the verification email. Please try again later or contact support.',
         email: email,
         otp: otp, // Only in development - remove in production
-        redirectUrl: `${process.env.FRONTEND_URL || 'https://sanjayraj-19.github.io/FrontEndZapBundle'}/verify-otp.html?email=${encodeURIComponent(email)}`
+        redirectUrl: `${process.env.FRONTEND_URL || 'https://sanjayraj-19.github.io/ZapBundle'}/verify-otp.html?email=${encodeURIComponent(email)}`
       });
     }
   } catch (err) {
@@ -1072,7 +1072,7 @@ app.get('/api/auth/google/callback', passport.authenticate('google', { failureRe
   async (req, res) => {
     // Issue JWT and redirect to frontend with token
     const token = jwt.sign({ userId: req.user._id, email: req.user.email }, JWT_SECRET, { expiresIn: '7d' });
-    const frontendUrl = process.env.FRONTEND_URL || 'https://sanjayraj-19.github.io/FrontEndZapBundle';
+    const frontendUrl = process.env.FRONTEND_URL || 'https://sanjayraj-19.github.io/ZapBundle';
     res.redirect(`${frontendUrl}/oauth-success.html?token=${token}`);
   }
 );
