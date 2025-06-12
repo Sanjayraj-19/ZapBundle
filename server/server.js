@@ -187,6 +187,20 @@ app.post('/api/register', async (req, res) => {
       logger: true // Log information about the transport mechanism
     });
     
+    // Build the verification URL for GitHub Pages with proper path joining
+    let frontendUrl = process.env.FRONTEND_URL || 'https://sanjayraj-19.github.io/FrontEndZapBundle';
+    
+    // Ensure URL doesn't end with a slash before adding path
+    if (frontendUrl.endsWith('/')) {
+      frontendUrl = frontendUrl.slice(0, -1);
+    }
+    
+    // SUPER SIMPLIFIED: Use the simplest possible URL with the simple verify page
+    const verificationUrl = `${frontendUrl}/verify-simple.html?token=${verificationToken}`;
+    
+    // Log for debugging
+    console.log('Generated verification URL:', verificationUrl);
+    
     // Verify the connection configuration
     try {
       await transporter.verify();
@@ -197,21 +211,6 @@ app.post('/api/register', async (req, res) => {
       console.log('Verification token for', email, ':', verificationToken);
       console.log('Verification URL:', verificationUrl);
     }
-    
-    // Build the verification URL for GitHub Pages with proper path joining
-    let frontendUrl = process.env.FRONTEND_URL || 'https://sanjayraj-19.github.io/FrontEndZapBundle';
-    
-    // Ensure URL doesn't end with a slash before adding path
-    if (frontendUrl.endsWith('/')) {
-      frontendUrl = frontendUrl.slice(0, -1);
-    }
-    
-    // SUPER SIMPLIFIED: Use the simplest possible URL with the simple verify page
-    const verificationUrl = `https://sanjayraj-19.github.io/FrontEndZapBundle/verify-simple.html?token=${verificationToken}`;
-    
-    // Log for debugging
-    console.log('SUPER SIMPLIFIED verification URL:', verificationUrl);
-    console.log('Generated verification URL:', verificationUrl);
     
     const mailOptions = {
       from: `"SaaSBundilo" <zapbundle@gmail.com>`,
