@@ -1419,15 +1419,15 @@
       }
     });
 
-    // Forgot Password Functions
-    let resetEmail = '';
-    let resetOtpToken = '';
-
     // Email validation function
     function isValidEmail(email) {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       return emailRegex.test(email);
     }
+
+    // Forgot Password Functions
+    let resetEmail = '';
+    let resetOtpToken = '';
 
     function showForgotPasswordModal() {
       document.getElementById('forgotPasswordModal').style.display = 'flex';
