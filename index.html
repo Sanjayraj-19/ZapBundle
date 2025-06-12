@@ -166,11 +166,13 @@
     .logo-img {
       height: 60px;
       width: auto;
-      background: transparent;
+      background: transparent !important;
       box-shadow: none;
       border: none;
       object-fit: contain;
       transition: transform 0.3s ease;
+      mix-blend-mode: multiply;
+      filter: contrast(1.1) brightness(1.1);
     }
     
     .logo-img:hover {
@@ -1261,6 +1263,7 @@
     <h2 class="fade-in">Help Us Build the Right Bundles</h2>
     <button class="survey-button fade-in" id="surveyBtn" onclick="startSurvey()"><i class="fas fa-clipboard-list"></i> Take the Survey</button>
     <button class="survey-button fade-in" id="resetSurveyBtn" onclick="resetSurveyData()" style="background: #dc3545; margin-left: 10px; font-size: 0.8rem; padding: 8px 16px;"><i class="fas fa-redo"></i> Reset Survey (Debug)</button>
+    <button class="survey-button fade-in" onclick="testNotification()" style="background: #28a745; margin-left: 10px; font-size: 0.8rem; padding: 8px 16px;"><i class="fas fa-bell"></i> Test Notification</button>
   </section>
   
   <!-- Testimonials Section -->
@@ -1641,13 +1644,21 @@
     let notificationShown = false;
 
     async function checkAndShowNotification() {
+      console.log('🔔 Checking notification status...');
       const token = localStorage.getItem('token');
-      if (!token) return; // Don't show notifications for non-logged-in users
+      if (!token) {
+        console.log('❌ No token found, user not logged in');
+        return; // Don't show notifications for non-logged-in users
+      }
 
       // Don't show if already shown in this session
-      if (notificationShown) return;
+      if (notificationShown) {
+        console.log('❌ Notification already shown in this session');
+        return;
+      }
 
       try {
+        console.log('📡 Fetching user profile...');
         // Check user's current status
         const profileResponse = await fetch('https://zapbundle.onrender.com/api/profile', {
           headers: {
@@ -1655,11 +1666,16 @@
           }
         });
 
-        if (!profileResponse.ok) return;
+        if (!profileResponse.ok) {
+          console.log('❌ Profile fetch failed:', profileResponse.status);
+          return;
+        }
 
         const profile = await profileResponse.json();
+        console.log('👤 Profile data:', profile);
         
         // Check survey status
+        console.log('📋 Fetching survey data...');
         const surveyResponse = await fetch('https://zapbundle.onrender.com/api/survey', {
           headers: {
             'Authorization': 'Bearer ' + token
@@ -1669,9 +1685,13 @@
         let surveyData = { isComplete: false, answers: {} };
         if (surveyResponse.ok) {
           surveyData = await surveyResponse.json();
+          console.log('📋 Survey data:', surveyData);
+        } else {
+          console.log('❌ Survey fetch failed:', surveyResponse.status);
         }
 
         // Check bundles status
+        console.log('📦 Fetching bundles data...');
         const bundlesResponse = await fetch('https://zapbundle.onrender.com/api/bundles', {
           headers: {
             'Authorization': 'Bearer ' + token
@@ -1681,13 +1701,22 @@
         let userBundles = [];
         if (bundlesResponse.ok) {
           userBundles = await bundlesResponse.json();
+          console.log('📦 User bundles:', userBundles);
+        } else {
+          console.log('❌ Bundles fetch failed:', bundlesResponse.status);
         }
 
         // Determine what notification to show - only for incomplete survey OR no bundles
+        console.log('🔍 Analyzing notification conditions...');
+        console.log('Survey completed (profile):', profile.surveyCompleted);
+        console.log('Survey complete (data):', surveyData.isComplete);
+        console.log('User bundles count:', userBundles.length);
+        
         let shouldShowNotification = false;
         
         if (!profile.surveyCompleted && !surveyData.isComplete) {
           // User hasn't completed survey - PRIORITY 1
+          console.log('✅ Showing survey notification');
           showNotification(
             'Complete Your Journey!',
             'Take our survey to get personalized bundle recommendations',
@@ -1698,6 +1727,7 @@
           shouldShowNotification = true;
         } else if (profile.surveyCompleted && userBundles.length === 0) {
           // User completed survey but has no bundles - PRIORITY 2
+          console.log('✅ Showing bundles notification');
           showNotification(
             'Ready for Bundles!',
             'Great! Now choose from our curated bundles or create your own',
@@ -1706,6 +1736,8 @@
             'fas fa-box-open'
           );
           shouldShowNotification = true;
+        } else {
+          console.log('❌ No notification needed - user has completed survey and has bundles');
         }
         // Don't show notification if user has completed survey AND has bundles
       } catch (error) {
@@ -1714,11 +1746,17 @@
     }
 
     function showNotification(title, message, buttonText, action, icon = 'fas fa-bell') {
+      console.log('🎉 Showing notification:', title);
       const popup = document.getElementById('notificationPopup');
       const titleEl = document.getElementById('notificationTitle');
       const messageEl = document.getElementById('notificationMessage');
       const actionBtn = document.getElementById('notificationAction');
       const iconEl = popup.querySelector('.notification-icon i');
+
+      if (!popup) {
+        console.error('❌ Notification popup element not found!');
+        return;
+      }
 
       titleEl.textContent = title;
       messageEl.textContent = message;
@@ -1782,6 +1820,19 @@
       setTimeout(() => {
         checkAndShowNotification();
       }, 2000);
+    }
+
+    // Test function to manually trigger notification
+    function testNotification() {
+      console.log('🧪 Testing notification manually...');
+      notificationShown = false; // Reset flag
+      showNotification(
+        'Test Notification!',
+        'This is a test notification to check if the popup works',
+        'Test Action',
+        'survey',
+        'fas fa-bell'
+      );
     }
     
     // Ensure this runs after DOM is fully loaded
