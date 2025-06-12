@@ -44,7 +44,7 @@ connectDB().catch(err => {
 
 // Middleware
 app.use(cors({
-  origin: ["https://sanjayraj-19.github.io", "http://localhost:5500"],
+  origin: ["https://sanjayraj-19.github.io", "http://localhost:5500", "http://127.0.0.1:5500"],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
@@ -52,7 +52,11 @@ app.use(cors({
 
 // Set additional headers for CORS
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', req.headers.origin);
+  const origin = req.headers.origin;
+  // Allow requests from GitHub Pages and localhost
+  if (origin && (origin.includes('sanjayraj-19.github.io') || origin.includes('localhost') || origin.includes('127.0.0.1'))) {
+    res.header('Access-Control-Allow-Origin', origin);
+  }
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   res.header('Access-Control-Allow-Credentials', 'true');
@@ -62,6 +66,17 @@ app.use((req, res, next) => {
   next();
 });
 app.use(express.json());
+
+// Add logging middleware for debugging
+app.use('/api', (req, res, next) => {
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.path} from ${req.headers.origin || 'unknown origin'}`);
+  next();
+});
+
+// Test endpoint for debugging
+app.get('/api/test', (req, res) => {
+  res.json({ message: 'API is working', timestamp: new Date().toISOString() });
+});
 
 // JWT middleware
 function authenticateToken(req, res, next) {
