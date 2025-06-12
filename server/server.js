@@ -44,7 +44,7 @@ connectDB().catch(err => {
 
 // Middleware
 app.use(cors({
-  origin: ["https://sanjayraj-19.github.io", "http://localhost:5500", "http://127.0.0.1:5500"],
+  origin: ["https://sanjayraj-19.github.io/FrontEndZapBundle", "https://sanjayraj-19.github.io", "http://localhost:5500", "http://127.0.0.1:5500"],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
