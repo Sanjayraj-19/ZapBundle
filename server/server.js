@@ -1239,6 +1239,27 @@ app.post('/api/remove-bundle', authenticateToken, async (req, res) => {
   }
 });
 
+// Get user's bundles (placeholder endpoint)
+app.get('/api/bundles', authenticateToken, async (req, res) => {
+  try {
+    const db = client.db('saaslink');
+    
+    // Get user's bundles (for now, return empty array since bundles feature isn't implemented yet)
+    // In the future, this would fetch actual bundles from a bundles collection
+    const userBundles = [];
+    
+    // You can add actual bundle logic here later
+    // const userBundles = await db.collection('bundles').find({ 
+    //   userId: req.user.userId 
+    // }).toArray();
+    
+    res.json(userBundles);
+  } catch (err) {
+    console.error('Get bundles error:', err);
+    res.status(500).json({ error: "Failed to get bundles." });
+  }
+});
+
 // Start server
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

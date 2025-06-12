@@ -1690,20 +1690,24 @@
           console.log('❌ Survey fetch failed:', surveyResponse.status);
         }
 
-        // Check bundles status
+        // Check bundles status (optional - endpoint might not exist yet)
         console.log('📦 Fetching bundles data...');
-        const bundlesResponse = await fetch('https://zapbundle.onrender.com/api/bundles', {
-          headers: {
-            'Authorization': 'Bearer ' + token
-          }
-        });
-
         let userBundles = [];
-        if (bundlesResponse.ok) {
-          userBundles = await bundlesResponse.json();
-          console.log('📦 User bundles:', userBundles);
-        } else {
-          console.log('❌ Bundles fetch failed:', bundlesResponse.status);
+        try {
+          const bundlesResponse = await fetch('https://zapbundle.onrender.com/api/bundles', {
+            headers: {
+              'Authorization': 'Bearer ' + token
+            }
+          });
+
+          if (bundlesResponse.ok) {
+            userBundles = await bundlesResponse.json();
+            console.log('📦 User bundles:', userBundles);
+          } else {
+            console.log('❌ Bundles fetch failed:', bundlesResponse.status, '- assuming no bundles');
+          }
+        } catch (bundleError) {
+          console.log('❌ Bundles API not available - assuming no bundles');
         }
 
         // Determine what notification to show - only for incomplete survey OR no bundles
@@ -1825,7 +1829,28 @@
     // Test function to manually trigger notification
     function testNotification() {
       console.log('🧪 Testing notification manually...');
-      notificationShown = false; // Reset flag
+      
+      // Check if popup element exists
+      const popup = document.getElementById('notificationPopup');
+      console.log('Popup element found:', popup);
+      
+      if (!popup) {
+        console.error('❌ Notification popup element not found in DOM!');
+        alert('Notification popup element not found! Check console.');
+        return;
+      }
+      
+      // Reset flag and show notification
+      notificationShown = false;
+      
+      // Try direct approach first
+      console.log('Attempting to show popup directly...');
+      popup.style.display = 'block';
+      popup.style.opacity = '1';
+      popup.style.transform = 'translateX(0)';
+      popup.classList.add('show');
+      
+      // Also try the normal function
       showNotification(
         'Test Notification!',
         'This is a test notification to check if the popup works',
