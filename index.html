@@ -1132,6 +1132,7 @@
   <section class="survey-section">
     <h2 class="fade-in">Help Us Build the Right Bundles</h2>
     <button class="survey-button fade-in" id="surveyBtn" onclick="startSurvey()"><i class="fas fa-clipboard-list"></i> Take the Survey</button>
+    <button class="survey-button fade-in" id="resetSurveyBtn" onclick="resetSurveyData()" style="background: #dc3545; margin-left: 10px; font-size: 0.8rem; padding: 8px 16px;"><i class="fas fa-redo"></i> Reset Survey (Debug)</button>
   </section>
   
   <!-- Testimonials Section -->
@@ -1475,6 +1476,36 @@
     function clearOldSurveyData() {
       localStorage.removeItem('surveyCompleted');
       localStorage.removeItem('surveys');
+    }
+
+    // Debug function to reset survey data
+    async function resetSurveyData() {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert('Please log in first');
+        return;
+      }
+
+      if (confirm('Are you sure you want to reset your survey data? This will delete all your answers.')) {
+        try {
+          const response = await fetch('https://zapbundle.onrender.com/api/survey/reset', {
+            method: 'DELETE',
+            headers: {
+              'Authorization': 'Bearer ' + token
+            }
+          });
+
+          if (response.ok) {
+            alert('Survey data reset successfully!');
+            updateSurveyButton();
+          } else {
+            alert('Failed to reset survey data');
+          }
+        } catch (error) {
+          console.error('Reset error:', error);
+          alert('Error resetting survey data');
+        }
+      }
     }
     
     // Ensure this runs after DOM is fully loaded
@@ -2019,6 +2050,23 @@
       }
 
       try {
+        // First check user profile for completion status
+        const profileResponse = await fetch('https://zapbundle.onrender.com/api/profile', {
+          headers: {
+            'Authorization': 'Bearer ' + token
+          }
+        });
+        
+        if (profileResponse.ok) {
+          const profile = await profileResponse.json();
+          console.log('Profile survey status:', profile.surveyCompleted);
+          
+          if (profile.surveyCompleted) {
+            alert('You have already completed the survey. Thank you!');
+            return;
+          }
+        }
+        
         // Load existing survey data
         const surveyResponse = await fetch('https://zapbundle.onrender.com/api/survey', {
           headers: {
@@ -2028,15 +2076,11 @@
         
         if (surveyResponse.ok) {
           const surveyData = await surveyResponse.json();
-          
-          if (surveyData.isComplete) {
-            alert('You have already completed the survey. Thank you!');
-            return;
-          }
+          console.log('Survey data:', surveyData);
           
           // Load existing answers if any
           surveyAnswers = surveyData.answers || {};
-          console.log('Loaded existing survey data:', surveyAnswers);
+          console.log('Loaded existing survey answers:', surveyAnswers);
         }
       } catch (error) {
         console.error('Error loading survey data:', error);
@@ -2154,7 +2198,7 @@
       if (!token) return;
       
       try {
-        await fetch('https://zapbundle.onrender.com/api/survey', {
+        const response = await fetch('https://zapbundle.onrender.com/api/survey', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -2165,7 +2209,12 @@
             isComplete: false
           })
         });
-        console.log('Progress auto-saved');
+        
+        if (response.ok) {
+          console.log('Progress auto-saved successfully');
+        } else {
+          console.error('Auto-save failed with status:', response.status);
+        }
       } catch (error) {
         console.error('Auto-save failed:', error);
       }

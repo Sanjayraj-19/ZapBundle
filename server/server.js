@@ -506,6 +506,8 @@ app.get('/api/survey', authenticateToken, async (req, res) => {
       userId: req.user.userId 
     });
     
+    console.log('Survey data for user', req.user.userId, ':', survey);
+    
     if (survey) {
       res.json({
         answers: survey.answers || {},
@@ -524,6 +526,34 @@ app.get('/api/survey', authenticateToken, async (req, res) => {
   } catch (err) {
     console.error('Get survey error:', err);
     res.status(500).json({ error: "Failed to get survey data." });
+  }
+});
+
+// Reset survey data (for debugging)
+app.delete('/api/survey/reset', authenticateToken, async (req, res) => {
+  try {
+    const db = client.db('saaslink');
+    
+    // Delete user's survey
+    await db.collection('surveys').deleteOne({ 
+      userId: req.user.userId 
+    });
+    
+    // Reset user's survey completion status
+    await usersCollection.updateOne(
+      { _id: new ObjectId(req.user.userId) },
+      { 
+        $unset: { 
+          surveyCompleted: "",
+          surveyCompletedAt: ""
+        }
+      }
+    );
+    
+    res.json({ message: "Survey data reset successfully" });
+  } catch (err) {
+    console.error('Reset survey error:', err);
+    res.status(500).json({ error: "Failed to reset survey data." });
   }
 });
 
