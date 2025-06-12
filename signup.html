@@ -788,7 +788,7 @@
           <p style="margin-bottom: 20px; color: var(--gray);">We've sent a 6-digit verification code to your email. Please enter it below.</p>
           <div class="form-group">
             <label for="resetOtp">Verification Code</label>
-            <input type="text" id="resetOtp" class="form-input" placeholder="Enter 6-digit code" maxlength="6">
+            <input type="text" id="resetOtp" class="form-input" placeholder="Enter 6-digit code" maxlength="6" pattern="[0-9]{6}" inputmode="numeric">
           </div>
           <button type="button" class="form-button" onclick="verifyResetCode()">Verify Code</button>
           <p style="margin-top: 15px; text-align: center;">
@@ -1423,6 +1423,12 @@
     let resetEmail = '';
     let resetOtpToken = '';
 
+    // Email validation function
+    function isValidEmail(email) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return emailRegex.test(email);
+    }
+
     function showForgotPasswordModal() {
       document.getElementById('forgotPasswordModal').style.display = 'flex';
       document.getElementById('forgotEmail').focus();
@@ -1482,14 +1488,15 @@
 
         if (response.ok) {
           resetEmail = email;
-          showAlert('Reset code sent to your email!', 'success');
+          // Server always returns success message for security reasons
+          showAlert('Reset code sent! Check your email for the verification code.', 'success');
           
           // Move to step 2
           document.getElementById('forgotStep1').style.display = 'none';
           document.getElementById('forgotStep2').style.display = 'block';
           document.getElementById('resetOtp').focus();
         } else {
-          showAlert(data.error || 'Failed to send reset code', 'error');
+          showAlert(data.error || data.message || 'Failed to send reset code', 'error');
         }
       } catch (error) {
         console.error('Reset code error:', error);
@@ -1677,6 +1684,21 @@
           verifyResetCode();
         } else if (activeElement.id === 'newPassword' || activeElement.id === 'confirmNewPassword') {
           resetPassword();
+        }
+      }
+    });
+
+    // Auto-format OTP input (numbers only)
+    document.addEventListener('input', function(event) {
+      if (event.target.id === 'resetOtp') {
+        // Remove non-numeric characters
+        event.target.value = event.target.value.replace(/[^0-9]/g, '');
+        
+        // Auto-submit when 6 digits are entered
+        if (event.target.value.length === 6) {
+          setTimeout(() => {
+            verifyResetCode();
+          }, 500); // Small delay for better UX
         }
       }
     });
