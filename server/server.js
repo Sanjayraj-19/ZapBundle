@@ -387,15 +387,47 @@ app.put('/api/profile', authenticateToken, async (req, res) => {
 // Survey submission endpoint
 app.post('/api/survey', authenticateToken, async (req, res) => {
   try {
-    const survey = req.body;
+    const { answers, completedAt } = req.body;
     const db = client.db('saaslink');
-    await db.collection('surveys').insertOne({ ...survey, userId: req.user.userId, submittedAt: new Date() });
+    
+    // Get user info
+    const user = await usersCollection.findOne({ _id: new ObjectId(req.user.userId) });
+    
+    // Save survey to database
+    await db.collection('surveys').insertOne({ 
+      answers, 
+      userId: req.user.userId, 
+      userEmail: user.email,
+      userName: user.name,
+      completedAt: completedAt || new Date(),
+      submittedAt: new Date() 
+    });
 
     // Mark user as having completed the survey
     await usersCollection.updateOne(
       { _id: new ObjectId(req.user.userId) },
-      { $set: { surveyCompleted: true } }
+      { $set: { surveyCompleted: true, surveyCompletedAt: new Date() } }
     );
+
+    // Format answers for email
+    let answersHTML = '';
+    Object.keys(answers).forEach(questionId => {
+      const questionNum = parseInt(questionId);
+      const surveyQuestions = [
+        { id: 1, question: "What type of business do you run?" },
+        { id: 2, question: "What's your monthly budget for SaaS tools?" },
+        { id: 3, question: "Which categories of SaaS tools do you use most?" },
+        { id: 4, question: "What's your biggest challenge with current SaaS subscriptions?" },
+        { id: 5, question: "How did you hear about SaaSBundilo?" },
+        { id: 6, question: "Any specific SaaS tools you'd like to see in our bundles?" }
+      ];
+      
+      const question = surveyQuestions.find(q => q.id === questionNum);
+      if (question && answers[questionId]) {
+        const answer = Array.isArray(answers[questionId]) ? answers[questionId].join(', ') : answers[questionId];
+        answersHTML += `<b>${question.question}</b><br>${answer}<br><br>`;
+      }
+    });
 
     // Send email to zapbundle@gmail.com
     const transporter = nodemailer.createTransport({
@@ -407,30 +439,38 @@ app.post('/api/survey', authenticateToken, async (req, res) => {
     });
 
     const mailOptions = {
-      from: `"ZapBundle Survey" <${process.env.EMAIL_USER}>`,
+      from: `"SaaSBundilo Survey" <${process.env.EMAIL_USER}>`,
       to: 'zapbundle@gmail.com',
-      subject: `New Survey Submission from ${survey.company_name || survey.email}`,
+      subject: `New Survey Submission from ${user.name || user.email}`,
       html: `
-        <h2>New Survey Submission</h2>
-        <b>Company Name:</b> ${survey.company_name || '-'}<br>
-        <b>Email:</b> ${survey.email}<br>
-        <b>Company Type:</b> ${survey.company_type}<br>
-        <b>Number of SaaS Tools:</b> ${survey.saas_count}<br>
-        <b>Types of SaaS Tools:</b> ${[...(survey.saas_types || []), survey.saas_types_other].filter(Boolean).join(', ')}<br>
-        <b>Monthly Spend:</b> ${survey.monthly_spend}<br>
-        <b>Biggest Challenge:</b> ${survey.challenge || survey.challenge_other}<br>
-        <b>Interested in Bundles:</b> ${survey.interest_bundles}<br>
-        <b>Early Access:</b> ${survey.early_access}<br>
-        <br>
-        <i>Submitted at: ${new Date().toLocaleString()}</i>
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #6366f1;">New Survey Submission</h2>
+          <hr>
+          <p><b>User:</b> ${user.name || 'N/A'}</p>
+          <p><b>Email:</b> ${user.email}</p>
+          <p><b>Completed At:</b> ${new Date(completedAt || new Date()).toLocaleString()}</p>
+          <hr>
+          <h3>Survey Responses:</h3>
+          ${answersHTML}
+          <hr>
+          <p style="color: #666; font-size: 12px;">
+            <i>Submitted via SaaSBundilo Survey System at ${new Date().toLocaleString()}</i>
+          </p>
+        </div>
       `
     };
 
-    await transporter.sendMail(mailOptions);
+    try {
+      await transporter.sendMail(mailOptions);
+      console.log('Survey notification email sent successfully');
+    } catch (emailError) {
+      console.error('Failed to send survey notification email:', emailError);
+      // Don't fail the request if email fails
+    }
 
-    res.json({ message: "Survey submitted and emailed!" });
+    res.json({ message: "Survey submitted successfully!" });
   } catch (err) {
-    console.error(err);
+    console.error('Survey submission error:', err);
     res.status(500).json({ error: "Survey submission failed." });
   }
 });
