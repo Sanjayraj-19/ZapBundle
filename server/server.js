@@ -695,6 +695,14 @@ app.post('/api/verify-otp', async (req, res) => {
       to: user.email,
       subject: '🎉 Welcome to SaaSBundilo - Your SaaS Journey Begins!',
       html: `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Welcome to SaaSBundilo</title>
+        </head>
+        <body style="margin: 0; padding: 20px; background-color: #f8fafc;">
         <div style="font-family: 'Poppins', Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 0; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); background-color: #ffffff;">
           <!-- Header with confetti background -->
           <div style="background: linear-gradient(135deg, #6366f1 0%, #ec4899 100%); padding: 40px 20px; text-align: center; position: relative; overflow: hidden;">
@@ -736,17 +744,22 @@ app.post('/api/verify-otp', async (req, res) => {
             
             <!-- Featured Bundles Preview -->
             <div style="margin-bottom: 35px;">
-              <h3 style="color: #1e293b; font-size: 20px; margin-bottom: 15px;">Popular Bundles You Might Like:</h3>
+              <h3 style="color: #1e293b; font-size: clamp(18px, 4vw, 20px); margin-bottom: 15px;">Popular Bundles You Might Like:</h3>
               <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 15px;">
-                <div style="flex: 1; min-width: 150px; background: linear-gradient(145deg, #f8fafc, #e2e8f0); padding: 15px; border-radius: 10px; text-align: center;">
-                  <div style="font-weight: 600; color: #0f172a; margin-bottom: 5px;">Marketing Suite</div>
-                  <div style="color: #64748b; font-size: 13px;">5 premium tools</div>
-                  <div style="color: #10b981; font-weight: 700; margin-top: 5px;">Save 35%</div>
+                <div style="flex: 1; min-width: 140px; background: linear-gradient(145deg, #f8fafc, #e2e8f0); padding: 15px; border-radius: 10px; text-align: center;">
+                  <div style="font-weight: 600; color: #0f172a; margin-bottom: 5px; font-size: clamp(14px, 3vw, 16px);">Marketing Suite</div>
+                  <div style="color: #64748b; font-size: clamp(12px, 2.5vw, 13px);">5 premium tools</div>
+                  <div style="color: #10b981; font-weight: 700; margin-top: 5px; font-size: clamp(13px, 3vw, 14px);">Save 35%</div>
                 </div>
-                <div style="flex: 1; min-width: 150px; background: linear-gradient(145deg, #f8fafc, #e2e8f0); padding: 15px; border-radius: 10px; text-align: center;">
-                  <div style="font-weight: 600; color: #0f172a; margin-bottom: 5px;">Dev Toolkit</div>
-                  <div style="color: #64748b; font-size: 13px;">7 premium tools</div>
-                  <div style="color: #10b981; font-weight: 700; margin-top: 5px;">Save 42%</div>
+                <div style="flex: 1; min-width: 140px; background: linear-gradient(145deg, #f8fafc, #e2e8f0); padding: 15px; border-radius: 10px; text-align: center;">
+                  <div style="font-weight: 600; color: #0f172a; margin-bottom: 5px; font-size: clamp(14px, 3vw, 16px);">Dev Toolkit</div>
+                  <div style="color: #64748b; font-size: clamp(12px, 2.5vw, 13px);">7 premium tools</div>
+                  <div style="color: #10b981; font-weight: 700; margin-top: 5px; font-size: clamp(13px, 3vw, 14px);">Save 42%</div>
+                </div>
+                <div style="flex: 1; min-width: 140px; background: linear-gradient(145deg, #f8fafc, #e2e8f0); padding: 15px; border-radius: 10px; text-align: center;">
+                  <div style="font-weight: 600; color: #0f172a; margin-bottom: 5px; font-size: clamp(14px, 3vw, 16px);">Business Pro</div>
+                  <div style="color: #64748b; font-size: clamp(12px, 2.5vw, 13px);">8 premium tools</div>
+                  <div style="color: #10b981; font-weight: 700; margin-top: 5px; font-size: clamp(13px, 3vw, 14px);">Save 40%</div>
                 </div>
               </div>
             </div>
@@ -761,20 +774,16 @@ app.post('/api/verify-otp', async (req, res) => {
           
           <!-- Footer -->
           <div style="background-color: #f1f5f9; padding: 30px; text-align: center; border-top: 1px solid #e2e8f0;">
-            <p style="color: #64748b; font-size: 14px; margin: 0 0 10px 0;">
+            <p style="color: #64748b; font-size: 14px; margin: 0 0 20px 0;">
               Need help? Reply to this email or contact us at <a href="mailto:support@saasbundilo.com" style="color: #6366f1; text-decoration: none;">support@saasbundilo.com</a>
             </p>
-            <div style="margin: 20px 0;">
-              <a href="https://twitter.com/saasbundilo" style="display: inline-block; margin: 0 10px;"><img src="https://saasbundilo.com/twitter.png" alt="Twitter" style="width: 24px; height: 24px;"></a>
-              <a href="https://linkedin.com/company/saasbundilo" style="display: inline-block; margin: 0 10px;"><img src="https://saasbundilo.com/linkedin.png" alt="LinkedIn" style="width: 24px; height: 24px;"></a>
-              <a href="https://facebook.com/saasbundilo" style="display: inline-block; margin: 0 10px;"><img src="https://saasbundilo.com/facebook.png" alt="Facebook" style="width: 24px; height: 24px;"></a>
-            </div>
-            <p style="color: #94a3b8; font-size: 12px; margin: 20px 0 0 0;">
-              &copy; 2025 SaaSBundilo. All rights reserved.<br>
-              123 SaaS Street, San Francisco, CA 94103
+            <p style="color: #94a3b8; font-size: 12px; margin: 0;">
+              &copy; 2025 SaaSBundilo. All rights reserved.
             </p>
           </div>
         </div>
+        </body>
+        </html>
       `
     };
     

@@ -1978,6 +1978,19 @@
       renderNavButtonArea();
       updateSurveyButton();
       
+      // Check URL hash for direct actions
+      if (window.location.hash === '#survey') {
+        setTimeout(() => {
+          startSurvey();
+        }, 1000); // Small delay to let page load
+      } else if (window.location.hash === '#bundles') {
+        setTimeout(() => {
+          document.querySelector('.bundles-section').scrollIntoView({ 
+            behavior: 'smooth' 
+          });
+        }, 1000);
+      }
+      
       // Show notification after a delay so users can see the page first
       setTimeout(() => {
         checkAndShowNotification();

@@ -548,6 +548,117 @@
         padding: 0 20px;
       }
     }
+
+    /* Forgot Password Modal Styles */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 10000;
+      backdrop-filter: blur(5px);
+    }
+
+    .modal-content {
+      background: white;
+      border-radius: 20px;
+      width: 90%;
+      max-width: 500px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: var(--shadow-xl);
+      animation: modalSlideIn 0.3s ease-out;
+    }
+
+    @keyframes modalSlideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-50px) scale(0.9);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 25px 30px 15px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .modal-header h3 {
+      color: var(--dark);
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin: 0;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      color: var(--gray);
+      cursor: pointer;
+      padding: 5px;
+      border-radius: 50%;
+      width: 35px;
+      height: 35px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+
+    .modal-close:hover {
+      background: var(--light);
+      color: var(--dark);
+    }
+
+    .modal-body {
+      padding: 25px 30px 30px;
+    }
+
+    .forgot-step {
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateX(20px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    /* Loading state for buttons */
+    .form-button.loading {
+      position: relative;
+      color: transparent;
+    }
+
+    .form-button.loading::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 20px;
+      height: 20px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top: 2px solid white;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: translate(-50%, -50%) rotate(0deg); }
+      100% { transform: translate(-50%, -50%) rotate(360deg); }
+    }
   </style>
 </head>
 <body>
@@ -646,6 +757,63 @@
         <!-- Form Footer -->
         <div class="form-footer">
           <p id="toggleText">Already have an account? <a href="#" onclick="toggleForm()">Login</a></p>
+          <p id="forgotPasswordLink" style="display: none; margin-top: 10px;">
+            <a href="#" onclick="showForgotPasswordModal()" style="color: var(--primary); font-size: 0.9rem;">Forgot Password?</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Forgot Password Modal -->
+  <div id="forgotPasswordModal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Reset Password</h3>
+        <button class="modal-close" onclick="closeForgotPasswordModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <!-- Step 1: Enter Email -->
+        <div id="forgotStep1" class="forgot-step">
+          <p style="margin-bottom: 20px; color: var(--gray);">Enter your email address and we'll send you a verification code to reset your password.</p>
+          <div class="form-group">
+            <label for="forgotEmail">Email Address</label>
+            <input type="email" id="forgotEmail" class="form-input" placeholder="Enter your email">
+          </div>
+          <button type="button" class="form-button" onclick="sendResetCode()">Send Reset Code</button>
+        </div>
+
+        <!-- Step 2: Enter OTP -->
+        <div id="forgotStep2" class="forgot-step" style="display: none;">
+          <p style="margin-bottom: 20px; color: var(--gray);">We've sent a 6-digit verification code to your email. Please enter it below.</p>
+          <div class="form-group">
+            <label for="resetOtp">Verification Code</label>
+            <input type="text" id="resetOtp" class="form-input" placeholder="Enter 6-digit code" maxlength="6">
+          </div>
+          <button type="button" class="form-button" onclick="verifyResetCode()">Verify Code</button>
+          <p style="margin-top: 15px; text-align: center;">
+            <a href="#" onclick="resendResetCode()" style="color: var(--primary); font-size: 0.9rem;">Resend Code</a>
+          </p>
+        </div>
+
+        <!-- Step 3: Set New Password -->
+        <div id="forgotStep3" class="forgot-step" style="display: none;">
+          <p style="margin-bottom: 20px; color: var(--gray);">Create a new password for your account.</p>
+          <div class="form-group">
+            <label for="newPassword">New Password</label>
+            <div class="password-field">
+              <input type="password" id="newPassword" class="form-input" placeholder="Enter new password">
+              <i class="toggle-password fas fa-eye" onclick="togglePasswordVisibility('newPassword', this)"></i>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="confirmNewPassword">Confirm New Password</label>
+            <div class="password-field">
+              <input type="password" id="confirmNewPassword" class="form-input" placeholder="Confirm new password">
+              <i class="toggle-password fas fa-eye" onclick="togglePasswordVisibility('confirmNewPassword', this)"></i>
+            </div>
+          </div>
+          <button type="button" class="form-button" onclick="resetPassword()">Reset Password</button>
         </div>
       </div>
     </div>
@@ -673,6 +841,7 @@
       const toggleText = document.getElementById('toggleText');
       const googleBtnText = document.getElementById('google-btn-text');
       const emailCheck = document.getElementById('emailCheck');
+      const forgotPasswordLink = document.getElementById('forgotPasswordLink');
       
       if (isSignup) {
         formTitle.textContent = 'Create Account';
@@ -682,6 +851,7 @@
         submitButton.textContent = 'Create Account';
         toggleText.innerHTML = 'Already have an account? <a href="#" onclick="toggleForm()">Login</a>';
         googleBtnText.textContent = 'Sign up with Google';
+        forgotPasswordLink.style.display = 'none';
       } else {
         formTitle.textContent = 'Welcome Back';
         formDescription.textContent = 'Log in to access your SaaSBundilo account and manage your SaaS subscriptions.';
@@ -690,6 +860,7 @@
         submitButton.textContent = 'Login';
         toggleText.innerHTML = 'Don\'t have an account? <a href="#" onclick="toggleForm()">Sign up</a>';
         googleBtnText.textContent = 'Login with Google';
+        forgotPasswordLink.style.display = 'block';
       }
       
       // Clear form fields and validation messages
@@ -1244,6 +1415,268 @@
           helperText.style.textAlign = 'center';
           helperText.innerHTML = 'Enter your password and press Enter to start verification polling';
           document.getElementById('password').parentNode.appendChild(helperText);
+        }
+      }
+    });
+
+    // Forgot Password Functions
+    let resetEmail = '';
+    let resetOtpToken = '';
+
+    function showForgotPasswordModal() {
+      document.getElementById('forgotPasswordModal').style.display = 'flex';
+      document.getElementById('forgotEmail').focus();
+      resetForgotPasswordSteps();
+    }
+
+    function closeForgotPasswordModal() {
+      document.getElementById('forgotPasswordModal').style.display = 'none';
+      resetForgotPasswordSteps();
+    }
+
+    function resetForgotPasswordSteps() {
+      // Reset all steps
+      document.getElementById('forgotStep1').style.display = 'block';
+      document.getElementById('forgotStep2').style.display = 'none';
+      document.getElementById('forgotStep3').style.display = 'none';
+      
+      // Clear all inputs
+      document.getElementById('forgotEmail').value = '';
+      document.getElementById('resetOtp').value = '';
+      document.getElementById('newPassword').value = '';
+      document.getElementById('confirmNewPassword').value = '';
+      
+      // Reset variables
+      resetEmail = '';
+      resetOtpToken = '';
+    }
+
+    async function sendResetCode() {
+      const email = document.getElementById('forgotEmail').value.trim();
+      const button = event.target;
+      
+      if (!email) {
+        showAlert('Please enter your email address', 'error');
+        return;
+      }
+
+      if (!isValidEmail(email)) {
+        showAlert('Please enter a valid email address', 'error');
+        return;
+      }
+
+      // Add loading state
+      button.classList.add('loading');
+      button.disabled = true;
+
+      try {
+        const response = await fetch(`${API_URL}/api/forgot-password`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ email })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          resetEmail = email;
+          showAlert('Reset code sent to your email!', 'success');
+          
+          // Move to step 2
+          document.getElementById('forgotStep1').style.display = 'none';
+          document.getElementById('forgotStep2').style.display = 'block';
+          document.getElementById('resetOtp').focus();
+        } else {
+          showAlert(data.error || 'Failed to send reset code', 'error');
+        }
+      } catch (error) {
+        console.error('Reset code error:', error);
+        showAlert('Network error. Please try again.', 'error');
+      } finally {
+        button.classList.remove('loading');
+        button.disabled = false;
+      }
+    }
+
+    async function verifyResetCode() {
+      const otp = document.getElementById('resetOtp').value.trim();
+      const button = event.target;
+      
+      if (!otp) {
+        showAlert('Please enter the verification code', 'error');
+        return;
+      }
+
+      if (otp.length !== 6) {
+        showAlert('Please enter a valid 6-digit code', 'error');
+        return;
+      }
+
+      // Add loading state
+      button.classList.add('loading');
+      button.disabled = true;
+
+      try {
+        const response = await fetch(`${API_URL}/api/verify-reset-otp`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ 
+            email: resetEmail,
+            otp: otp 
+          })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          resetOtpToken = data.resetToken;
+          showAlert('Code verified! Set your new password.', 'success');
+          
+          // Move to step 3
+          document.getElementById('forgotStep2').style.display = 'none';
+          document.getElementById('forgotStep3').style.display = 'block';
+          document.getElementById('newPassword').focus();
+        } else {
+          showAlert(data.error || 'Invalid verification code', 'error');
+        }
+      } catch (error) {
+        console.error('OTP verification error:', error);
+        showAlert('Network error. Please try again.', 'error');
+      } finally {
+        button.classList.remove('loading');
+        button.disabled = false;
+      }
+    }
+
+    async function resendResetCode() {
+      if (!resetEmail) {
+        showAlert('Please start the reset process again', 'error');
+        return;
+      }
+
+      try {
+        const response = await fetch(`${API_URL}/api/forgot-password`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ email: resetEmail })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          showAlert('New reset code sent to your email!', 'success');
+        } else {
+          showAlert(data.error || 'Failed to resend code', 'error');
+        }
+      } catch (error) {
+        console.error('Resend code error:', error);
+        showAlert('Network error. Please try again.', 'error');
+      }
+    }
+
+    async function resetPassword() {
+      const newPassword = document.getElementById('newPassword').value;
+      const confirmPassword = document.getElementById('confirmNewPassword').value;
+      const button = event.target;
+      
+      if (!newPassword || !confirmPassword) {
+        showAlert('Please fill in both password fields', 'error');
+        return;
+      }
+
+      if (newPassword !== confirmPassword) {
+        showAlert('Passwords do not match', 'error');
+        return;
+      }
+
+      if (newPassword.length < 8) {
+        showAlert('Password must be at least 8 characters long', 'error');
+        return;
+      }
+
+      if (!resetOtpToken) {
+        showAlert('Invalid reset session. Please start again.', 'error');
+        resetForgotPasswordSteps();
+        return;
+      }
+
+      // Add loading state
+      button.classList.add('loading');
+      button.disabled = true;
+
+      try {
+        const response = await fetch(`${API_URL}/api/reset-password`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ 
+            resetToken: resetOtpToken,
+            newPassword: newPassword 
+          })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          showAlert('Password reset successfully! You can now login.', 'success');
+          closeForgotPasswordModal();
+          
+          // Switch to login mode if not already
+          if (isSignup) {
+            toggleForm();
+          }
+          
+          // Pre-fill email
+          document.getElementById('email').value = resetEmail;
+          document.getElementById('password').focus();
+        } else {
+          showAlert(data.error || 'Failed to reset password', 'error');
+        }
+      } catch (error) {
+        console.error('Password reset error:', error);
+        showAlert('Network error. Please try again.', 'error');
+      } finally {
+        button.classList.remove('loading');
+        button.disabled = false;
+      }
+    }
+
+    // Helper function for password visibility toggle in modal
+    function togglePasswordVisibility(fieldId, icon) {
+      const field = document.getElementById(fieldId);
+      const isPassword = field.type === 'password';
+      
+      field.type = isPassword ? 'text' : 'password';
+      icon.classList.toggle('fa-eye');
+      icon.classList.toggle('fa-eye-slash');
+    }
+
+    // Close modal when clicking outside
+    document.addEventListener('click', function(event) {
+      const modal = document.getElementById('forgotPasswordModal');
+      if (event.target === modal) {
+        closeForgotPasswordModal();
+      }
+    });
+
+    // Handle Enter key in forgot password inputs
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Enter') {
+        const activeElement = document.activeElement;
+        
+        if (activeElement.id === 'forgotEmail') {
+          sendResetCode();
+        } else if (activeElement.id === 'resetOtp') {
+          verifyResetCode();
+        } else if (activeElement.id === 'newPassword' || activeElement.id === 'confirmNewPassword') {
+          resetPassword();
         }
       }
     });
