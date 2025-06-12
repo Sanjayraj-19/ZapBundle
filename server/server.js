@@ -188,15 +188,15 @@ app.post('/api/register', async (req, res) => {
     });
     
     // Build the verification URL for GitHub Pages with proper path joining
-    let frontendUrl = process.env.FRONTEND_URL || 'https://sanjayraj-19.github.io/FrontEndZapBundle';
+    let frontendUrl = process.env.FRONTEND_URL || 'https://sanjayraj-19.github.io';
     
     // Ensure URL doesn't end with a slash before adding path
     if (frontendUrl.endsWith('/')) {
       frontendUrl = frontendUrl.slice(0, -1);
     }
     
-    // SUPER SIMPLIFIED: Use the simplest possible URL with the simple verify page
-    const verificationUrl = `${frontendUrl}/verify-simple.html?token=${verificationToken}`;
+    // Use the correct path to verify-simple.html
+    const verificationUrl = `${frontendUrl}/SaaSLink/client/verify-simple.html?token=${verificationToken}`;
     
     // Log for debugging
     console.log('Generated verification URL:', verificationUrl);
@@ -220,9 +220,9 @@ app.post('/api/register', async (req, res) => {
         <div style="font-family: 'Poppins', Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 0; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); background-color: #ffffff;">
           <!-- Header with gradient background -->
           <div style="background: linear-gradient(135deg, #6366f1 0%, #06b6d4 100%); padding: 40px 20px; text-align: center;">
-            <img src="https://saasbundilo.com/logo.png" alt="SaaSBundilo" style="width: 80px; height: 80px; border-radius: 16px; background: white; padding: 10px; margin-bottom: 20px; box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);">
-            <h1 style="color: white; margin: 0; font-size: 28px; font-weight: 700;">Verify Your Email</h1>
-            <p style="color: rgba(255, 255, 255, 0.9); font-size: 16px; margin-top: 10px;">You're just one click away from saving on SaaS!</p>
+            <h1 style="color: white; margin: 0; font-size: 28px; font-weight: 700;">SaaSBundilo</h1>
+            <h2 style="color: white; margin: 10px 0; font-size: 24px; font-weight: 700;">Verify Your Email</h2>
+            <p style="color: rgba(255, 255, 255, 0.9); font-size: 16px; margin-top: 10px;">You're just one click away from accessing your account!</p>
           </div>
           
           <!-- Content area -->
@@ -230,16 +230,15 @@ app.post('/api/register', async (req, res) => {
             <h2 style="color: #1e293b; font-size: 22px; margin-top: 0;">Hello ${name || 'there'}! 👋</h2>
             
             <p style="color: #475569; font-size: 16px; line-height: 1.6; margin-bottom: 25px;">
-              Thanks for joining SaaSBundilo! We're excited to help you discover and save on premium SaaS subscriptions.
+              Thanks for joining SaaSBundilo! We're excited to have you on board.
             </p>
             
             <div style="background-color: #f8fafc; border-left: 4px solid #6366f1; padding: 20px; margin-bottom: 25px; border-radius: 6px;">
               <p style="color: #1e293b; font-size: 16px; margin: 0 0 15px 0; font-weight: 600;">Why verify?</p>
               <ul style="color: #475569; padding-left: 20px; margin: 0;">
-                <li style="margin-bottom: 8px;">Unlock exclusive SaaS bundle deals</li>
-                <li style="margin-bottom: 8px;">Save up to 40% on your subscriptions</li>
-                <li style="margin-bottom: 8px;">Get personalized recommendations</li>
-                <li>Manage all your SaaS tools in one place</li>
+                <li style="margin-bottom: 8px;">Secure your account</li>
+                <li style="margin-bottom: 8px;">Access all features</li>
+                <li>Get started right away</li>
               </ul>
             </div>
             
@@ -257,17 +256,11 @@ app.post('/api/register', async (req, res) => {
           
           <!-- Footer -->
           <div style="background-color: #f1f5f9; padding: 30px; text-align: center; border-top: 1px solid #e2e8f0;">
-            <p style="color: #64748b; font-size: 14px; margin: 0 0 10px 0;">
+            <p style="color: #64748b; font-size: 14px; margin: 0;">
               Need help? Reply to this email or contact us at <a href="mailto:support@saasbundilo.com" style="color: #6366f1; text-decoration: none;">support@saasbundilo.com</a>
             </p>
-            <div style="margin: 20px 0;">
-              <a href="https://twitter.com/saasbundilo" style="display: inline-block; margin: 0 10px;"><img src="https://saasbundilo.com/twitter.png" alt="Twitter" style="width: 24px; height: 24px;"></a>
-              <a href="https://linkedin.com/company/saasbundilo" style="display: inline-block; margin: 0 10px;"><img src="https://saasbundilo.com/linkedin.png" alt="LinkedIn" style="width: 24px; height: 24px;"></a>
-              <a href="https://facebook.com/saasbundilo" style="display: inline-block; margin: 0 10px;"><img src="https://saasbundilo.com/facebook.png" alt="Facebook" style="width: 24px; height: 24px;"></a>
-            </div>
             <p style="color: #94a3b8; font-size: 12px; margin: 20px 0 0 0;">
-              &copy; 2025 SaaSBundilo. All rights reserved.<br>
-              123 SaaS Street, San Francisco, CA 94103
+              &copy; 2024 SaaSBundilo. All rights reserved.
             </p>
           </div>
         </div>
