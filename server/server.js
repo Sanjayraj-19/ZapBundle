@@ -387,27 +387,48 @@ app.put('/api/profile', authenticateToken, async (req, res) => {
 // Survey submission endpoint
 app.post('/api/survey', authenticateToken, async (req, res) => {
   try {
-    const { answers, completedAt } = req.body;
+    const { answers, completedAt, isComplete } = req.body;
     const db = client.db('saaslink');
     
     // Get user info
     const user = await usersCollection.findOne({ _id: new ObjectId(req.user.userId) });
     
-    // Save survey to database
-    await db.collection('surveys').insertOne({ 
+    // Check if user already has a survey
+    const existingSurvey = await db.collection('surveys').findOne({ 
+      userId: req.user.userId 
+    });
+    
+    const surveyData = {
       answers, 
       userId: req.user.userId, 
       userEmail: user.email,
       userName: user.name,
-      completedAt: completedAt || new Date(),
-      submittedAt: new Date() 
-    });
+      isComplete: isComplete || false,
+      lastUpdated: new Date(),
+      completedAt: isComplete ? (completedAt || new Date()) : null
+    };
+    
+    if (existingSurvey) {
+      // Update existing survey
+      await db.collection('surveys').updateOne(
+        { userId: req.user.userId },
+        { 
+          $set: surveyData
+        }
+      );
+    } else {
+      // Create new survey
+      surveyData.createdAt = new Date();
+      await db.collection('surveys').insertOne(surveyData);
+    }
 
-    // Mark user as having completed the survey
-    await usersCollection.updateOne(
-      { _id: new ObjectId(req.user.userId) },
-      { $set: { surveyCompleted: true, surveyCompletedAt: new Date() } }
-    );
+    // Only mark user as completed if survey is actually complete
+    if (isComplete) {
+      await usersCollection.updateOne(
+        { _id: new ObjectId(req.user.userId) },
+        { $set: { surveyCompleted: true, surveyCompletedAt: new Date() } }
+      );
+    }
 
     // Format answers for email
     let answersHTML = '';
@@ -468,10 +489,41 @@ app.post('/api/survey', authenticateToken, async (req, res) => {
       // Don't fail the request if email fails
     }
 
-    res.json({ message: "Survey submitted successfully!" });
+    res.json({ message: "Survey submitted successfully!", isComplete: isComplete });
   } catch (err) {
     console.error('Survey submission error:', err);
     res.status(500).json({ error: "Survey submission failed." });
+  }
+});
+
+// Get user's survey data
+app.get('/api/survey', authenticateToken, async (req, res) => {
+  try {
+    const db = client.db('saaslink');
+    
+    // Get user's existing survey
+    const survey = await db.collection('surveys').findOne({ 
+      userId: req.user.userId 
+    });
+    
+    if (survey) {
+      res.json({
+        answers: survey.answers || {},
+        isComplete: survey.isComplete || false,
+        completedAt: survey.completedAt,
+        lastUpdated: survey.lastUpdated
+      });
+    } else {
+      res.json({
+        answers: {},
+        isComplete: false,
+        completedAt: null,
+        lastUpdated: null
+      });
+    }
+  } catch (err) {
+    console.error('Get survey error:', err);
+    res.status(500).json({ error: "Failed to get survey data." });
   }
 });
 

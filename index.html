@@ -1428,9 +1428,34 @@
               alert('Thank you for completing our survey! 🎉');
             };
           } else {
-            // User has not completed the survey
-            surveyBtn.innerHTML = '<i class="fas fa-clipboard-list"></i> Take the Survey';
-            surveyBtn.style.background = ''; // Reset background
+            // Check if user has partial survey data
+            try {
+              const surveyResponse = await fetch('https://zapbundle.onrender.com/api/survey', {
+                headers: {
+                  'Authorization': 'Bearer ' + token
+                }
+              });
+              
+              if (surveyResponse.ok) {
+                const surveyData = await surveyResponse.json();
+                const hasPartialData = Object.keys(surveyData.answers || {}).length > 0;
+                
+                if (hasPartialData) {
+                  surveyBtn.innerHTML = '<i class="fas fa-edit"></i> Continue Survey';
+                  surveyBtn.style.background = 'linear-gradient(135deg, var(--warning) 0%, var(--secondary) 100%)';
+                } else {
+                  surveyBtn.innerHTML = '<i class="fas fa-clipboard-list"></i> Take the Survey';
+                  surveyBtn.style.background = ''; // Reset background
+                }
+              } else {
+                surveyBtn.innerHTML = '<i class="fas fa-clipboard-list"></i> Take the Survey';
+                surveyBtn.style.background = ''; // Reset background
+              }
+            } catch (surveyError) {
+              surveyBtn.innerHTML = '<i class="fas fa-clipboard-list"></i> Take the Survey';
+              surveyBtn.style.background = ''; // Reset background
+            }
+            
             surveyBtn.onclick = startSurvey;
           }
         } else {
@@ -1994,27 +2019,32 @@
       }
 
       try {
-        // Check if survey already completed in database
-        const response = await fetch('https://zapbundle.onrender.com/api/profile', {
+        // Load existing survey data
+        const surveyResponse = await fetch('https://zapbundle.onrender.com/api/survey', {
           headers: {
             'Authorization': 'Bearer ' + token
           }
         });
         
-        if (response.ok) {
-          const profile = await response.json();
-          if (profile.surveyCompleted) {
+        if (surveyResponse.ok) {
+          const surveyData = await surveyResponse.json();
+          
+          if (surveyData.isComplete) {
             alert('You have already completed the survey. Thank you!');
             return;
           }
+          
+          // Load existing answers if any
+          surveyAnswers = surveyData.answers || {};
+          console.log('Loaded existing survey data:', surveyAnswers);
         }
       } catch (error) {
-        console.error('Error checking survey status:', error);
-        // Continue with survey if API call fails
+        console.error('Error loading survey data:', error);
+        // Continue with empty survey if API call fails
+        surveyAnswers = {};
       }
 
       currentQuestionIndex = 0;
-      surveyAnswers = {};
       document.getElementById('surveyModal').style.display = 'block';
       document.body.style.overflow = 'hidden'; // Prevent background scrolling
       showQuestion(currentQuestionIndex);
@@ -2113,6 +2143,32 @@
       } else if (type === 'text') {
         surveyAnswers[questionId] = value;
       }
+      
+      // Auto-save progress after each answer
+      autoSaveProgress();
+    }
+
+    // Auto-save survey progress
+    async function autoSaveProgress() {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+      
+      try {
+        await fetch('https://zapbundle.onrender.com/api/survey', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify({
+            answers: surveyAnswers,
+            isComplete: false
+          })
+        });
+        console.log('Progress auto-saved');
+      } catch (error) {
+        console.error('Auto-save failed:', error);
+      }
     }
 
     function updateNavigationButtons(index, question) {
@@ -2169,6 +2225,16 @@
     async function submitSurvey() {
       try {
         const token = localStorage.getItem('token');
+        
+        // Check if all required questions are answered
+        const requiredQuestions = surveyQuestions.filter(q => q.required);
+        const unansweredRequired = requiredQuestions.filter(q => 
+          !surveyAnswers[q.id] || 
+          (Array.isArray(surveyAnswers[q.id]) && surveyAnswers[q.id].length === 0)
+        );
+        
+        const isComplete = unansweredRequired.length === 0;
+        
         const response = await fetch('https://zapbundle.onrender.com/api/survey', {
           method: 'POST',
           headers: {
@@ -2177,13 +2243,21 @@
           },
           body: JSON.stringify({
             answers: surveyAnswers,
-            completedAt: new Date().toISOString()
+            completedAt: new Date().toISOString(),
+            isComplete: isComplete
           })
         });
 
         if (response.ok) {
-          // Show thank you message
-          showThankYou();
+          const result = await response.json();
+          
+          if (isComplete) {
+            // Show completion thank you message
+            showThankYou(true);
+          } else {
+            // Show partial submission message
+            showThankYou(false, unansweredRequired);
+          }
           
           // Update survey button to reflect database status
           updateSurveyButton();
@@ -2196,23 +2270,44 @@
       }
     }
 
-    function showThankYou() {
+    function showThankYou(isComplete = true, unansweredQuestions = []) {
       const container = document.getElementById('surveyQuestionContainer');
-      container.innerHTML = `
-        <div class="survey-thank-you">
-          <h3>🎉 Thank You!</h3>
-          <p>Your responses help us create better SaaS bundles for businesses like yours.</p>
-          <p>We'll notify you when new bundles matching your needs are available!</p>
-        </div>
-      `;
+      
+      if (isComplete) {
+        container.innerHTML = `
+          <div class="survey-thank-you">
+            <h3>🎉 Survey Completed!</h3>
+            <p>Thank you for completing our survey! Your responses help us create better SaaS bundles for businesses like yours.</p>
+            <p>We'll notify you when new bundles matching your needs are available!</p>
+          </div>
+        `;
+        
+        // Auto-close after 3 seconds for completed surveys
+        setTimeout(() => {
+          closeSurvey();
+        }, 3000);
+      } else {
+        const unansweredList = unansweredQuestions.map(q => `• ${q.question}`).join('<br>');
+        container.innerHTML = `
+          <div class="survey-thank-you">
+            <h3>📝 Progress Saved!</h3>
+            <p>Your responses have been saved. You can continue the survey anytime by clicking "Take the Survey" again.</p>
+            <div style="margin: 20px 0; padding: 15px; background-color: #fff3cd; border-radius: 8px; border-left: 4px solid #ffc107;">
+              <strong>Still need to answer:</strong><br>
+              ${unansweredList}
+            </div>
+            <p><small>Complete all required questions to finish your survey!</small></p>
+          </div>
+        `;
+        
+        // Auto-close after 5 seconds for partial submissions
+        setTimeout(() => {
+          closeSurvey();
+        }, 5000);
+      }
       
       // Hide navigation buttons
       document.querySelector('.survey-navigation').style.display = 'none';
-      
-      // Auto-close after 3 seconds
-      setTimeout(() => {
-        closeSurvey();
-      }, 3000);
     }
 
     // Event listeners for navigation buttons
