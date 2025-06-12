@@ -18,7 +18,7 @@ function generateOTP() {
 
 // Helper function to hash OTP for secure storage
 async function hashOTP(otp) {
-  return await bcrypt.hash(otp, 12);
+  return await bcrypt.hash(otp, 8); // Using fewer rounds for OTP as it's temporary
 }
 
 dotenv.config();
@@ -124,15 +124,7 @@ passport.use(new GoogleStrategy({
   return done(null, user);
 }));
 
-// Helper function to generate a 6-digit OTP
-function generateOTP() {
-  return Math.floor(100000 + Math.random() * 900000).toString();
-}
 
-// Helper function to hash OTP for secure storage
-async function hashOTP(otp) {
-  return await bcrypt.hash(otp, 8); // Using fewer rounds for OTP as it's temporary
-}
 
 // Register
 app.post('/api/register', async (req, res) => {
