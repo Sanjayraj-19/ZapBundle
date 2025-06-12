@@ -45,40 +45,81 @@ async function connectDB() {
 }
 connectDB();
 
-// Middleware
+// Middleware - Enhanced CORS configuration
 app.use(cors({
-  origin: ["https://sanjayraj-19.github.io/ZapBundle", "https://sanjayraj-19.github.io", "http://localhost:5500", "http://127.0.0.1:5500"],
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    const allowedOrigins = [
+      'https://sanjayraj-19.github.io',
+      'https://sanjayraj-19.github.io/ZapBundle',
+      'http://localhost:5500',
+      'http://127.0.0.1:5500',
+      'http://localhost:3000',
+      'http://127.0.0.1:3000'
+    ];
+    
+    // Check if the origin is in the allowed list or contains sanjayraj-19.github.io
+    if (allowedOrigins.includes(origin) || origin.includes('sanjayraj-19.github.io')) {
+      callback(null, true);
+    } else {
+      console.log('CORS blocked origin:', origin);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
+  exposedHeaders: ['Content-Length', 'X-Foo', 'X-Bar'],
+  maxAge: 86400 // 24 hours
 }));
 
-// Set additional headers for CORS
+// Additional CORS headers middleware
 app.use((req, res, next) => {
   const origin = req.headers.origin;
-  // Allow requests from GitHub Pages and localhost
+  
+  // Log all requests for debugging
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.url} from origin: ${origin || 'no-origin'}`);
+  
+  // Set CORS headers explicitly
   if (origin && (origin.includes('sanjayraj-19.github.io') || origin.includes('localhost') || origin.includes('127.0.0.1'))) {
     res.header('Access-Control-Allow-Origin', origin);
+    res.header('Access-Control-Allow-Credentials', 'true');
   }
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  res.header('Access-Control-Allow-Credentials', 'true');
+  
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  res.header('Access-Control-Max-Age', '86400');
+  
+  // Handle preflight requests
   if (req.method === 'OPTIONS') {
-    return res.sendStatus(200);
+    console.log('Handling OPTIONS preflight request from:', origin);
+    return res.status(200).end();
   }
+  
   next();
 });
 app.use(express.json());
 
-// Add logging middleware for debugging
-app.use('/api', (req, res, next) => {
-  console.log(`${new Date().toISOString()} - ${req.method} ${req.path} from ${req.headers.origin || 'unknown origin'}`);
-  next();
+// Test endpoint for debugging CORS
+app.get('/api/test', (req, res) => {
+  res.json({ 
+    message: 'API is working', 
+    timestamp: new Date().toISOString(),
+    origin: req.headers.origin || 'no-origin',
+    method: req.method,
+    headers: req.headers
+  });
 });
 
-// Test endpoint for debugging
-app.get('/api/test', (req, res) => {
-  res.json({ message: 'API is working', timestamp: new Date().toISOString() });
+// CORS test endpoint
+app.get('/api/cors-test', (req, res) => {
+  res.json({ 
+    message: 'CORS is working correctly',
+    origin: req.headers.origin,
+    timestamp: new Date().toISOString()
+  });
 });
 
 // Simple test endpoint without dependencies

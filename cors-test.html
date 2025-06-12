@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CORS Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .success {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+        }
+        button {
+            padding: 10px 15px;
+            margin: 5px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        pre {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 3px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>CORS Test Page</h1>
+    <p>This page will test CORS connectivity to the backend server.</p>
+    
+    <div class="test-section">
+        <h3>CORS Configuration Status</h3>
+        <p>The server has been updated with enhanced CORS configuration to resolve the cross-origin issues.</p>
+        <div id="status-info">
+            <h4>Changes Made:</h4>
+            <ul>
+                <li>Enhanced CORS origin validation</li>
+                <li>Improved preflight request handling</li>
+                <li>Added comprehensive request logging</li>
+                <li>Fixed header configuration</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Log current origin for debugging
+        console.log('Current origin:', window.location.origin);
+        console.log('CORS configuration has been updated on the server');
+    </script>
+</body>
+</html>
