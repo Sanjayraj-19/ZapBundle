@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login Failed - SaaSBundilo</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #333;
+    }
+
+    .container {
+      background: white;
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      max-width: 500px;
+      width: 90%;
+    }
+
+    .error-icon {
+      font-size: 4rem;
+      color: #e74c3c;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      color: #2c3e50;
+      margin-bottom: 15px;
+      font-size: 2rem;
+    }
+
+    p {
+      color: #7f8c8d;
+      margin-bottom: 30px;
+      line-height: 1.6;
+      font-size: 1.1rem;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 12px 30px;
+      background: linear-gradient(135deg, #6366f1 0%, #06b6d4 100%);
+      color: white;
+      text-decoration: none;
+      border-radius: 50px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      margin: 0 10px;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn-secondary {
+      background: #95a5a6;
+    }
+
+    .btn-secondary:hover {
+      background: #7f8c8d;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <i class="fas fa-exclamation-triangle error-icon"></i>
+    <h1>Login Failed</h1>
+    <p>We encountered an issue while trying to sign you in with Google. This could be due to:</p>
+    <ul style="text-align: left; margin-bottom: 30px; color: #7f8c8d;">
+      <li>You cancelled the Google authentication process</li>
+      <li>There was a temporary server issue</li>
+      <li>Your Google account doesn't have the required permissions</li>
+    </ul>
+    <div>
+      <a href="signup.html" class="btn">
+        <i class="fas fa-redo"></i> Try Again
+      </a>
+      <a href="index.html" class="btn btn-secondary">
+        <i class="fas fa-home"></i> Go Home
+      </a>
+    </div>
+  </div>
+
+  <script>
+    // Auto-redirect after 10 seconds
+    setTimeout(() => {
+      window.location.href = 'signup.html';
+    }, 10000);
+  </script>
+</body>
+</html>

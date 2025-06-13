@@ -696,7 +696,7 @@
         
         <!-- Social Login -->
         <div class="social-login">
-          <button class="google-btn" onclick="window.location.href='https://zapbundle.onrender.com/api/auth/google'">
+          <button class="google-btn" onclick="handleGoogleSignIn()">
             <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" style="height: 20px; width: 20px; object-fit: contain; margin-right: 8px;">
             <span id="google-btn-text">Sign up with Google</span>
           </button>
@@ -1752,6 +1752,24 @@
         }
       }
     });
+
+    // Handle Google Sign-In
+    async function handleGoogleSignIn() {
+      try {
+        // Check server connectivity first
+        const isServerOnline = await checkServerConnection();
+        if (!isServerOnline) {
+          showAlert('Unable to connect to authentication server. Please try again later.', 'error');
+          return;
+        }
+        
+        // Redirect to Google OAuth
+        window.location.href = `${API_URL}/api/auth/google`;
+      } catch (error) {
+        console.error('Google sign-in error:', error);
+        showAlert('Failed to initiate Google sign-in. Please try again.', 'error');
+      }
+    }
 
     // Auto-format OTP input (numbers only) and handle password strength
     document.addEventListener('input', function(event) {
