@@ -627,6 +627,128 @@
       box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
     }
     
+    .form-input[readonly] {
+      background-color: #f8f9fa !important;
+      cursor: not-allowed !important;
+      color: #6c757d;
+      border-color: #dee2e6;
+    }
+    
+    .form-input[readonly]:focus {
+      box-shadow: none;
+      border-color: #dee2e6;
+    }
+    
+    .auto-filled-note {
+      color: #6c757d !important;
+      font-size: 0.85rem !important;
+      margin-top: 4px !important;
+      display: block !important;
+      font-style: italic;
+    }
+
+    /* Contact Form Notification Styles */
+    .notification-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 10000;
+      backdrop-filter: blur(5px);
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    .notification-content {
+      background: white;
+      padding: 40px;
+      border-radius: 20px;
+      text-align: center;
+      max-width: 400px;
+      width: 90%;
+      box-shadow: var(--shadow-xl);
+      animation: slideUp 0.3s ease-out;
+    }
+
+    .notification-icon {
+      font-size: 4rem;
+      color: var(--success);
+      margin-bottom: 20px;
+    }
+
+    .notification-content h3 {
+      color: var(--dark);
+      margin-bottom: 15px;
+      font-size: 1.5rem;
+    }
+
+    .notification-content p {
+      color: var(--gray);
+      margin-bottom: 25px;
+      line-height: 1.6;
+    }
+
+    .notification-btn {
+      background: var(--gradient-1);
+      color: white;
+      padding: 12px 30px;
+      border-radius: 50px;
+      border: none;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: var(--shadow-md);
+    }
+
+    .notification-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .submit-button.loading {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+
+    .submit-button.loading .btn-text {
+      display: none;
+    }
+
+    .submit-button.loading::after {
+      content: 'Sending...';
+      display: inline-block;
+    }
+
+    .submit-button.loading .btn-icon {
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes slideUp {
+      from { 
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to { 
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    
     .form-textarea {
       height: 150px;
       resize: vertical;
@@ -1322,11 +1444,18 @@
   <section class="contact-section" id="contact-us">
     <div class="contact-container fade-in">
       <h2>Contact Us</h2>
+      <div id="contact-welcome-message" style="display: none; background: linear-gradient(135deg, #e8f5e8 0%, #f0f8ff 100%); padding: 15px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid var(--success);">
+        <p style="margin: 0; color: var(--dark); font-size: 0.95rem;">
+          <i class="fas fa-user-check" style="color: var(--success); margin-right: 8px;"></i>
+          <span id="welcome-user-name"></span>, we've pre-filled your information to make this easier!
+        </p>
+      </div>
       <form action="https://formsubmit.co/zapbundle@gmail.com" method="POST" class="contact-form">
         <!-- FormSubmit Configuration -->
         <input type="hidden" name="_subject" value="New Contact Form Submission - SaaSBundilo">
-        <input type="hidden" name="_next" value="https://sanjayraj-19.github.io/ZapBundle/index.html#contact-us">
+        <input type="hidden" name="_next" value="https://sanjayraj-19.github.io/ZapBundle/index.html#contact-success">
         <input type="hidden" name="_captcha" value="false">
+        <input type="hidden" name="_template" value="table">
         
         <div class="form-group">
           <label for="name" class="form-label">Your Name</label>
@@ -1343,10 +1472,25 @@
           <textarea id="message" name="message" class="form-input form-textarea" required></textarea>
         </div>
         
-        <button type="submit" class="submit-button">Send Message</button>
+        <button type="submit" class="submit-button" id="contact-submit-btn">
+          <span class="btn-text">Send Message</span>
+          <i class="fas fa-paper-plane btn-icon" style="margin-left: 8px;"></i>
+        </button>
       </form>
     </div>
   </section>
+
+  <!-- Contact Form Success Notification -->
+  <div id="contact-success-notification" class="notification-overlay" style="display: none;">
+    <div class="notification-content">
+      <div class="notification-icon">
+        <i class="fas fa-check-circle"></i>
+      </div>
+      <h3>Message Sent Successfully!</h3>
+      <p>Thank you for contacting us. We'll get back to you within 24 hours.</p>
+      <button onclick="closeContactNotification()" class="notification-btn">Got it!</button>
+    </div>
+  </div>
   
   <!-- Footer -->
   <footer class="footer">
@@ -1977,11 +2121,160 @@
 
 
     
+    // Auto-fill contact form for signed-in users
+    async function initializeContactForm() {
+      const profile = await getProfile();
+      if (profile) {
+        // Show welcome message
+        const welcomeMessage = document.getElementById('contact-welcome-message');
+        const welcomeUserName = document.getElementById('welcome-user-name');
+        if (welcomeMessage && welcomeUserName) {
+          welcomeUserName.textContent = `Hello ${profile.name || 'there'}`;
+          welcomeMessage.style.display = 'block';
+        }
+        
+        const nameField = document.getElementById('name');
+        const emailField = document.getElementById('email');
+        
+        if (nameField && profile.name) {
+          nameField.value = profile.name;
+        }
+        
+        if (emailField && profile.email) {
+          emailField.value = profile.email;
+          emailField.readOnly = true;
+          emailField.style.backgroundColor = '#f8f9fa';
+          emailField.style.cursor = 'not-allowed';
+          
+          // Add a note for the user
+          const emailGroup = emailField.closest('.form-group');
+          if (emailGroup && !emailGroup.querySelector('.auto-filled-note')) {
+            const note = document.createElement('small');
+            note.className = 'auto-filled-note';
+            note.style.color = '#6c757d';
+            note.style.fontSize = '0.85rem';
+            note.style.marginTop = '4px';
+            note.style.display = 'block';
+            note.innerHTML = '<i class="fas fa-info-circle"></i> Email auto-filled from your account';
+            emailGroup.appendChild(note);
+          }
+        }
+        
+        // Update form subject to include user info for signed-in users
+        const form = document.querySelector('.contact-form');
+        const subjectField = form.querySelector('input[name="_subject"]');
+        if (subjectField && profile.name) {
+          subjectField.value = `Contact Form - ${profile.name} (Registered User)`;
+        }
+      }
+      
+      // Set up form submission handling
+      setupContactFormSubmission();
+    }
+
+    // Handle contact form submission with notification
+    function setupContactFormSubmission() {
+      const form = document.querySelector('.contact-form');
+      const submitBtn = document.getElementById('contact-submit-btn');
+      
+      if (form && submitBtn) {
+        form.addEventListener('submit', function(e) {
+          // Show loading state
+          submitBtn.classList.add('loading');
+          submitBtn.disabled = true;
+          
+          // Form will submit to FormSubmit.co and redirect back with #contact-success
+          // The notification will be shown when the page reloads with that hash
+        });
+      }
+    }
+
+    // Show contact form success notification
+    async function showContactSuccessNotification() {
+      const notification = document.getElementById('contact-success-notification');
+      if (notification) {
+        // Personalize the notification for signed-in users
+        const profile = await getProfile();
+        const notificationContent = notification.querySelector('.notification-content');
+        
+        if (profile && notificationContent) {
+          const heading = notificationContent.querySelector('h3');
+          const message = notificationContent.querySelector('p');
+          
+          if (heading) {
+            heading.textContent = `Thank you, ${profile.name}!`;
+          }
+          
+          if (message) {
+            message.textContent = `Your message has been sent successfully. We'll respond to ${profile.email} within 24 hours.`;
+          }
+        }
+        
+        notification.style.display = 'flex';
+        
+        // Reset form after showing notification
+        setTimeout(() => {
+          const form = document.querySelector('.contact-form');
+          const submitBtn = document.getElementById('contact-submit-btn');
+          
+          if (form) {
+            // Reset form fields (except auto-filled ones)
+            const messageField = document.getElementById('message');
+            if (messageField) messageField.value = '';
+            
+            // Only reset name and email if user is not signed in
+            if (!profile) {
+              const nameField = document.getElementById('name');
+              const emailField = document.getElementById('email');
+              if (nameField) nameField.value = '';
+              if (emailField) emailField.value = '';
+            }
+          }
+          
+          if (submitBtn) {
+            submitBtn.classList.remove('loading');
+            submitBtn.disabled = false;
+          }
+        }, 500);
+      }
+    }
+
+    // Close contact notification
+    function closeContactNotification() {
+      const notification = document.getElementById('contact-success-notification');
+      if (notification) {
+        notification.style.display = 'none';
+      }
+    }
+
+    // Add keyboard support for closing notification
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        const notification = document.getElementById('contact-success-notification');
+        if (notification && notification.style.display === 'flex') {
+          closeContactNotification();
+        }
+      }
+    });
+
+    // Close notification when clicking outside the content
+    document.addEventListener('click', function(e) {
+      const notification = document.getElementById('contact-success-notification');
+      const notificationContent = document.querySelector('.notification-content');
+      
+      if (notification && notification.style.display === 'flex') {
+        if (e.target === notification && !notificationContent.contains(e.target)) {
+          closeContactNotification();
+        }
+      }
+    });
+
     // Ensure this runs after DOM is fully loaded
     window.addEventListener('DOMContentLoaded', function() {
       clearOldSurveyData(); // Clear old localStorage data
       renderNavButtonArea();
       updateSurveyButton();
+      initializeContactForm(); // Auto-fill contact form for signed-in users
       
       // Check URL hash for direct actions
       if (window.location.hash === '#survey') {
@@ -1994,6 +2287,16 @@
             behavior: 'smooth' 
           });
         }, 1000);
+      } else if (window.location.hash === '#contact-success') {
+        setTimeout(() => {
+          showContactSuccessNotification();
+          // Scroll to contact section
+          document.querySelector('.contact-section').scrollIntoView({ 
+            behavior: 'smooth' 
+          });
+          // Clean up the URL hash
+          history.replaceState(null, null, window.location.pathname);
+        }, 500);
       }
       
       // Show notification after a delay so users can see the page first
