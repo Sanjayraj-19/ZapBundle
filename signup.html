@@ -1466,20 +1466,6 @@
     let resetEmail = '';
     let resetOtpToken = '';
 
-    // Check server connectivity
-    async function checkServerConnection() {
-      try {
-        const response = await fetch(`${API_URL}/api/health`, { 
-          method: 'GET',
-          timeout: 5000 
-        });
-        return response.ok;
-      } catch (error) {
-        console.warn('Server connectivity check failed:', error);
-        return false;
-      }
-    }
-
     function showForgotPasswordModal() {
       document.getElementById('forgotPasswordModal').style.display = 'flex';
       document.getElementById('forgotEmail').focus();
@@ -1754,20 +1740,27 @@
     });
 
     // Handle Google Sign-In
-    async function handleGoogleSignIn() {
+    function handleGoogleSignIn() {
+      const button = document.querySelector('.google-btn');
+      const originalText = button.innerHTML;
+      
       try {
-        // Check server connectivity first
-        const isServerOnline = await checkServerConnection();
-        if (!isServerOnline) {
-          showAlert('Unable to connect to authentication server. Please try again later.', 'error');
-          return;
-        }
+        // Show loading feedback
+        button.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right: 8px;"></i> Connecting to Google...';
+        button.disabled = true;
         
-        // Redirect to Google OAuth
-        window.location.href = `${API_URL}/api/auth/google`;
+        // Small delay to show loading state, then redirect
+        setTimeout(() => {
+          window.location.href = `${API_URL}/api/auth/google`;
+        }, 300);
+        
       } catch (error) {
         console.error('Google sign-in error:', error);
         showAlert('Failed to initiate Google sign-in. Please try again.', 'error');
+        
+        // Reset button state
+        button.innerHTML = originalText;
+        button.disabled = false;
       }
     }
 

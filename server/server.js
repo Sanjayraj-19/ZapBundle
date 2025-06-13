@@ -113,6 +113,16 @@ app.get('/api/test', (req, res) => {
   });
 });
 
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+  res.json({ 
+    status: 'healthy',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    server: 'SaaSBundilo Backend'
+  });
+});
+
 // CORS test endpoint
 app.get('/api/cors-test', (req, res) => {
   res.json({ 
